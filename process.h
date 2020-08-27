@@ -14,6 +14,8 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QThread>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QTableView>
 #include <QGridLayout>
 #include "EDM/EDM.h"
@@ -38,6 +40,7 @@ private:
     void showFileText();
     void createMenus();
     void createActions();
+    void MacProcessOperate();
 private:
     EDM* edm;
     EDM_OP_List* edmOpList;
@@ -45,6 +48,7 @@ private:
     QString strSysPath;
     QString strOpName;
     QThread* tThread;
+    QMutex mutex;
     Program* program;
     QStatusBar* statBar;
     QAction* processAction;

@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QtConcurrent>
 
 extern QString path;
 Process::Process(QWidget *parent): QMainWindow(parent)
@@ -199,6 +200,31 @@ void Process::createActions()
     connect(pauseAction,&QAction::triggered,this,&Process::pause);
 
 }
+
+//加工线程
+void Process::MacProcessOperate()
+{
+    while (true)
+    {
+        QMutexLocker lock(&mutex);
+        if (pDlg->m_pEdm)
+        {
+            if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
+                pDlg->HandleOpMsg(&msg);
+            pDlg->HandleEdmOpStatus();
+
+            if (edmOpList)
+            {
+                edmOpList->CarryOn();
+            }
+        }
+        QThread::msleep(OPERATE_TRREAD_SLEEP_TIME);
+    }
+    EDM_OP_List::DeleteEdmOpList();
+    return 0;
+}
+
+
 void Process::pause()
 {
     if (!edmOpList->m_pEdmOp)return;
@@ -208,13 +234,13 @@ void Process::pause()
 
 void Process::programProcess()
 {
-//    static MAC_OPERATE_TYPE enType = OP_HOLE_PROGRAME;
-//    edmOpList->DeleteEdmOp();
-//    edmOpList->SetEdmOpType(enType);
-//    edmOpList->ResetEdmOpFile();
+    static MAC_OPERATE_TYPE enType = OP_HOLE_PROGRAME;
+    edmOpList->DeleteEdmOp();
+    edmOpList->SetEdmOpType(enType);
+    edmOpList->ResetEdmOpFile();
 
-//    edmOpList->SetStart(FALSE);
-//    edm->CloseHardWare();
+    edmOpList->SetStart(FALSE);
+    edm->CloseHardWare();
 }
 
 void Process::imitateProcess()
