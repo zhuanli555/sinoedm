@@ -14,7 +14,7 @@
 
 using namespace std;
 
-enum 
+typedef enum
 {
 	MSG_PUMP=1,
 	MSG_ROTATE,
@@ -29,9 +29,9 @@ enum
 	MSG_VECT_WORK_SET,
 	MSG_VECT_C_CENTER,
 	MSG_ADJUST_CIRCLE,
-};
+}MSG_MOVE;
 
-enum
+typedef enum
 {
 	MSG_OP =0,
 	MSG_PAUSE,
@@ -40,7 +40,7 @@ enum
 	MSG_TEST,
 	MSG_TEST_C,
 	MSG_OP_OVER,
-};
+}MSG_TYPE;
 
 //轴运动使用的控制参数硬件参数
 typedef struct  edmAxis_Adjust

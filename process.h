@@ -41,10 +41,14 @@ private:
     void createMenus();
     void createActions();
     void MacProcessOperate();
+    void HandleOpMsg();
+    void HandleEdmOpStatus();
 private:
     EDM* edm;
     EDM_OP_List* edmOpList;
     EDM_OP* edmOp;
+    MSG_TYPE msg;
+    MAC_OPERATE_TYPE enType;
     QString strSysPath;
     QString strOpName;
     QThread* tThread;
