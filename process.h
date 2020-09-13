@@ -47,7 +47,7 @@ private:
     EDM* edm;
     EDM_OP_List* edmOpList;
     EDM_OP* edmOp;
-    MSG_TYPE msg;
+    MSG_TYPE gMsg;
     MAC_OPERATE_TYPE enType;
     QString strSysPath;
     QString strOpName;
@@ -61,7 +61,7 @@ private:
     //left
     CoordWidget* coordWidget;
     //right
-    QString filename;
+    QString gFilename;
     QLabel *fileLabel;
     QPlainTextEdit* fileText;
     AlarmSignal* alarmSignal;

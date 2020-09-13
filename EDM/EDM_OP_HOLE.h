@@ -135,9 +135,7 @@ private:
 	BOOL EdmHoleRepeat();
 	BOOL EdmHoleRootSleep();
 	BOOL EdmHoleSynchro();
-	void EdmHolePassCtl();
-	void EdmHolePassCtl_1();
-	void EdmHolePassCtl_3();
+    void EdmHolePassCtl();
 
 	BOOL EdmHoleGo2AdjustPos();
 	BOOL EdmHoleReturnOpPos();

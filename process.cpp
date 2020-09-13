@@ -211,7 +211,6 @@ void Process::MacProcessOperate()
         QThread::msleep(OPERATE_TRREAD_SLEEP_TIME);
     }
     EDM_OP_List::DeleteEdmOpList();
-    return 0;
 }
 
 //处理各个类型的加工
@@ -225,7 +224,7 @@ void Process::HandleOpMsg()
         return;
     }
 
-    switch(msg)
+    switch(gMsg)
     {
     case MSG_OP:
         {
@@ -240,28 +239,18 @@ void Process::HandleOpMsg()
         {
             if (!edmOpList->m_pEdmOp)
                 return;
-            edmOpList->m_pEdmOp->SetPassPara(m_dlgPassChart.m_fElec
-                                  ,m_dlgPassChart.m_fSpeed
-                                  ,m_dlgPassChart.m_iSpeedFilterCnt
-                                  ,m_dlgPassChart.m_iElecFilterCnt);
-            edmOpList->m_pEdmOp->EdmOpSetStart(!(pMsg->wParam));
+//            edmOpList->m_pEdmOp->SetPassPara(m_dlgPassChart.m_fElec
+//                                  ,m_fSpeed
+//                                  ,m_iSpeedFilterCnt
+//                                  ,m_iElecFilterCnt);//设置电参数和速度
+            edmOpList->m_pEdmOp->EdmOpSetStart(FALSE);//设置停止
 
         }
         break;
     case MSG_FILE:
         {
-            if (edmOpList->SetEdmOpFile(*(string*)(pMsg->wParam),*(string*)(pMsg->lParam)))
-            {
-                strFileName = (*(string*)(pMsg->lParam)).c_str();
-                edm->SaveFileName(strFileName);
-                GetDlgItem(IDC_EDIT_OP_NAME)->SetWindowText((*(string*)(pMsg->lParam)).c_str());
-                if (m_strOpName != strFileName)
-                {
-                    m_strOpName = strFileName;
-
-                }
-
-            }
+        //获取filename
+           edmOpList->SetEdmOpFile(path,gFilename);
         }
         break;
     case MSG_TEST:
@@ -270,38 +259,24 @@ void Process::HandleOpMsg()
                 return;
             edmOpList->m_pEdmOp->EdmOpSetTest(TRUE);
             edmOpList->m_pEdmOp->EdmOpSetStart(TRUE);
-            this->PostMessage(WM_AVOID_BLOCK,FALSE,0);
-        }
-        break;
-    case MSG_TEST_C:
-        {
-            if (!edmOpList->m_pEdmOp || !edm->m_stSysSet.stSetNoneLabel.bCycleMeasure)
-                return;
-            edmOpList->m_pEdmOp->EdmOpSetTest(FALSE);
-            edmOpList->m_pEdmOp->EdmOpSetStart(FALSE);
         }
         break;
     case MSG_ELEC:
         {
-            strElec = *(string*)(pMsg->wParam);
-            memcpy(&elec,(MAC_ELEC_PARA*)(pMsg->lParam),sizeof(MAC_ELEC_PARA));
-            if (!edmOpList->m_pEdmOp)
-            {
-                if (((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex >=0 && ((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex < OP_HOLE_PAGE_MAX)
-                {
-                    edm->WriteElecPara(&(((MAC_ELEC_PARA*)(pMsg->lParam))->stElecPage[((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex]),"HandleOpMsg");
-                }
-            }
-            else
-            {
-                edmOpList->m_pEdmOp->SetEdmOpElec(strElec,elec);
-            }
-        }
-        break;
-    case MSG_OP_OVER:
-        {
-            SetPause(TRUE);
-            edmOpList->EdmOpListOver();
+        //获取电参数
+//            strElec = *(string*)(pMsg->wParam);
+//            memcpy(&elec,(MAC_ELEC_PARA*)(pMsg->lParam),sizeof(MAC_ELEC_PARA));
+//            if (!edmOpList->m_pEdmOp)
+//            {
+//                if (((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex >=0 && ((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex < OP_HOLE_PAGE_MAX)
+//                {
+//                    edm->WriteElecPara(&(((MAC_ELEC_PARA*)(pMsg->lParam))->stElecPage[((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex]),"HandleOpMsg");
+//                }
+//            }
+//            else
+//            {
+//                edmOpList->m_pEdmOp->SetEdmOpElec(strElec,elec);
+//            }
         }
         break;
     default:
@@ -326,16 +301,14 @@ void Process::HandleEdmOpStatus()
     }
 
     pOp = edmOpList->m_pEdmOp;
-    if (pOp != m_pOp || edmOpList->m_bChange)
+    if (pOp != edmOp || edmOpList->m_bChange)
     {
-        m_pOp = pOp;
+        edmOp = pOp;
         edmOpList->m_bChange = FALSE;
-        OpFileCopyAndSend();
     }
 
     if (pOp->m_stOpStatus.stCycle.bPauseCmd)
     {
-        this->PostMessage(WM_AVOID_BLOCK,TRUE,0);
         pOp->m_stOpStatus.stCycle.bPauseCmd = FALSE;
     }
 
@@ -370,15 +343,14 @@ void Process::HandleEdmOpStatus()
         edm->EdmYellowLump( !(pOp->m_stOpStatus.enErrAll.errOp==OP_NO_ERR));
     }
 
-    m_dlgOpStatus.SetOpStatusPara(pOp->m_stOpStatus.iCmdIndex
-                                  ,pOp->m_stOpStatus.stCycle.iCycleIndex
-                                  ,pOp->m_stOpStatus.stCycle.iTimeSec
-                                  ,pOp->m_stOpStatus.stCycle.iOpPage);
+//    m_dlgOpStatus.SetOpStatusPara(pOp->m_stOpStatus.iCmdIndex
+//                                  ,pOp->m_stOpStatus.stCycle.iCycleIndex
+//                                  ,pOp->m_stOpStatus.stCycle.iTimeSec
+//                                  ,pOp->m_stOpStatus.stCycle.iOpPage);//旋转轴
 
     if (pOp->m_stOpStatus.bCheck_C_Over)
     {
         pOp->m_stOpStatus.bCheck_C_Over = FALSE;
-        m_dlgOpStatus.FillGridTabelPlus();
     }
 
     if (bOver != edmOpList->m_bOver)
@@ -401,13 +373,13 @@ void Process::pause()
 void Process::programProcess()
 {
     enType = OP_HOLE_PROGRAME;
-    msg = MSG_OP;
+    gMsg = MSG_OP;
 }
 
 void Process::imitateProcess()
 {
     enType = OP_HOLE_SIMULATE;
-    msg = MSG_OP;
+    gMsg = MSG_OP;
 }
 
 
@@ -446,12 +418,12 @@ void Process::keyPressEvent(QKeyEvent *e)
 
 void Process::showFileText()
 {
-    filename = QFileDialog::getOpenFileName(this,"open File",path);
-    QFileInfo info(filename);
+    gFilename = QFileDialog::getOpenFileName(this,"open File",path);
+    QFileInfo info(gFilename);
     m_strElecName = info.fileName();
-    if (!filename.isEmpty())
+    if (!gFilename.isEmpty())
     {
-        QFile file(filename);
+        QFile file(gFilename);
         QTextStream textStream;
         if (file.open(QIODevice::ReadOnly))
         {
