@@ -13,7 +13,6 @@
 #include "program.h"
 #include "setting.h"
 #include "unionzero.h"
-#include <QtConcurrent>
 
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 {
