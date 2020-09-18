@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "string": "cpp"
+        "string": "cpp",
+        "qmainwindow": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false
 }

@@ -25,6 +25,7 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     bPause = 1;
     //left
     coordWidget = new CoordWidget();
+    qDebug()<<"hello";
     //right
     alarmSignal = new AlarmSignal();
     fileLabel = new QLabel(QString::fromLocal8Bit("加工文件名(F4)"));
