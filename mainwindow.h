@@ -11,6 +11,8 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QThread>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QGridLayout>
 #include "EDM/EDM.h"
 #include "coordwidget.h"
@@ -31,6 +33,7 @@ public:
     EDM_COOR_TYPE m_enCoorType;
 private:
     BOOL EDMMacInit();
+    void MacUserOperate();
     void createMenus();
     void createActions();
 private:
@@ -40,6 +43,7 @@ private:
     int m_iOpenTimeOp;
 
     QThread* tThread;
+    QMutex mutex;
     QMenu* processMenu;
     QMenu* programMenu;
     QMenu* settingMenu;

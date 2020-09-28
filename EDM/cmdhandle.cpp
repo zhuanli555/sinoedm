@@ -993,10 +993,30 @@ BOOL CmdHandle::ReadCmdFromFile(QString strPath,QString strFile,vector<QString>*
     {
         str = in.readLine();
         str = str.trimmed().toUpper();
-        if (str!="")
-        {
-            pVector->push_back(str);
-        }
+        if (str=="HEADSTART")
+		{
+			bHeadStart = TRUE;
+			continue;
+		}		
+		if (str=="HEADOVER")
+		{
+			bHeadRv = TRUE;
+			continue;
+		}
+
+		if (bHeadStart&& !bHeadRv)
+		{
+			GetElecParaFromQString(str,strName,&stElec);
+			pMap->insert(make_pair(strName,stElec));
+		}
+
+		if (bHeadRv)
+		{
+			if (str!="")
+			{
+				pVector->push_back(str);
+			}			
+		}	
     }
     if (!bHeadStart && !bHeadRv)
     {

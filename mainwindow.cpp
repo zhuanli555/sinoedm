@@ -13,6 +13,7 @@
 #include "program.h"
 #include "setting.h"
 #include "unionzero.h"
+#include <QtConcurrent>
 
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 {
@@ -68,11 +69,14 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     createActions();
     createMenus();
     //设置多线程信号
-    tThread = new QThread();
-    edm->moveToThread(tThread);
-    connect(tThread,&QThread::finished,tThread,&QObject::deleteLater);
-    connect(tThread,&QThread::finished,edm,&QObject::deleteLater);
-    tThread->start();
+
+//    tThread = new QThread();
+//    edm->moveToThread(tThread);
+//    connect(tThread,&QThread::finished,tThread,&QObject::deleteLater);
+//    connect(tThread,&QThread::finished,edm,&QObject::deleteLater);
+//    tThread->start();
+    //设置多线程
+    QtConcurrent::run(this,&MainWindow::MacUserOperate);
     //设置定时器
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
@@ -82,11 +86,17 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 
 MainWindow::~MainWindow()
 {
-    if(tThread)
+}
+
+void MainWindow::MacUserOperate()
+{
+    while(true)
     {
-        tThread->quit();
+        QMutexLocker lock(&mutex);
+        edm->GetEdmComm();
+        coordWidget->HandleEdmCycleData();//coordwidget 循环
+        QThread::msleep(EDM_SHOW_THREAD_SLEEP_TIME);
     }
-    tThread->wait();
 }
 
 BOOL MainWindow::EDMMacInit()
@@ -107,7 +117,6 @@ void MainWindow::timeUpdate()
     float ll = tt%1000000;
     QString s = QString::number(ll/1000,'f',3);
     statBar->showMessage(s);
-    coordWidget->HandleEdmCycleData();//coordwidget 循环
     //发送command循环
     //其他循环
     //测试alarm

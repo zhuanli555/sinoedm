@@ -397,7 +397,7 @@ BOOL Process::EDMProcessInit()
     bInit = edm->EdmInit();
     //edm->GetFileName(strOpName);//从数据库获取filename
     edm->m_strSysPath = path;
-
+    strOpName = gFilename;
     edmOpList = EDM_OP_List::GetEdmOpListPtr();
     edmOp = edmOpList->m_pEdmOp;
     edmOpList->SetEdmOpFile(path,strOpName);
