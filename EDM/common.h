@@ -146,11 +146,14 @@ typedef struct isaMAC_ROTATE_PARA
 typedef enum
 {
 	OP_TYPE_NONE       = 0,    //无加工状态
-	//小孔
-	OP_HOLE_SING       = 1,    //单孔加工
-	OP_HOLE_PROGRAME   = 2,    //程序加工
-	OP_HOLE_SIMULATE   = 3,    //模拟加工
-	OP_HOLE_MILL       = 4,    //铣削加工
+    //单孔加工
+    OP_HOLE_SING       = 1,
+    //程序加工
+    OP_HOLE_PROGRAME   = 2,
+    //模拟加工
+    OP_HOLE_SIMULATE   = 3,
+    //铣削加工
+    OP_HOLE_MILL       = 4,
 	OP_HOLE_CHECK_C    = 5,    //圆度测量
 	OP_HOLE_DISCHARGE  = 9,    //对刀
 

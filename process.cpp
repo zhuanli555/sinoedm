@@ -25,7 +25,6 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     bPause = 1;
     //left
     coordWidget = new CoordWidget();
-    qDebug()<<"hello";
     //right
     alarmSignal = new AlarmSignal();
     fileLabel = new QLabel(QString::fromLocal8Bit("加工文件名(F4)"));
@@ -192,12 +191,13 @@ void Process::createActions()
     connect(pauseAction,&QAction::triggered,this,&Process::pause);
 
 }
-
+bool _abort=false;
 //加工线程
 void Process::MacProcessOperate()
 {
     while (true)
     {
+        if(_abort)return;
         QMutexLocker lock(&mutex);
         if (edm)
         {
@@ -206,10 +206,11 @@ void Process::MacProcessOperate()
 
             if (edmOpList)
             {
+                qDebug()<<"edm op carry on";
                 edmOpList->CarryOn();
             }
         }
-        QThread::msleep(OPERATE_TRREAD_SLEEP_TIME);
+        QThread::msleep(20);
     }
     EDM_OP_List::DeleteEdmOpList();
 }

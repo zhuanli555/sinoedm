@@ -95,7 +95,7 @@ void MainWindow::MacUserOperate()
         QMutexLocker lock(&mutex);
         edm->GetEdmComm();
         coordWidget->HandleEdmCycleData();//coordwidget Ñ­»·
-        QThread::msleep(EDM_SHOW_THREAD_SLEEP_TIME);
+        QThread::msleep(20);
     }
 }
 

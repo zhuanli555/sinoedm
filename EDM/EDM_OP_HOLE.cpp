@@ -249,7 +249,10 @@ void EDM_OP_HOLE::EdmOpStageRestart()
 	m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
 }
 
-
+/**
+ * 加工过程
+ * 1.遍历m_ListStage执行加工各个步骤
+*/
 void EDM_OP_HOLE::EdmHoleCarry()
 {
 	fEdmOpStage pStageCarry;
@@ -657,6 +660,7 @@ BOOL EDM_OP_HOLE::EdmHoleLocation()
 	return FALSE;	
 }
 
+//加工同步
 BOOL EDM_OP_HOLE::EdmHoleSynchro()
 {
 	DIGIT_CMD cmd;
