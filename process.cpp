@@ -1,4 +1,3 @@
-#include "process.h"
 #include <QDebug>
 #include <QtGui/QKeyEvent>
 #include <QTextCodec>
@@ -9,6 +8,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QtConcurrent>
+#include "process.h"
 
 extern QString path;
 Process::Process(QWidget *parent): QMainWindow(parent)
@@ -127,11 +127,21 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     rgLayout->addWidget(elecZero);
     rgLayout->addWidget(elecFix);
     rgLayout->addWidget(elecProcess);
-
+    //middlelayout
+    QVBoxLayout *midLayout = new QVBoxLayout();
+    QHBoxLayout *mPtLayout = new QHBoxLayout();
+    QPushButton *addButton = new QPushButton("add");
+    QPushButton *delButton = new QPushButton("del");
+    //connect(addButton,&QPushButton::clicked,this,&Process::insertRow);
+    //connect(delButton,&QPushButton::clicked,this,&Process::deleteRow);
+    mPtLayout->addWidget(addButton);
+    mPtLayout->addWidget(delButton);
+    midLayout->addLayout(mPtLayout);
+    midLayout->addWidget(elecParaTable);
     bottomLayout = new QHBoxLayout();
     //bottomLayout->addStretch();
     bottomLayout->addLayout(bgLayout);
-    bottomLayout->addWidget(elecParaTable);
+    bottomLayout->addLayout(midLayout);
     bottomLayout->addLayout(rgLayout);
     //main
     QGridLayout *mainLayout =new QGridLayout();

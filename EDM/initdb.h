@@ -13,7 +13,7 @@ void addVal(QSqlQuery &q, int iVal)
 QSqlError initDb()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(":memory:");
+    db.setDatabaseName("sino.db");
 
     if (!db.open()) {
         QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
@@ -25,9 +25,9 @@ QSqlError initDb()
         return db.lastError();
     }
 
-    QStringList tables = db.tables();
-    if (tables.contains("x_label", Qt::CaseInsensitive))
-        return QSqlError();
+//    QStringList tables = db.tables();
+//    if (tables.contains("x_label", Qt::CaseInsensitive))
+//        return QSqlError();
 
     QSqlQuery q;
     q.exec(QLatin1String("create table x_label(iIndex integer primary key, iPos integer,iVal integer)"));
@@ -65,6 +65,7 @@ QSqlError initDb()
                          iRotSpeed int,    \
                          elecid int, \
                          foreign key(elecid) references elec_oral(id)"));
+    
     return QSqlError();
 }
 

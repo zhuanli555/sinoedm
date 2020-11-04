@@ -22,7 +22,8 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     this->setCentralWidget(widget);
     setWindowTitle(QString::fromLocal8Bit("数控机床v1.0"));
     setGeometry(0,0,QApplication::desktop()->availableGeometry().width(),QApplication::desktop()->availableGeometry().height());
-    //获取edm实例
+    //init db
+    initDb();
     //init edm
     EDMMacInit();
     //状态栏
