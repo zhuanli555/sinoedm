@@ -138,6 +138,7 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     mPtLayout->addWidget(delButton);
     midLayout->addLayout(mPtLayout);
     midLayout->addWidget(elecParaTable);
+
     bottomLayout = new QHBoxLayout();
     //bottomLayout->addStretch();
     bottomLayout->addLayout(bgLayout);
