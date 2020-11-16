@@ -22,7 +22,8 @@ ElecParaTable::ElecParaTable(QSqlRelationalTableModel *elecpage, QSqlTableModel 
     _model->setHeaderData(8,Qt::Horizontal, QString::fromLocal8Bit("¼Ó¹¤Á¿"));
 
     connect(_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(dataChangedSlot(QModelIndex,QModelIndex,QVector<int>)));
-    connect(addButton,SIGNAL(clicked()),this,SLOT(dataInsertSlot()));
+    connect(addButton,SIGNAL(clicked()),this,SLOT(dataInsertSlot()));//cant connect in there
+    connect(delButton,SIGNAL(clicked()),this,SLOT(dataDeleteSlot()));
     showData(elecpage,elecoral,name);
     this->setModel(_model);
 }
@@ -36,10 +37,15 @@ void ElecParaTable::dataChangedSlot(const QModelIndex &topLeft, const QModelInde
 //add
 void ElecParaTable::dataInsertSlot()
 {
-    int rowCount = elecPageModel->rowCount();
-    _model->setHeaderData(rowCount,Qt::Vertical, QObject::tr("page %1").arg(rowCount));
+    int rowIndex = elecPageModel->rowCount() + 1;
+    _model->setHeaderData(rowIndex,Qt::Vertical, QObject::tr("page %1").arg(rowIndex));
 
     _model->insertRow(0);
+}
+
+void ElecParaTable::dataDeleteSlot()
+{
+    //find the index and delete and remove from db
 }
 
 void ElecParaTable::showData(QSqlRelationalTableModel *elecpage, QSqlTableModel *elecoral, QString name)
