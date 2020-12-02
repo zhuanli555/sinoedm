@@ -7,10 +7,10 @@ ElecParaTable::ElecParaTable(QSqlRelationalTableModel *elecpage, QSqlTableModel 
     : QTableView(parent)
 {
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
-    QPushButton *addButton =new QPushButton("add",this);
+    QPushButton *addButton = new QPushButton("add",this);
+    QPushButton *delButton = new QPushButton("del",this);
     //add table header
-    _model = new QStandardItemModel(this);
-    _model->setColumnCount(9);
+    _model = new QStandardItemModel(6,9,this);
     _model->setHeaderData(0,Qt::Horizontal, QString::fromLocal8Bit("±‹¿í"));
     _model->setHeaderData(1,Qt::Horizontal, QString::fromLocal8Bit("±‹Í£"));
     _model->setHeaderData(2,Qt::Horizontal, QString::fromLocal8Bit("µçÁ÷"));

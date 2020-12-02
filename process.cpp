@@ -130,10 +130,10 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     //middlelayout
     QVBoxLayout *midLayout = new QVBoxLayout();
     QHBoxLayout *mPtLayout = new QHBoxLayout();
-    QPushButton *addButton = new QPushButton("add");
-    QPushButton *delButton = new QPushButton("del");
-    //connect(addButton,&QPushButton::clicked,this,&Process::insertRow);
-    //connect(delButton,&QPushButton::clicked,this,&Process::deleteRow);
+    addButton = new QPushButton("add");
+    delButton = new QPushButton("del");
+    connect(addButton,&QPushButton::clicked,this,&Process::insertRow);
+    connect(delButton,&QPushButton::clicked,this,&Process::deleteRow);
     mPtLayout->addWidget(addButton);
     mPtLayout->addWidget(delButton);
     midLayout->addLayout(mPtLayout);
@@ -172,6 +172,40 @@ Process::~Process()
     EDM_OP_List::DeleteEdmOpList();
 }
 
+void Process::insertRow()
+{
+    QModelIndex index = elecParaTable->selectionModel()->currentIndex();
+    QAbstractItemModel *model = elecParaTable->model();
+
+    if (!model->insertRow(index.row()+1, index.parent()))
+        return;
+
+    updateActions();
+
+    for (int column = 0; column < model->columnCount(index.parent()); ++column) {
+        QModelIndex child = model->index(index.row()+1, column, index.parent());
+        model->setData(child, QVariant("[No data]"), Qt::EditRole);
+    }
+}
+
+void Process::deleteRow()
+{
+    QModelIndex index = elecParaTable->selectionModel()->currentIndex();
+    QAbstractItemModel *model = elecParaTable->model();
+    if (model->removeRow(index.row(), index.parent()))
+        updateActions();
+}
+
+void Process::updateActions()
+{
+    bool hasSelection = !elecParaTable->selectionModel()->selection().isEmpty();
+    delButton->setEnabled(hasSelection);
+
+    bool hasCurrent = elecParaTable->selectionModel()->currentIndex().isValid();
+    addButton->setEnabled(hasCurrent);
+
+
+}
 void Process::createMenus()
 {
     QMenuBar* myMenu = menuBar();

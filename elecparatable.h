@@ -22,6 +22,7 @@ private:
 
 public slots:
     void dataInsertSlot();
+    void dataDeleteSlot();
     void dataChangedSlot(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 };
 

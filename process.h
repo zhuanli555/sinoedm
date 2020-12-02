@@ -68,6 +68,8 @@ private:
     QGridLayout* rightLayout;
     //bottom
     QHBoxLayout* bottomLayout;
+    QPushButton* addButton;
+    QPushButton* delButton;
     ElecParaTable *elecParaTable;
     QLineEdit *jxProcessVal;
     QLineEdit *ProcessNumVal;
@@ -107,6 +109,9 @@ protected slots:
     void pause();
     void programProcess();
     void imitateProcess();
+    void insertRow();
+    void deleteRow();
+    void updateActions();
 };
 
 
