@@ -10,6 +10,8 @@
 #include <QtConcurrent>
 #include "process.h"
 
+//Î¢¿×»ú
+
 extern QString path;
 Process::Process(QWidget *parent): QMainWindow(parent)
 {
@@ -132,12 +134,14 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     QHBoxLayout *mPtLayout = new QHBoxLayout();
     addButton = new QPushButton("add");
     delButton = new QPushButton("del");
+    QTableView *tableView = new QTableView;
     connect(addButton,&QPushButton::clicked,this,&Process::insertRow);
     connect(delButton,&QPushButton::clicked,this,&Process::deleteRow);
     mPtLayout->addWidget(addButton);
     mPtLayout->addWidget(delButton);
     midLayout->addLayout(mPtLayout);
-    midLayout->addWidget(elecParaTable);
+    //tableview
+    midLayout->addWidget(tableView);
 
     bottomLayout = new QHBoxLayout();
     //bottomLayout->addStretch();
@@ -151,7 +155,6 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     mainLayout->addWidget(coordWidget,0,0);
     mainLayout->addLayout(rightLayout,0,1);
     mainLayout->addLayout(bottomLayout,1,0,1,2);
-    //mainLayout->addWidget(elecParaTable,1,0,1,2);
     mainLayout->setColumnStretch(0,1);//ÉèÖÃ1:1
     mainLayout->setColumnStretch(1,1);
     mainLayout->setRowStretch(0,1);

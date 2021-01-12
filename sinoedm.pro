@@ -44,7 +44,9 @@ SOURCES += \
     EDM/EDM_OP_HOLE.cpp \
     EDM/EDM_OP_List.cpp \
     EDM/electool.cpp \
-    spindelegate.cpp
+    spindelegate.cpp \
+#    elecoralmodel.cpp \
+#    elecpagemodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -67,7 +69,9 @@ HEADERS += \
     EDM/EDM_OP_HOLE.h \
     EDM/EDM_OP_List.h \
     EDM/electool.h \
-    spindelegate.h
+    spindelegate.h \
+#    //elecoralmodel.h \
+#    //elecpagemodel.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
