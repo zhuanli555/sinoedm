@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QList>
+#include <EDM/EDM.h>
 
 class AlarmSignal : public QWidget
 {
@@ -17,6 +18,7 @@ public:
 
 private:
     QGridLayout* mainLayout;
+    EDM *edm;
     QLabel* purgeValue;
     QLabel* shakeValue;
     QLabel* protectValue;
@@ -30,6 +32,10 @@ private:
 signals:
 
 public slots:
+    void edmProtect();
+    void edmPurge();
+    void edmShake();
+    void edmHighFreq();
 };
 
 #endif // ALARMSIGNAL_H

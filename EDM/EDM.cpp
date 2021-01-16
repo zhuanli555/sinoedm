@@ -582,7 +582,7 @@ int EDM::HandBoxProcess()
 void EDM::CloseHardWare()
 {
 	//Ó²¼þµÄ¹Ø±Õ
-	m_stEdmInterfaceOut.btO199 |=0x3F;
+    m_stEdmInterfaceOut.btO188 |=0x3F;
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 }
 
@@ -670,12 +670,12 @@ bool EDM::EdmRotate(bool bSwitch,bool bOpen,int iSpeed,bool bDir)
 	{
 		if (bOpen)
 		{
-			m_stEdmInterfaceOut.btO199 &=0xEF;
+            m_stEdmInterfaceOut.btO188 &=0xEF;
 			str = "open rotate";
 		}
 		else
 		{
-			m_stEdmInterfaceOut.btO199 |=0x10;
+            m_stEdmInterfaceOut.btO188 |=0x10;
 			str = "close rotate";
 		}
 
@@ -705,9 +705,9 @@ bool EDM::EdmRotate(bool bSwitch,bool bOpen,int iSpeed,bool bDir)
 bool EDM::EdmPower(bool bOpen)
 {
 	if (bOpen)
-		m_stEdmInterfaceOut.btO199 &=0xFB;
+        m_stEdmInterfaceOut.btO188 &=0xFB;
 	else
-		m_stEdmInterfaceOut.btO199 |=0x04;
+        m_stEdmInterfaceOut.btO188 |=0x04;
 
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	m_stStatus.bPower = bOpen;
@@ -719,9 +719,9 @@ bool EDM::EdmPower(bool bOpen)
 bool EDM::EdmPrune(bool bOpen)
 {
 	if (bOpen)
-		m_stEdmInterfaceOut.btO199 &=0xF7;
+        m_stEdmInterfaceOut.btO188 &=0xF7;
 	else
-		m_stEdmInterfaceOut.btO199 |=0x08;
+        m_stEdmInterfaceOut.btO188 |=0x08;
 
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	m_stStatus.bPrune = bOpen;
@@ -732,9 +732,9 @@ bool EDM::EdmPrune(bool bOpen)
 bool EDM::EdmHummer(bool bOpen)
 {
 	if (bOpen)
-		m_stEdmInterfaceOut.btO199 &=0xDF;
+        m_stEdmInterfaceOut.btO188 &=0xDF;
 	else
-		m_stEdmInterfaceOut.btO199 |=0x20;
+        m_stEdmInterfaceOut.btO188 |=0x20;
 
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 

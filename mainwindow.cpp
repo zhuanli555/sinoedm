@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     QWidget* widget = new QWidget();
     this->setCentralWidget(widget);
     setWindowTitle(QString::fromLocal8Bit("数控机床v1.0"));
-    setGeometry(0,0,QApplication::desktop()->availableGeometry().width(),QApplication::desktop()->availableGeometry().height());
+    setGeometry(0,0,QApplication::desktop()->width(),QApplication::desktop()->height());
     //init db
     initDb();
     //init edm
@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     axisSet = new QPushButton(QString::fromLocal8Bit("轴置数Ctrl/?"));
     axisZero = new QPushButton(QString::fromLocal8Bit("轴清零Alt/?"));
     findCenter = new QPushButton(QString::fromLocal8Bit("找中心(F)"));
-    connect(findCenter,&QPushButton::clicked,this,&MainWindow::edmFindCenter);
+    //connect(findCenter,&QPushButton::clicked,this,&MainWindow::edmFindCenter);
 
     rightLayout = new QGridLayout();
     rightLayout->setSpacing(20);
@@ -76,8 +76,9 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 //    connect(tThread,&QThread::finished,tThread,&QObject::deleteLater);
 //    connect(tThread,&QThread::finished,edm,&QObject::deleteLater);
 //    tThread->start();
-    //设置多线程
-    QtConcurrent::run(this,&MainWindow::MacUserOperate);
+    //设置多线
+    QFuture<void> macOp = QtConcurrent::run(this,&MainWindow::MacUserOperate);
+    //macOp.waitForFinished();
     //设置定时器
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
@@ -142,8 +143,8 @@ void MainWindow::createActions()
     programAction->setStatusTip("编程文件");
     connect(programAction,&QAction::triggered,this,&MainWindow::renderToProgram);
 
-    settingAction = new QAction(QString::fromLocal8Bit("设置(F4)"),this);
-    settingAction->setShortcut(tr("F4"));
+    settingAction = new QAction(QString::fromLocal8Bit("设置(F10)"),this);
+    settingAction->setShortcut(tr("F10"));
     settingAction->setStatusTip("设置");
     connect(settingAction,&QAction::triggered,this,&MainWindow::renderToSetting);
 
@@ -219,19 +220,17 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         close();
         break;
     case Qt::Key_F4:
-        edmPurge();
+        alarmSignal->edmPurge();break;
     case Qt::Key_F5:
-        close();
+        alarmSignal->edmHighFreq();break;
     case Qt::Key_F6:
-        edmProtect();
+        alarmSignal->edmProtect();break;
     case Qt::Key_F7:
-        edmShake();
+        alarmSignal->edmShake();break;
     case Qt::Key_F8:
-        close();
+        alarmSignal->edmProtect();break;
     case Qt::Key_F9:
-        close();
-    case Qt::Key_F10:
-        close();
+        close();break;
     default:
         break;
     }
@@ -263,65 +262,6 @@ void MainWindow::renderToUnionZero()
     int res = unionZero->exec();
     if(res != QDialog::Accepted)return;
     unionZero->show();
-}
-
-void MainWindow::edmProtect()
-{
-    //多线程
-    edm->EdmSetProtect(edm->m_stEdmShowData.stStatus.bNoProtect);
-    if(edm->m_stEdmShowData.stStatus.bNoProtect)
-    {
-        protectValue->setStyleSheet("background-color:green;");
-    }else{
-        protectValue->setStyleSheet("background-color:red;");
-    }
-}
-
-void MainWindow::edmPurge()
-{
-    edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);//低压 冲液？
-    if(edm->m_stEdmShowData.stStatus.bPumpLow)
-    {
-        purgeValue->setStyleSheet("background-color:red;");
-    }
-    else{
-        purgeValue->setStyleSheet("background-color:green;");
-    }
-}
-
-void MainWindow::edmShake()
-{
-    edm->EdmSetShake(edm->m_stEdmShowData.stStatus.bShake);
-    if(edm->m_stEdmShowData.stStatus.bShake)
-    {
-        shakeValue->setStyleSheet("background-color:green;");
-    }else{
-        shakeValue->setStyleSheet("background-color:red;");
-    }
-}
-
-void MainWindow::edmHighFreq()
-{
-    edm->EdmPower(!edm->m_stEdmShowData.stStatus.bPower);
-    if(edm->m_stEdmShowData.stStatus.bPower)
-    {
-        highFreqValue->setStyleSheet("background-color:red;");
-    }
-    else{
-        highFreqValue->setStyleSheet("background-color:green;");
-    }
-}
-
-void MainWindow::edmFindCenter()
-{
-    edm->EdmPower(!edm->m_stEdmShowData.stStatus.bPower);
-    if(edm->m_stEdmShowData.stStatus.bPower)
-    {
-        highFreqValue->setStyleSheet("background-color:red;");
-    }
-    else{
-        highFreqValue->setStyleSheet("background-color:green;");
-    }
 }
 
 void MainWindow::edmSendComand()

@@ -5,6 +5,7 @@ AlarmSignal::AlarmSignal(QWidget *parent) : QWidget(parent)
 {
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
     setMaximumWidth(600);
+    edm = EDM::GetEdmInstance();
     purgeValue = new QLabel(QString::fromLocal8Bit("冲液(F4)"));
     fixElecValue = new QLabel(QString::fromLocal8Bit("修电极(F5)"));
     highFreqValue = new QLabel(QString::fromLocal8Bit("高频(F6)"));
@@ -57,3 +58,55 @@ void AlarmSignal::reSort()
         mainLayout->addWidget(alarmList.at(i),i%6,j);
     }
 }
+
+void AlarmSignal::edmPurge()
+{
+
+    edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);//低压 冲液？
+    if(edm->m_stEdmShowData.stStatus.bPumpLow)
+    {
+        purgeValue->setStyleSheet("background-color:red;");
+    }
+    else{
+        purgeValue->setStyleSheet("background-color:green;");
+    }
+}
+
+void AlarmSignal::edmHighFreq()
+{
+    qDebug()<<"alarmhighfreq";
+    edm->EdmPower(!edm->m_stEdmShowData.stStatus.bPower);
+    if(edm->m_stEdmShowData.stStatus.bPower)
+    {
+        highFreqValue->setStyleSheet("background-color:red;");
+    }
+    else{
+        highFreqValue->setStyleSheet("background-color:green;");
+    }
+}
+
+void AlarmSignal::edmProtect()
+{
+    //多线程
+    edm->EdmSetProtect(edm->m_stEdmShowData.stStatus.bNoProtect);
+    if(edm->m_stEdmShowData.stStatus.bNoProtect)
+    {
+        protectValue->setStyleSheet("background-color:green;");
+    }else{
+        protectValue->setStyleSheet("background-color:red;");
+    }
+}
+
+
+
+void AlarmSignal::edmShake()
+{
+    edm->EdmSetShake(edm->m_stEdmShowData.stStatus.bShake);
+    if(edm->m_stEdmShowData.stStatus.bShake)
+    {
+        shakeValue->setStyleSheet("background-color:green;");
+    }else{
+        shakeValue->setStyleSheet("background-color:red;");
+    }
+}
+

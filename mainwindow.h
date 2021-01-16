@@ -83,12 +83,7 @@ protected slots:
     void renderToProgram();
     void renderToSetting();
     void renderToUnionZero();
-    void edmProtect();
-    void edmPurge();
-    void edmShake();
-    void edmHighFreq();
     void edmSendComand();
-    void edmFindCenter();
     void timeUpdate();
 };
 

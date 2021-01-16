@@ -19,7 +19,7 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     QWidget* widget = new QWidget();
     this->setCentralWidget(widget);
     setWindowTitle(QString::fromLocal8Bit("数控机床v1.0"));
-    setGeometry(0,0,QApplication::desktop()->availableGeometry().width(),QApplication::desktop()->availableGeometry().height());
+    setGeometry(0,0,QApplication::desktop()->width(),QApplication::desktop()->height());
     //获取edm实例 加工多线程
     EDMProcessInit();
     //状态栏
@@ -29,7 +29,7 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     coordWidget = new CoordWidget();
     //right
     alarmSignal = new AlarmSignal();
-    fileLabel = new QLabel(QString::fromLocal8Bit("加工文件名(F4)"));
+    fileLabel = new QLabel(QString::fromLocal8Bit("加工文件名(F10)"));
     fileText = new QPlainTextEdit;
     fileText->setReadOnly(true);
     fileText->setMaximumWidth(400);
@@ -163,7 +163,8 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     createActions();
     createMenus();
     //设置多线程
-    QtConcurrent::run(this,&Process::MacProcessOperate);
+    QFuture<void> macPr = QtConcurrent::run(this,&Process::MacProcessOperate);
+    //macPr.waitForFinished();
     //设置定时器设置20ms
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&Process::timeUpdate);
@@ -239,13 +240,12 @@ void Process::createActions()
     connect(pauseAction,&QAction::triggered,this,&Process::pause);
 
 }
-bool _abort=false;
+
 //加工线程
 void Process::MacProcessOperate()
 {
     while (true)
     {
-        if(_abort)return;
         QMutexLocker lock(&mutex);
         if (edm)
         {
@@ -254,7 +254,6 @@ void Process::MacProcessOperate()
 
             if (edmOpList)
             {
-                qDebug()<<"edm op carry on";
                 edmOpList->CarryOn();
             }
         }
@@ -457,12 +456,32 @@ BOOL Process::EDMProcessInit()
 
 void Process::keyPressEvent(QKeyEvent *e)
 {
-    if (e->key() == Qt::Key_Escape)
+    switch (e->key()) {
+    case Qt::Key_Escape:
         close();
-    if (e->key() == Qt::Key_F4){
+        break;
+    case Qt::Key_F4:
+        alarmSignal->edmPurge();
+        break;
+    case Qt::Key_F5:
+        alarmSignal->edmHighFreq();
+        break;
+    case Qt::Key_F6:
+        alarmSignal->edmProtect();
+        break;
+    case Qt::Key_F7:
+        alarmSignal->edmShake();
+        break;
+    case Qt::Key_F8:
+        alarmSignal->edmProtect();
+        break;
+    case Qt::Key_F9:
+        close();
+        break;
+    case Qt::Key_F10:
         showFileText();
-    }
-    else if((e->modifiers() == Qt::AltModifier) && (e->key() == Qt::Key_X)){
+    default:
+        break;
     }
 }
 
@@ -486,7 +505,7 @@ void Process::showFileText()
         file.close();
     }
     //show
-    fileLabel->setText(QString::fromLocal8Bit("加工文件名(F4):")+m_strElecName);
+    fileLabel->setText(QString::fromLocal8Bit("加工文件名(F10):")+m_strElecName);
     //重新渲染表格
     elecParaTable->showData(elecPageModel,elecOralModel,m_strElecName);
 }

@@ -21,7 +21,7 @@ public:
 public:
     QChar m_str;
     QString m_strVal;
-    EDM *edm;
+
 private slots:
     void returnValue();
 protected:
@@ -30,6 +30,7 @@ private:
     QFrame *contentFrame;              	//具体显示面板
     QLabel *label2;
     QLineEdit *lineEdit2;
+    EDM *edm;
 };
 
 #endif // AXISSETDIALOG_H
