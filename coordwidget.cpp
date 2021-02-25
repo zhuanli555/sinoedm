@@ -12,9 +12,9 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     wLabel = new QLabel("W");
     aLabel = new QLabel("A");
     bLabel = new QLabel("B");
-
+    float zero = 0.000;
     QString tmp1 = QString("%1").arg("-123.567");
-    QString tmp2 = QString("%1").arg("0.000");
+    QString tmp2 = QString("%1").arg(zero,8,'g',3);
     xValue = new QLabel(tmp1);
     yValue = new QLabel(tmp2);
     zValue = new QLabel(tmp2);
@@ -120,17 +120,17 @@ void CoordWidget::ShowData(const MAC_COMMON& stMaccomm,int iRelLabel[])
             if(i == 0)
             {
                 fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
-                str = QString("%8.3f").arg(fTmp);
+                str = QString("%1").arg(fTmp,8,'g',3);
                 xMValue->setText(str);
                 fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
-                str = QString("%8.3f").arg(fTmp);
+                str = QString("%1").arg(fTmp,8,'g',3);
                 xValue->setText(str);
             }else if (i == 1) {
                 fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
-                str = QString("%8.3f").arg(fTmp);
+                str = QString("%1").arg(fTmp,8,'g',3);
                 yMValue->setText(str);
                 fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
-                str = QString("%8.3f").arg(fTmp);
+                str = QString("%1").arg(fTmp,8,'g',3);
                 yValue->setText(str);
             }
         }

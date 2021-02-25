@@ -7,27 +7,24 @@ AlarmSignal::AlarmSignal(QWidget *parent) : QWidget(parent)
     setMaximumWidth(600);
     edm = EDM::GetEdmInstance();
     purgeValue = new QLabel(QString::fromLocal8Bit("冲液(F4)"));
-    fixElecValue = new QLabel(QString::fromLocal8Bit("修电极(F5)"));
-    highFreqValue = new QLabel(QString::fromLocal8Bit("高频(F6)"));
-    shakeValue = new QLabel(QString::fromLocal8Bit("振动(F7)"));
-    protectValue = new QLabel(QString::fromLocal8Bit("防撞保护(F8)"));
-    rotateValue = new QLabel(QString::fromLocal8Bit("旋转(F9)"));
+    highFreqValue = new QLabel(QString::fromLocal8Bit("高频(F5)"));
+    shakeValue = new QLabel(QString::fromLocal8Bit("振动(F6)"));
+    protectValue = new QLabel(QString::fromLocal8Bit("防撞保护(F7)"));
+    rotateValue = new QLabel(QString::fromLocal8Bit("旋转(F8)"));
 
     mainLayout = new QGridLayout(this);
     mainLayout->setSpacing(20);
     mainLayout->addWidget(purgeValue,0,0);
-    mainLayout->addWidget(fixElecValue,1,0);
-    mainLayout->addWidget(highFreqValue,2,0);
-    mainLayout->addWidget(shakeValue,3,0);
-    mainLayout->addWidget(protectValue,4,0);
-    mainLayout->addWidget(rotateValue,5,0);
+    mainLayout->addWidget(highFreqValue,1,0);
+    mainLayout->addWidget(shakeValue,2,0);
+    mainLayout->addWidget(protectValue,3,0);
+    mainLayout->addWidget(rotateValue,4,0);
 
     protectValue->setMaximumWidth(85);
     purgeValue->setStyleSheet("background-color:red;");
     shakeValue->setStyleSheet("background-color:red;");
     protectValue->setStyleSheet("background-color:green;");
     highFreqValue->setStyleSheet("background-color:green;");
-    fixElecValue->setStyleSheet("background-color:red;");
     rotateValue->setStyleSheet("background-color:red;");
 }
 
@@ -74,7 +71,6 @@ void AlarmSignal::edmPurge()
 
 void AlarmSignal::edmHighFreq()
 {
-    qDebug()<<"alarmhighfreq";
     edm->EdmPower(!edm->m_stEdmShowData.stStatus.bPower);
     if(edm->m_stEdmShowData.stStatus.bPower)
     {

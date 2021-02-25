@@ -7,6 +7,7 @@
 #include <QStatusBar>
 #include <QAction>
 #include <QLabel>
+#include <QComboBox>
 #include <QPushButton>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -73,7 +74,7 @@ private:
     //bottom
     QLabel* commandLabel;
     QLineEdit* commandLine;
-    QLabel* speedValue;
+    QComboBox* speedValue;
     QHBoxLayout* bottomLayout;
 protected:
     void keyPressEvent(QKeyEvent *e) override;

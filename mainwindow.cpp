@@ -50,7 +50,11 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     commandLine = new QLineEdit();
     connect(commandLine,&QLineEdit::returnPressed,this,&MainWindow::edmSendComand);
     QLabel *speedLabel = new QLabel(QString::fromLocal8Bit("定位速度:"));
-    speedValue = new QLabel(QString::fromLocal8Bit("mid"));
+    speedValue = new QComboBox();
+    speedValue->clear();
+    QStringList speedlist;
+    speedlist<<"1000"<<"2000"<<"5000"<<"10000"<<"20000";
+    speedValue->addItems(speedlist);
     bottomLayout = new QHBoxLayout();
     bottomLayout->addWidget(commandLabel);
     bottomLayout->addWidget(commandLine);
@@ -78,7 +82,6 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 //    tThread->start();
     //设置多线
     QtConcurrent::run(this,&MainWindow::MacUserOperate);
-    //macOp.waitForFinished();
     //设置定时器
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
@@ -221,14 +224,12 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     case Qt::Key_F4:
         alarmSignal->edmPurge();break;
     case Qt::Key_F5:
-        alarmSignal->edmHighFreq();break;
+        alarmSignal->edmProtect();break;
     case Qt::Key_F6:
-        alarmSignal->edmProtect();break;
-    case Qt::Key_F7:
         alarmSignal->edmShake();break;
-    case Qt::Key_F8:
+    case Qt::Key_F7:
         alarmSignal->edmProtect();break;
-    case Qt::Key_F9:
+    case Qt::Key_F8:
         close();break;
     default:
         break;
@@ -269,20 +270,10 @@ void MainWindow::edmSendComand()
     DIGIT_CMD cmdDefault;
     CmdHandle* pCmdHandle;
     QString cmdstr;
-    int speed;
-    if(speedValue->text() == "mid")
-    {
-        speed = 10000;
-    }else if(speedValue->text() == "low")
-    {
-        speed = 5000;
-    }else{
-        speed = 20000;
-    }
+    int speed = speedValue->currentText().toInt();
     cmdstr = commandLine->text();
-    qDebug()<<cmdstr;
     memset(&cmdDefault,0,sizeof(DIGIT_CMD));
-    cmdDefault.enAim = AIM_G91;
+    cmdDefault.enAim = AIM_G90;
     cmdDefault.enOrbit = ORBIT_G00;
     cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
     cmdDefault.iFreq = CmdHandle::GetSpeedFreq(speed);
