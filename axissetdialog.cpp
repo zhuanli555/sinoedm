@@ -48,8 +48,8 @@ AxisSetDialog::AxisSetDialog(int key, QWidget *parent)
 AxisSetDialog::AxisSetDialog(QWidget *parent)
     : QDialog(parent)
 {
-    label2 =new QLabel(QString::fromLocal8Bit("请选择合适的轴"),this);
-    QGridLayout *TopLayout =new QGridLayout(this);
+    label2 = new QLabel(QString::fromLocal8Bit("请选择合适的轴"),this);
+    QGridLayout *TopLayout = new QGridLayout(this);
     TopLayout->addWidget(label2,0,0);
 }
 

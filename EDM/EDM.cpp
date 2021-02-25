@@ -347,11 +347,13 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
 
     //AutoClearMakeUpVal(pMacUser);
     dwStatus = ioctl(fd,IOC_MOVEPARA_FROM_USER,pMacUser);
-     if (dwStatus==1)
-     {
+    if (dwStatus==1)
+    {
+
         CmdHandle::DigitCmd2QString(pMacUser,str);
+        qDebug()<<str;
         return true;
-     }
+    }
 
 	return false;
 }

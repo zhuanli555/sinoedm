@@ -44,7 +44,7 @@ SOURCES += \
     EDM/EDM_OP_HOLE.cpp \
     EDM/EDM_OP_List.cpp \
     EDM/electool.cpp \
-    spindelegate.cpp \
+    spindelegate.cpp
 #    elecoralmodel.cpp \
 #    elecpagemodel.cpp
 
@@ -69,7 +69,7 @@ HEADERS += \
     EDM/EDM_OP_HOLE.h \
     EDM/EDM_OP_List.h \
     EDM/electool.h \
-    spindelegate.h \
+    spindelegate.h
 #    //elecoralmodel.h \
 #    //elecpagemodel.h
 
@@ -79,3 +79,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES +=
+
+FORMS +=

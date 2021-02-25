@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 //    connect(tThread,&QThread::finished,edm,&QObject::deleteLater);
 //    tThread->start();
     //设置多线
-    QFuture<void> macOp = QtConcurrent::run(this,&MainWindow::MacUserOperate);
+    QtConcurrent::run(this,&MainWindow::MacUserOperate);
     //macOp.waitForFinished();
     //设置定时器
     QTimer *t = new QTimer(this);
@@ -204,14 +204,13 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
             CmdHandle *pCmdHandle;
             static DIGIT_CMD stDigitCmd;
             DIGIT_CMD cmdDefault;
-            QString cmd = "G92 G00";
+            QString cmd = "G90 G00";
             cmd += m_str;
             cmd += "0";
             cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
             pCmdHandle = new CmdHandle(FALSE,cmd,&stDigitCmd,&cmdDefault);
             delete pCmdHandle;
             edm->EdmSendMovePara(&stDigitCmd);
-            //emit signalSendMovePara(&stDigitCmd);
         }
     }
 
@@ -269,6 +268,7 @@ void MainWindow::edmSendComand()
     static DIGIT_CMD stDigitCmd;
     DIGIT_CMD cmdDefault;
     CmdHandle* pCmdHandle;
+    QString cmdstr;
     int speed;
     if(speedValue->text() == "mid")
     {
@@ -279,13 +279,15 @@ void MainWindow::edmSendComand()
     }else{
         speed = 20000;
     }
+    cmdstr = commandLine->text();
+    qDebug()<<cmdstr;
     memset(&cmdDefault,0,sizeof(DIGIT_CMD));
     cmdDefault.enAim = AIM_G91;
     cmdDefault.enOrbit = ORBIT_G00;
     cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
     cmdDefault.iFreq = CmdHandle::GetSpeedFreq(speed);
 
-    pCmdHandle = new CmdHandle(FALSE,commandLine->text(),&stDigitCmd,&cmdDefault);
+    pCmdHandle = new CmdHandle(FALSE,cmdstr,&stDigitCmd,&cmdDefault);
     delete pCmdHandle;
     stDigitCmd.stOp.bShortDis = TRUE;
     stDigitCmd.bNoCheck = TRUE;
