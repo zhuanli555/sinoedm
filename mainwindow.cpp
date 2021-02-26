@@ -276,7 +276,7 @@ void MainWindow::edmSendComand()
     cmdDefault.enAim = AIM_G90;
     cmdDefault.enOrbit = ORBIT_G00;
     cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
-    cmdDefault.iFreq = CmdHandle::GetSpeedFreq(speed);
+    cmdDefault.iFreq = speed;
 
     pCmdHandle = new CmdHandle(FALSE,cmdstr,&stDigitCmd,&cmdDefault);
     delete pCmdHandle;

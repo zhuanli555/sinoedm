@@ -243,7 +243,7 @@ unsigned long  EDM::CalcCheckBool(MAC_INTERFACE_IN *pIn)
 
 	return bCheck;
 }
-//wangchangxi
+//获取端口数据
 bool EDM::GetEdmStatusData()
 {
 	DWORD dwStatus;
@@ -349,7 +349,6 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
     dwStatus = ioctl(fd,IOC_MOVEPARA_FROM_USER,pMacUser);
     if (dwStatus==1)
     {
-
         CmdHandle::DigitCmd2QString(pMacUser,str);
         qDebug()<<str;
         return true;

@@ -22,21 +22,19 @@
 
 #define OPERATE_TRREAD_SLEEP_TIME        20
 #define EDM_SHOW_THREAD_SLEEP_TIME       35
-#define EDM_MAC_LABEL_COUNT              8
+#define EDM_MAC_LABEL_COUNT              7
 #define EDM_INT_SPEED_MAX      600
-#define ARR_EDM_LABEL_SHOW  {0,1,5,3,7,6,4,2}
-#define ARR_EDM_LABEL_SHOW_CHAR {'X','Y','Z','A','B','C','W','S'}
-#define ARR_EDM_LABEL_CHAR {'X','Y','C','A','S','W','B','Z'}
+#define ARR_EDM_LABEL_SHOW  {0,1,6,4,5,2,3}
+#define ARR_EDM_LABEL_SHOW_CHAR {'X','Y','Z','A','B','C','W'}
+#define ARR_EDM_LABEL_CHAR {'X','Y','C','W','A','B','Z'}
 
 #define INT_SPEED_CTRL_FREQ_MIN       1000   //速度控制最小频率
 #define INT_SPEED_CTRL_ADD            10     //升降速增加值
 
-#define MAC_LABEL_COUNT        8             //轴的总数目,不包括R轴，R轴单独控制
-#define MAC_RTZERO_LABEL_COUNT 9
+#define MAC_LABEL_COUNT        7            //轴的总数目,不包括R轴，R轴单独控制
+#define MAC_RTZERO_LABEL_COUNT 8
 #define OP_HOLE_PAGE_MAX       6
-#define MAC_INT_FREQ           5000         //中断频率
-#define MAC_INT_FREQ_LOW        1000
-#define MAC_INT_FREQ_HIGH       10000
+#define MAC_INT_FREQ           10000         //中断频率
 #define MAC_LABEL_MOST_LONG    1001          //轴最长,以毫米为单位
 
 #define FALSE 0
