@@ -24,7 +24,7 @@ EDM_OP_File::~EDM_OP_File()
 
 
 //要修改
-BOOL EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
+unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 {
 	vector<QString>::iterator it;
 	int iHoleIndexBak;
@@ -69,11 +69,11 @@ BOOL EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 }
 
 //要修改
-void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,BOOL bStart,BOOL bCycleStart,int iPageIndex)
+void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bStart,unsigned char bCycleStart,int iPageIndex)
 {
 	int iHoleIndexBak = 0;
     QString strName=str.toUpper();
-	BOOL bWrite = FALSE;
+	unsigned char bWrite = FALSE;
 
 	iHoleIndexBak = m_mpElecMan[strName].stElecOral.iOpHoleIndex;
 	memcpy(&m_mpElecMan[strName],&elec,sizeof(MAC_ELEC_PARA));
@@ -123,7 +123,7 @@ void EDM_OP_File::SetEdmElecIndex(int iCmdIndex)
 	}
 }
 
-BOOL EDM_OP_File::IsStrElecCmd(QString str)
+unsigned char EDM_OP_File::IsStrElecCmd(QString str)
 {
 	map<QString,MAC_ELEC_PARA>::iterator it;
 	QString tmp;
@@ -144,7 +144,7 @@ BOOL EDM_OP_File::IsStrElecCmd(QString str)
 	return FALSE;
 }
 
-BOOL EDM_OP_File::IsPauseCmd(QString str)
+unsigned char EDM_OP_File::IsPauseCmd(QString str)
 {
     str = str.toUpper().trimmed();
 	if (str=="M00")
@@ -153,7 +153,7 @@ BOOL EDM_OP_File::IsPauseCmd(QString str)
 	return FALSE;
 }
 
-BOOL EDM_OP_File::IsMillStart(QString str)
+unsigned char EDM_OP_File::IsMillStart(QString str)
 {
     str = str.toUpper().trimmed();
 	if (str=="(")
@@ -162,7 +162,7 @@ BOOL EDM_OP_File::IsMillStart(QString str)
 	return FALSE;
 }
 
-BOOL EDM_OP_File::IsMillOver(QString str)
+unsigned char EDM_OP_File::IsMillOver(QString str)
 {
     str = str.toUpper().trimmed();
 	if (str==")")
@@ -172,7 +172,7 @@ BOOL EDM_OP_File::IsMillOver(QString str)
 }
 
 
-BOOL EDM_OP_File::IsOverCmd(QString str)
+unsigned char EDM_OP_File::IsOverCmd(QString str)
 {
     str = str.toUpper().trimmed();
 	if (str=="M02")
@@ -181,7 +181,7 @@ BOOL EDM_OP_File::IsOverCmd(QString str)
 	return FALSE;
 }
 
-BOOL EDM_OP_File::IsMillFile(QString str)
+unsigned char EDM_OP_File::IsMillFile(QString str)
 {
 	if(str == "")return FALSE;
 
@@ -261,7 +261,7 @@ void EDM_OP_File::PlusDigit2Cmd()
 	int iSumLastMac[MAC_LABEL_COUNT];
 	int iWorkPos_All[6][MAC_LABEL_COUNT];
 	int iLabel;
-	BOOL bFirstEntry = TRUE;
+	unsigned char bFirstEntry = TRUE;
     CmdHandle* pCmdHandle;
 
 	m_enAim = AIM_G90;

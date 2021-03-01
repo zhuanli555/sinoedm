@@ -58,7 +58,7 @@ EDM::~EDM()
 
 bool EDM::EdmInit()
 {
-	DWORD dwStatus;
+	short dwStatus;
 
 	m_stEdmInterfaceOut.btO144 = 0x07;
 	m_stEdmInterfaceOut.btO140 = 0xFF;
@@ -103,7 +103,7 @@ bool EDM::EdmClose()
 
 bool EDM::GetEdmComm()
 {
-    DWORD dwStatus;
+    short dwStatus;
     dwStatus = ioctl(fd,IOC_COMM_TO_USER,&m_stEdmComm);
 	if (m_bOffLine)
 	{
@@ -115,7 +115,7 @@ bool EDM::GetEdmComm()
 
 bool EDM::GetEdmMacPassPara(MAC_PASS_PARA* pPass)
 {
-	DWORD dwStatus;
+	short dwStatus;
 
     memset(pPass,0,sizeof(MAC_PASS_PARA));
     dwStatus = ioctl(fd,IOC_PASS_CTL,pPass);
@@ -134,119 +134,10 @@ int EDM::GetEdmAxisWorkPos(int iLabel)
 	return iRet;
 }
 
-unsigned long  EDM::CalcDirectBool(MAC_INTERFACE_IN *pIn)
-{
-	unsigned long bDirect = 1;	
-
-	bDirect = pIn->btI188 & 0x01;
-
-	return bDirect;//短路BOOL值
-}
-
-unsigned long  EDM::CalcLimitBool(MAC_INTERFACE_IN *pIn,int iLabel,unsigned long bDir,unsigned long bDirectMotor)
-{
-	unsigned long bLimit=1;
-	switch(iLabel)
-	{
-	case 0://X
-		{
-			if (bDir)
-				bLimit=pIn->btI18D & 0x02;
-			else
-				bLimit=pIn->btI18D & 0x01;
-		}
-		break;
-	case 1://Y
-		{
-			if (bDir)
-				bLimit=pIn->btI18D & 0x08;
-			else
-				bLimit=pIn->btI18D & 0x04;
-		}			
-		break;
-	case 2://C
-		{
-			if (bDirectMotor)
-			{
-				bLimit = !(pIn->btI140 & 0x04);
-			}
-			else
-			{
-				if (bDir)
-					bLimit=0;
-				else
-					bLimit=pIn->btI18D & 0x40;
-			}			
-		}			
-		break;	
-	case 3://A
-		{
-			if (bDir)
-				bLimit=pIn->btI18D & 0x20;
-			else
-				bLimit=pIn->btI188 & 0x08;
-		}
-		break;	
-	case 4://S
-		{
-			if (bDir)
-				bLimit=pIn->btI18C & 0x01;
-			else
-				bLimit=pIn->btI18C & 0x02;
-		}
-		break;
-	case 5://W
-		{
-			if (bDir)
-				bLimit=pIn->btI18C & 0x10;
-			else
-				bLimit=pIn->btI18C & 0x20;
-		}		
-		break;
-	case 6://B
-		{
-			if (bDir)
-				bLimit=pIn->btI18C & 0x40;
-			else
-				bLimit=pIn->btI18C & 0x80;
-		}		
-		break;
-	case 7://Z
-		{
-			if (bDir)
-				bLimit=pIn->btI18C & 0x04;
-			else
-				bLimit=pIn->btI18C & 0x08;
-		}		
-		break;
-	default:
-		break;
-	}
-	return bLimit;
-}
-
-unsigned long EDM::CalcAlarmBool(MAC_INTERFACE_IN *pIn,int iLabel)
-{
-	unsigned long bAlarm=1;
-	static unsigned char btAlarm[MAC_LABEL_COUNT] = {0x10,0x20,0x40,0x80,0x01,0x04,0x08,0x02};
-
-	bAlarm = pIn->btI184 & btAlarm[iLabel];
-
-	return bAlarm;
-}
-
-unsigned long  EDM::CalcCheckBool(MAC_INTERFACE_IN *pIn)
-{
-	BOOL bCheck = TRUE;
-
-	bCheck = !(pIn->btI144 & 0x08);
-
-	return bCheck;
-}
 //获取端口数据
 bool EDM::GetEdmStatusData()
 {
-	DWORD dwStatus;
+	short dwStatus;
 	int iLabel=0;
 
 	memcpy(&m_stEdmShowData.stComm,&m_stEdmComm,sizeof(MAC_COMMON));
@@ -319,7 +210,7 @@ int EDM::GetSpeed(int iFreq)
 
 bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
 {
-	DWORD dwStatus;
+	short dwStatus;
 	bool bSwitchOver = false;
     QString str;
 
@@ -410,7 +301,7 @@ void EDM::EdmStop()
 
 bool EDM::EdmStopMove(bool bStatus)
 {
-	DWORD dwStatus;
+	short dwStatus;
     QString str = "stop move";
 
     m_stEdmOpEntile.bStop = TRUE;
@@ -434,7 +325,7 @@ void EDM::EdmStopSignClose()
 
 bool EDM::EdmRtZero(int iLabel)
 {
-	DWORD dwStatus;
+	short dwStatus;
 
 	if (m_stEdmComm.enMvStatus==RULE_RTZERO)
 		return false;
@@ -460,7 +351,7 @@ void EDM::EdmZeroSignClose()
 
 bool EDM::EdmSetProtect(bool bProtect)
 {
-	DWORD dwStatus;
+	short dwStatus;
 
 	if (m_stEdmComm.enMvStatus==RULE_RTZERO)
 		return false;
@@ -488,7 +379,7 @@ int EDM::HandBoxProcess()
 {
 	DIGIT_CMD stDigitCmd;
 	static int iSpeedFreq[3]={MAC_INT_FREQ,2000,166};
-	static BYTE btOut[3] = {0x1B,0x1D,0x1E};
+	static unsigned char btOut[3] = {0x1B,0x1D,0x1E};
 	static int iLabel_F[4] ={0,1,7,4};
 	static int iLabel_S[3] ={3,5,2};
 	static int iIndex = 0;
@@ -496,11 +387,11 @@ int EDM::HandBoxProcess()
 	static int iSpeedSum =0;
 	static bool bStop= false;
 	static bool bHas = false;
-	BYTE btComp = 0x01;
-	DWORD dwStatus=0;
-	BYTE btTmp;
-	BYTE btTmp1;
-    BYTE btTmp2;
+	unsigned char btComp = 0x01;
+	short dwStatus=0;
+	unsigned char btTmp;
+	unsigned char btTmp1;
+    unsigned char btTmp2;
 	bool bDirMove = false;
 
 	stDigitCmd.iAxisCnt=0;
@@ -663,7 +554,7 @@ int EDM::GetRAxisFreq(int iSpeed)
 
 bool EDM::EdmRotate(bool bSwitch,bool bOpen,int iSpeed,bool bDir)
 {
-	DWORD dwStatus;
+	short dwStatus;
     QString str;
 	MAC_ROTATE_PARA stRotate;
 
@@ -805,11 +696,11 @@ void EDM::EdmSaveMacComm()
 //设置电参数
 int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
 {
-	BYTE btTmp;
-	BYTE btCal;
+	unsigned char btTmp;
+	unsigned char btCal;
     QString str;
     QString strTmp = "write elec:";
-	BOOL bDebug = TRUE;
+	unsigned char bDebug = TRUE;
 	int iForbit;
 
 	//防止乱码
@@ -879,7 +770,7 @@ int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
 void EDM::SetServoToGive(int iPercent)
 {
 	int iConverge =  (iPercent - 30) * 4;
-	BYTE btServo;
+	unsigned char btServo;
 
 	if (iConverge>=10 && iConverge<=240)
 		btServo = iConverge;
@@ -889,11 +780,7 @@ void EDM::SetServoToGive(int iPercent)
 			btServo = 10;
 		if (iConverge > 240)
 			btServo = 240;
-	}	
-	//TODO
-	// WriteByteToReg(0x183,0xB2);
-	// WriteByteToReg(0x182,btServo);
-	// WriteByteToReg(0x182,0);
+	}
 }
 
 bool EDM::GetAxisOffset()
@@ -938,7 +825,7 @@ bool EDM::GetAxisOffset()
 	return bAxisOffset;
 }
 
-BOOL EDM::FindElecManElem(QString str)
+unsigned char EDM::FindElecManElem(QString str)
 {
     QString strTmp;
     map<QString,MAC_ELEC_PARA>::iterator it;
@@ -970,7 +857,7 @@ void EDM::GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan)
 bool EDM::SaveMacPara(MAC_SYSTEM_SET* pSysSet)
 {
 	MAC_SYSTEM_SET sys;
-	DWORD dwStatus;
+	short dwStatus;
 
 	memcpy(&sys,pSysSet,sizeof(MAC_SYSTEM_SET));
 	RetCenter_C_G59();
@@ -989,7 +876,7 @@ bool EDM::SwitchWorkIndex(int iSwitch)
 {
 	DIGIT_CMD cmd;
 	int iIndex;
-	DWORD dwStatus;
+	short dwStatus;
 	if (m_stEdmComm.enMvStatus == RULE_MOVE_OVER)
 	{
 		if (iSwitch==m_iWorkIndex)
@@ -1062,7 +949,7 @@ void EDM::ReSetWorkPosSetByIndex(int iIndex,int iWork[])
 }
 
 
-void EDM::SetAxisAdjust(int iLabel, BOOL bDir)
+void EDM::SetAxisAdjust(int iLabel, unsigned char bDir)
 {
 	memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
 	m_stAxisAdjust.bAdjust = TRUE;
@@ -1259,7 +1146,7 @@ void EDM::EdmAxisAdjustCircleInside()
 {
 	DIGIT_CMD stDigitCmd;
 	int iLabel[4] = {0,0,1,1};
-	BOOL bDir[4] = {TRUE,FALSE,TRUE,FALSE};
+	unsigned char bDir[4] = {TRUE,FALSE,TRUE,FALSE};
 	int iVal_Center[2];
 
 	if (!m_stAxisAdjust.bAdjust)
@@ -1387,7 +1274,7 @@ void EDM::EdmAxisAdjustCircleOutSide()
 {
 	DIGIT_CMD stDigitCmd;
 	int iLabel[4] = {0,0,1,1};
-	BOOL bDir[4] = {TRUE,FALSE,TRUE,FALSE};
+	unsigned char bDir[4] = {TRUE,FALSE,TRUE,FALSE};
 	int iProtect = ((float)m_stAdjustCircle.iSemiDiameter)*0.1;
 	int iVal_Center[2];
 

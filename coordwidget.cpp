@@ -142,7 +142,7 @@ void CoordWidget::SaveData()
 {
     static MAC_COMMON stMaccomLast;
     static int iSaveCnt = 0;
-    BOOL bSave = FALSE;
+    unsigned char bSave = FALSE;
     memset(&stMaccomLast,0,sizeof(MAC_COMMON));
     if (++iSaveCnt>=5)
     {

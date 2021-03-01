@@ -19,7 +19,7 @@
 
 #define IOC_MAXNR  10
 
-
+/* 上位机需要 */
 #define OPERATE_TRREAD_SLEEP_TIME        20
 #define EDM_SHOW_THREAD_SLEEP_TIME       35
 #define EDM_MAC_LABEL_COUNT              7
@@ -43,47 +43,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef unsigned char BOOL,BYTE;
-typedef short DWORD;
-
-typedef struct isaMAC_INTERFACE_IN
-{
-	BYTE btI140; 
-	BYTE btI144;
-	BYTE btI148;
-	BYTE btI184;
-	BYTE btI188;
-	BYTE btI18C;
-	BYTE btI18D;	
-	BYTE btI1C4;
-	BYTE btI1C8;
-	BYTE btI1A6;
-	BYTE btI1A7;
-	BYTE btI310;
-	BYTE btI312;
-	BYTE btI15C;//shineng
-	BYTE btI1DC;//shineng
-}MAC_INTERFACE_IN;
-
-typedef struct  isaMAC_INTERFACE_OUT
-{
-	BYTE btO184;
-	BYTE btO188;
-	BYTE btO190;
-	BYTE btO18C;//zhongduan
-	BYTE btO199;
-	BYTE btO144;
-	BYTE btO1C4;
-	BYTE btO140;	//x,y,z
-}MAC_INTERFACE_OUT;
-
-typedef struct isaMac_Para
-{
-    MAC_INTERFACE_OUT pOut;
-    MAC_INTERFACE_IN pIn;
-}Mac_Para;
-
+//TODO
 //车电极
 typedef struct edmMacOther
 {
@@ -139,19 +99,28 @@ typedef struct isaMAC_ROTATE_PARA
 	int iFreq;
 }MAC_ROTATE_PARA;
 
-
-//加工类别
+/**
+ * 加工类别
+ * OP_TYPE_NONE       = 0,    //无加工状态
+	//小孔
+	OP_HOLE_SING       = 1,    //单孔加工
+	OP_HOLE_PROGRAME   = 2,    //程序加工
+	OP_HOLE_SIMULATE   = 3,    //模拟加工
+	OP_HOLE_MILL       = 4,    //铣削加工
+	OP_HOLE_CHECK_C    = 5,    //圆度测量
+	OP_HOLE_DISCHARGE  = 9,    //对刀
+	OP_MOLD_GRIND      = 11,   //磨削加工
+	//成型
+	OP_MOLD_SHAPE      = 21,   //成型加工	
+*/
 typedef enum
 {
 	OP_TYPE_NONE       = 0,    //无加工状态
-    //单孔加工
-    OP_HOLE_SING       = 1,
-    //程序加工
-    OP_HOLE_PROGRAME   = 2,
-    //模拟加工
-    OP_HOLE_SIMULATE   = 3,
-    //铣削加工
-    OP_HOLE_MILL       = 4,
+	//小孔
+	OP_HOLE_SING       = 1,    //单孔加工
+	OP_HOLE_PROGRAME   = 2,    //程序加工
+	OP_HOLE_SIMULATE   = 3,    //模拟加工
+	OP_HOLE_MILL       = 4,    //铣削加工
 	OP_HOLE_CHECK_C    = 5,    //圆度测量
 	OP_HOLE_DISCHARGE  = 9,    //对刀
 
@@ -160,8 +129,13 @@ typedef enum
 	OP_MOLD_SHAPE      = 21,   //成型加工	
 }MAC_OPERATE_TYPE;
 
-
-//轴无限运动方式时的停下来
+/**
+ * 轴运动方式
+ * 0 运动物理结束
+	1 运动中
+	2 回零运动
+	3 正常运动补偿
+*/
 typedef enum
 {
 	RULE_MOVE_OVER      = 0,     //运动物理结束
@@ -170,8 +144,15 @@ typedef enum
 	RULE_COMPEN         = 3,     //正常运动补偿
 }MOVE_STATUS;
 
-
-//轴运动方式时的停下来
+/**
+ * 轴运动问题
+ * 0 没有问题
+	1 软限位问题
+	2 硬限位问题
+	3 非法使用
+	4 回零错误
+	5 程序编制错误
+*/
 typedef enum
 {
 	MOVE_NO_TROUBLE     = 0,    //没有问题
@@ -192,15 +173,26 @@ typedef enum
 	COOR_G59,
 }EDM_COOR_TYPE;
 
-//运动目标类型
+/**
+ * 运动目标类型
+ * 0 绝对尺寸
+ * 1 增量尺寸
+ * 2 工件坐标原点设置
+*/
 typedef enum
 {
-	AIM_G90 = 0,
-	AIM_G91 = 1,
-	AIM_G92 = 2,	
+	AIM_G90 = 0,//绝对尺寸
+	AIM_G91 = 1,//增量尺寸
+	AIM_G92 = 2,	//工件坐标原点设置
 }EDM_AIM_TYPE;
 
-//运动轨迹类型
+/**
+ * 运动轨迹类型
+ * 0 快速运动
+ * 1 直线插补
+ * 2 顺圆
+ * 3 逆圆
+*/
 typedef enum
 {
 	ORBIT_G00 = 0,      //快速运动
@@ -210,7 +202,10 @@ typedef enum
 }EDM_ORBIT_TYPE;
 
 
-//轴运动使用的齿补控制参数
+/**
+ * 轴运动使用的齿补控制参数
+ * iChiBu 齿补数，从数据库中读
+ * */
 typedef struct  kpAxis_ChiBuVal
 {
 	int iChiBu;                                //齿补数，从数据库中读
@@ -255,7 +250,14 @@ typedef struct  kpAxis_Para_Kp
 	Axis_LuoBuVal     stLuoBuVal;
 }Axis_Para_Kp;
 
-//轴运动KP\USER都使用的参数
+/**
+ * 轴运动KP\USER都使用的参数
+ * int iMachPos;           机械位置，从内存中读
+	int iWorkPosSet;        工作坐标设定对应机械位置值
+	int iRasilPos;          光栅尺坐标
+	unsigned long bDirMove;          新的运动方向
+	unsigned long dwPulseCount;     调试用,发送脉冲数
+*/
 typedef struct isaAxis_Para_Common
 {
 	int iMachPos;           //机械位置，从内存中读
@@ -296,6 +298,14 @@ typedef struct isaMAC_COMMON
 	MAC_OPERATE_TYPE enOpType;     //加工类别
 }MAC_COMMON;
 
+/**
+ * 加工参数
+ * Axis_Para_Kp  stAxisCtrlKp[MAC_LABEL_COUNT] 轴运动使用的参数
+	int  iOpLabel                    加工轴
+	unsigned long bOpDir 加工方向
+	unsigned long bDebug 代码调试参数，软参数
+	unsigned long bNoCheck 需要用检测信号
+*/
 typedef struct isaMAC_KPINT
 {
 	Axis_Para_Kp  stAxisCtrlKp[MAC_LABEL_COUNT];
@@ -303,7 +313,7 @@ typedef struct isaMAC_KPINT
 	unsigned long bOpDir;                      //加工方向
 	unsigned long bDebug;                      //代码调试参数，软参数
 	unsigned long bNoCheck;                    //需要用检测信号
-}MAC_KPINT;
+}MAC_KPINT;//驱动内部执行变量
 
 typedef struct kpMAC_SPEED_CTL 
 {
@@ -322,6 +332,16 @@ typedef struct isaAxisDigitPara
 	int iDistance;   //运动距离
 }AxisDigitPara;
 
+/**
+ * int  iFreq 速度对应频率
+	int  iAxisCnt 进入驱动轴数
+	unsigned long bNoCheck 需要用检测信号
+	EDM_AIM_TYPE enAim 命令类型
+	EDM_ORBIT_TYPE enOrbit 轨迹类型
+	EDM_COOR_TYPE  enCoor 多坐标系
+	Edm_OP stOp 加工参数	
+	AxisDigitPara stAxisDigit[15] 轴的运动参数,最多一次送10个轴
+*/
 typedef struct edmDIGIT_CMD
 {
 	int  iFreq;                     //速度对应频率
@@ -346,8 +366,38 @@ typedef struct isaMAC_HANDLE_ENTILE
 	unsigned long bNoProtect;                //防撞保护取反
 	unsigned long bRtZero;                   //回零
 	int  iLabel;                    //回零轴
-}MAC_HANDLE_ENTILE;
+}MAC_HANDLE_ENTILE;//手动控制
 
+typedef struct isaMAC_INTERFACE_IN
+{
+	unsigned char btI140; 
+	unsigned char btI144;
+	unsigned char btI148;
+	unsigned char btI184;
+	unsigned char btI188;
+	unsigned char btI18C;
+	unsigned char btI18D;	
+	unsigned char btI1C4;
+	unsigned char btI1C8;
+	unsigned char btI1A6;
+	unsigned char btI1A7;
+	unsigned char btI310;
+	unsigned char btI312;
+	unsigned char btI15C;//shineng
+	unsigned char btI1DC;//shineng
+}MAC_INTERFACE_IN;
+
+typedef struct  isaMAC_INTERFACE_OUT
+{
+	unsigned char btO184;
+	unsigned char btO188;
+	unsigned char btO190;
+	unsigned char btO18C;//中断
+	unsigned char btO199;
+	unsigned char btO144;
+	unsigned char btO1C4;	
+	unsigned char btO140;//x,y,z
+}MAC_INTERFACE_OUT;
 
 typedef struct isaMAC_SYSTEM_SET_NONE_LABEL
 {
@@ -386,7 +436,7 @@ typedef struct isaMAC_SYSTEM_SET_NONE_LABEL
 	int iBlindPos_X;
 	int iBlindPos_Y;
 	int iBlind_Deviate;
-}Mac_System_Set_None_Label;
+}Mac_System_Set_None_Label;//系统设置时不涉及轴
 
 typedef struct isaMAC_SYSTEM_SET
 {	
@@ -399,7 +449,12 @@ typedef struct isaMAC_SYSTEM_SET
 	int iPosPrecision[MAC_LABEL_COUNT];
 	int iAxistLabel;
 	Mac_System_Set_None_Label stSetNoneLabel;
-}MAC_SYSTEM_SET;
+}MAC_SYSTEM_SET;//系统设置
+
+unsigned long CalcLimitBool(MAC_INTERFACE_IN *pIn,int iLabel,unsigned long bDir,unsigned long bDirectMotor);
+unsigned long CalcAlarmBool(MAC_INTERFACE_IN *pIn,int iLabel);
+unsigned long CalcDirectBool(MAC_INTERFACE_IN *pIn);
+unsigned long CalcCheckBool(MAC_INTERFACE_IN *pIn);
 
 #ifdef __cplusplus
 }

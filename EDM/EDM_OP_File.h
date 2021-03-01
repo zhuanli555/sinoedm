@@ -42,16 +42,16 @@ protected:
 	MAC_ELEC_PARA* m_pElecPara;	
 	MAC_OPERATE_TYPE m_enOpType;
 public:
-	BOOL SetEdmOpFile(QString sPath,QString sFile);
-	void SetEdmOpElec(QString str,MAC_ELEC_PARA elec,BOOL bStart,BOOL bCycleStart,int iPageIndex);
-    BOOL IsStrElecCmd(QString str);
-    BOOL IsPauseCmd(QString str);
-    BOOL IsOverCmd(QString str);
-    BOOL IsMillStart(QString str);
-    BOOL IsMillOver(QString str);
+	unsigned char SetEdmOpFile(QString sPath,QString sFile);
+	void SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bStart,unsigned char bCycleStart,int iPageIndex);
+    unsigned char IsStrElecCmd(QString str);
+    unsigned char IsPauseCmd(QString str);
+    unsigned char IsOverCmd(QString str);
+    unsigned char IsMillStart(QString str);
+    unsigned char IsMillOver(QString str);
 	void SetEdmElecIndex(int iCmdIndex);
 	void PlusDigit2Cmd();
-    BOOL IsMillFile(QString str);
+    unsigned char IsMillFile(QString str);
 	void SaveElec2Db();
     QString GetLastElecName(int iCmdIndex);
 	void SetOpType(MAC_OPERATE_TYPE enOpType);

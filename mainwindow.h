@@ -33,7 +33,7 @@ public:
     MAC_SYSTEM_SET mSysSet;
     EDM_COOR_TYPE m_enCoorType;
 private:
-    BOOL EDMMacInit();
+    unsigned char EDMMacInit();
     void MacUserOperate();
     void createMenus();
     void createActions();

@@ -75,7 +75,7 @@ void EDM_OP_List::DeleteEdmOp()
 	}	
 }
 
-BOOL EDM_OP_List::SetEdmOpFile(QString sPath,QString sFile)
+unsigned char EDM_OP_List::SetEdmOpFile(QString sPath,QString sFile)
 {	
 	m_bChange = TRUE;	
 	if (m_pEdmOp)
@@ -168,7 +168,7 @@ void EDM_OP_List::CarryOn()
 }
 
 
-BOOL EDM_OP_List::GetOpFileInfo(QString* pStringFile,MAP_ELEC_MAN* pElec,vector<QString>* pCmd,vector<QString>* pCmdAbs)
+unsigned char EDM_OP_List::GetOpFileInfo(QString* pStringFile,MAP_ELEC_MAN* pElec,vector<QString>* pCmd,vector<QString>* pCmdAbs)
 {
 	MAP_ELEC_MAN elecMap;
 	map<QString,MAC_ELEC_PARA>::iterator it = pElec->begin();

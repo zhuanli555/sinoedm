@@ -34,9 +34,9 @@ public:
     ~ Process();
 public:
     QString m_strElecName;
-    BOOL bPause;
+    unsigned char bPause;
 private:
-    BOOL EDMProcessInit();
+    unsigned char EDMProcessInit();
     void showFileText();
     void createMenus();
     void createActions();

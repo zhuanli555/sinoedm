@@ -83,7 +83,7 @@ void EDM_OP_HOLE::EdmHoleOpTypeInit()
 	m_it = m_ListStage.begin();		
 }
 
-void EDM_OP_HOLE::EdmOpSetTest(BOOL bTest)
+void EDM_OP_HOLE::EdmOpSetTest(unsigned char bTest)
 {
 	memset(&m_stOpCtrl,0,sizeof(HOLE_CTRL));
 	if (bTest)
@@ -100,7 +100,7 @@ void EDM_OP_HOLE::EdmOpSetTest(BOOL bTest)
 }
 
 
-void EDM_OP_HOLE::EdmOpSetStart(BOOL bStart)
+void EDM_OP_HOLE::EdmOpSetStart(unsigned char bStart)
 {
 	MAC_OPERATE_TYPE enOpType;
 	enOpType = m_stOpStatus.enOpType;	
@@ -414,9 +414,9 @@ void EDM_OP_HOLE::EdmHoleMvCmdProcess()
 }
 
 //主轴回升
-BOOL EDM_OP_HOLE::EdmHoleRise()
+unsigned char EDM_OP_HOLE::EdmHoleRise()
 {
-	BOOL bRise = FALSE;
+	unsigned char bRise = FALSE;
 	DIGIT_CMD cmd;
 	QString strRec;
 	QString strTmpRec = " ";
@@ -468,7 +468,7 @@ BOOL EDM_OP_HOLE::EdmHoleRise()
 	return FALSE;
 }
 
-BOOL EDM_OP_HOLE::EdmHoleUp2Safe()
+unsigned char EDM_OP_HOLE::EdmHoleUp2Safe()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -513,7 +513,7 @@ BOOL EDM_OP_HOLE::EdmHoleUp2Safe()
 }
 
 
-BOOL EDM_OP_HOLE::EdmHoleDownFromSafe()
+unsigned char EDM_OP_HOLE::EdmHoleDownFromSafe()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -565,14 +565,14 @@ BOOL EDM_OP_HOLE::EdmHoleDownFromSafe()
 	return FALSE;
 }
 
-BOOL EDM_OP_HOLE::EdmHoleLocation()
+unsigned char EDM_OP_HOLE::EdmHoleLocation()
 {
 	int iLabel;
 	int iVal;
-	BOOL bExist = FALSE;
-	BOOL bAddCycleMeasVal = FALSE;
+	unsigned char bExist = FALSE;
+	unsigned char bAddCycleMeasVal = FALSE;
     DIGIT_CMD cmd2Send;
-	BOOL bEmptyMove=FALSE;
+	unsigned char bEmptyMove=FALSE;
 
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
@@ -661,7 +661,7 @@ BOOL EDM_OP_HOLE::EdmHoleLocation()
 }
 
 //加工同步
-BOOL EDM_OP_HOLE::EdmHoleSynchro()
+unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 {
 	DIGIT_CMD cmd;
 	DIGIT_CMD cmd2Send;
@@ -763,7 +763,7 @@ BOOL EDM_OP_HOLE::EdmHoleSynchro()
 }
 
 //电极对零
-BOOL EDM_OP_HOLE::EdmHoleZeroAdjust_Sing()
+unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust_Sing()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -823,7 +823,7 @@ BOOL EDM_OP_HOLE::EdmHoleZeroAdjust_Sing()
 }
 
 
-BOOL EDM_OP_HOLE::EdmHoleZeroAdjust()
+unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 {
 	Elec_Page stElec;
 	DIGIT_CMD cmd;
@@ -902,7 +902,7 @@ BOOL EDM_OP_HOLE::EdmHoleZeroAdjust()
 }
 
 //电极修整
-BOOL EDM_OP_HOLE::EdmHolePrune()
+unsigned char EDM_OP_HOLE::EdmHolePrune()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -974,7 +974,7 @@ BOOL EDM_OP_HOLE::EdmHolePrune()
 }
 
 //单孔加工
-BOOL EDM_OP_HOLE::EdmHoleOpPage()
+unsigned char EDM_OP_HOLE::EdmHoleOpPage()
 {
 	int iSum =0;
 	int iPage = 0;
@@ -1189,7 +1189,7 @@ BOOL EDM_OP_HOLE::EdmHoleOpPage()
 }
 
 
-BOOL EDM_OP_HOLE::EdmHoleMillPage()
+unsigned char EDM_OP_HOLE::EdmHoleMillPage()
 {
 	int iSum =0;
 	int iPage = 0;
@@ -1349,7 +1349,7 @@ BOOL EDM_OP_HOLE::EdmHoleMillPage()
 }
 
 //重复加工
-BOOL EDM_OP_HOLE::EdmHoleRepeat()
+unsigned char EDM_OP_HOLE::EdmHoleRepeat()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -1430,7 +1430,7 @@ BOOL EDM_OP_HOLE::EdmHoleRepeat()
 }
 
 //底部停留
-BOOL EDM_OP_HOLE::EdmHoleRootSleep()
+unsigned char EDM_OP_HOLE::EdmHoleRootSleep()
 {
 	QString strRec;
 	QString strTmpRec;
@@ -1648,7 +1648,7 @@ void EDM_OP_HOLE::EdmHolePassCtl()
 }
 
 //电极修整
-BOOL EDM_OP_HOLE::EdmHoleGo2AdjustPos()
+unsigned char EDM_OP_HOLE::EdmHoleGo2AdjustPos()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -1681,7 +1681,7 @@ BOOL EDM_OP_HOLE::EdmHoleGo2AdjustPos()
 	return FALSE;
 }
 
-BOOL EDM_OP_HOLE::EdmHoleReturnOpPos()
+unsigned char EDM_OP_HOLE::EdmHoleReturnOpPos()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -1713,7 +1713,7 @@ BOOL EDM_OP_HOLE::EdmHoleReturnOpPos()
 	return FALSE;
 }
 
-BOOL EDM_OP_HOLE::EdmHoleGo2StartPos()
+unsigned char EDM_OP_HOLE::EdmHoleGo2StartPos()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -1741,7 +1741,7 @@ BOOL EDM_OP_HOLE::EdmHoleGo2StartPos()
 }
 
 //复位
-BOOL EDM_OP_HOLE::EdmHoleResetStartPos()
+unsigned char EDM_OP_HOLE::EdmHoleResetStartPos()
 {
 	DIGIT_CMD cmd;
 	QString strRec;
@@ -1851,11 +1851,11 @@ void EDM_OP_HOLE::EdmHoleRecover()
 }
 
 
-void EDM_OP_HOLE::SetEdmHolePower(BOOL bPower,BOOL bPrune,BOOL bOtherClose)
+void EDM_OP_HOLE::SetEdmHolePower(unsigned char bPower,unsigned char bPrune,unsigned char bOtherClose)
 {
-	BOOL bRotate = TRUE;
-	BOOL bLowPump = FALSE;
-	BOOL bOther = TRUE;
+	unsigned char bRotate = TRUE;
+	unsigned char bLowPump = FALSE;
+	unsigned char bOther = TRUE;
 
 	EDM_OP::m_bSetPower = bPower;	
 
@@ -1888,7 +1888,7 @@ void EDM_OP_HOLE::SetEdmHolePower(BOOL bPower,BOOL bPrune,BOOL bOtherClose)
 }
 
 
-BOOL EDM_OP_HOLE::ExteedTimeAlarm()
+unsigned char EDM_OP_HOLE::ExteedTimeAlarm()
 {
 	int iCntMax =0;
 	int iCntMin = 0;
@@ -1914,7 +1914,7 @@ BOOL EDM_OP_HOLE::ExteedTimeAlarm()
 	return FALSE;
 }
 
-BOOL EDM_OP_HOLE::PoleLenAlarm()
+unsigned char EDM_OP_HOLE::PoleLenAlarm()
 {
 	int iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;
 
@@ -2001,7 +2001,7 @@ void EDM_OP_HOLE::EdmOpGoHigh()
 
 
 
-BOOL EDM_OP_HOLE::EdmOpMvAheadChkLabel()
+unsigned char EDM_OP_HOLE::EdmOpMvAheadChkLabel()
 {
 	DIGIT_CMD cmd;
 	CHECK_MODE enMode =CHECK_ELASTIC;
@@ -2052,7 +2052,7 @@ BOOL EDM_OP_HOLE::EdmOpMvAheadChkLabel()
 
 
 
-BOOL EDM_OP_HOLE::EdmOpMvWaitChkLabel()
+unsigned char EDM_OP_HOLE::EdmOpMvWaitChkLabel()
 {
 	int iVal;
 	CHECK_MODE enMode =CHECK_ELASTIC;
@@ -2083,7 +2083,7 @@ BOOL EDM_OP_HOLE::EdmOpMvWaitChkLabel()
 }
 
 
-BOOL EDM_OP_HOLE::EdmOpMvBackChkLabel()
+unsigned char EDM_OP_HOLE::EdmOpMvBackChkLabel()
 {
 	DIGIT_CMD cmd;
 	CHECK_MODE enMode =CHECK_ELASTIC;

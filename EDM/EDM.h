@@ -45,9 +45,9 @@ typedef enum
 //轴运动使用的控制参数硬件参数
 typedef struct  edmAxis_Adjust
 {	
-	BOOL bAdjust;
-	BOOL bDir;
-	BOOL bOver;
+	unsigned char bAdjust;
+	unsigned char bDir;
+	unsigned char bOver;
 	int iLabel;
 	int iStage;
 	int iAdjustCnt;
@@ -71,8 +71,8 @@ typedef struct edmAdjustCircle
 	int iSemiDiameter;
 	int iVal_X[5];
 	int iVal_Y[5];
-	BOOL bAdjust;
-	BOOL bOver;
+	unsigned char bAdjust;
+	unsigned char bOver;
 }ADJUST_CIRCLE;
 
 
@@ -178,7 +178,7 @@ public:
 	void EdmZeroSignClose();
 	void EdmSaveMacComm();
 
-	void SetAxisAdjust(int iLabel, BOOL bDir);
+	void SetAxisAdjust(int iLabel, unsigned char bDir);
 	void SetAxisAdjustCircleType(ADJUST_CIRCLE* pAdjustCircle);
 	void EdmAxisAdjust();
     void EdmAxisAdjustCircle();
@@ -188,31 +188,23 @@ public:
 	void ClearMakeUpVal();
 	void AutoClearMakeUpVal(DIGIT_CMD* pMacUser);
 	bool HasMakeUpVal();
-	bool GetMakeUpVal(int iVal_C,int* pVal);
-	unsigned long  CalcCheckBool(MAC_INTERFACE_IN *pIn);
+    bool GetMakeUpVal(int iVal_C,int* pVal);
 
 private:
 	bool EdmRedLump(bool bRed);
 	void EdmReadMacPara();
-	int  WriteByteToReg(int iCtrAdd,BYTE btCtrVal);
-	BYTE ReadByteFromReg(int iCtrAdd);
+	int  WriteByteToReg(int iCtrAdd,unsigned char btCtrVal);
+	unsigned char ReadByteFromReg(int iCtrAdd);
 	void SetServoToGive(int iPercent);
-	bool GetAxisOffset();
-	unsigned long  CalcDirectBool(MAC_INTERFACE_IN *);
-	unsigned long  CalcLimitBool(MAC_INTERFACE_IN *,int ,unsigned long ,unsigned long );
-	unsigned long  CalcAlarmBool(MAC_INTERFACE_IN *pIn,int iLabel);
-	
+    bool GetAxisOffset();
 	int GetSpeed(int iFreq);
 	int HandBoxProcess();	
-	
 	bool SwitchWorkIndex(int iIndex);
-
 	void RetCenter_C_G59();
-
 	void EdmAxisAdjustCircleInside();
 	void EdmAxisAdjustCircleOutSide();
 public:
-    BOOL FindElecManElem(QString str);
+    unsigned char FindElecManElem(QString str);
     void GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan);
     int WriteElecPara(Elec_Page *pElecPara,QString strFunc);
 	bool GetWorkPosSetByIndex(int iIndex,int iWork[]);

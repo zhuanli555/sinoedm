@@ -20,9 +20,9 @@ typedef struct
 
 typedef struct opPassChartPara
 {
-	BOOL bClear;
-	BOOL bSet;
-	BOOL bRealTimeIn;
+	unsigned char bClear;
+	unsigned char bSet;
+	unsigned char bRealTimeIn;
 	int iPosRealTime;
 	int iSpeedRealTime;
 	int iElecRealTime;
@@ -39,8 +39,8 @@ typedef struct opStatusNewCycle
 	int  iCycleIndex;          //循环编号
 	int  iTimeSec;             //时间
 	int  iTimeCnt;             //单次加工时间计数器
-	BOOL bPauseCmd;            //暂停指令
-	BOOL bCycleStart; 
+	unsigned char bPauseCmd;            //暂停指令
+	unsigned char bCycleStart; 
 	Pass_Chart_Para stPassChart;
 }STATUS_NEW_CYCYLE;
 
@@ -57,11 +57,11 @@ typedef struct  opStatus
 	MAC_OPERATE_TYPE enOpType; //加工类型
 	STATUS_NEW_CYCYLE stCycle; //状态信息
 	ERROR_ALL  enErrAll;       //错误提示
-	BOOL bStart;               //暂停
-	BOOL bOpOver;              //本次加工结束
-	BOOL bCheck_C_Over;        //圆度测量完成
+	unsigned char bStart;               //暂停
+	unsigned char bOpOver;              //本次加工结束
+	unsigned char bCheck_C_Over;        //圆度测量完成
 	int  iCmdIndex;            //命令号
-	BOOL bNewOp;
+	unsigned char bNewOp;
 	void* pNewHoleOp;
 }OP_STATUS;
 
@@ -71,9 +71,9 @@ public:
 	EDM_OP();
 	virtual  ~EDM_OP();	
 public:
-	static BOOL m_bSetPower;
-	static BOOL m_bStartCount;
-	static BOOL m_bInOp;	
+	static unsigned char m_bSetPower;
+	static unsigned char m_bStartCount;
+	static unsigned char m_bInOp;	
 	EDM_OP* m_pEdmOpPre;
 	OP_STATUS m_stOpStatus;	
 	
@@ -85,22 +85,22 @@ protected:
 	int m_iWorkPos_All[6][MAC_LABEL_COUNT];
 	int  m_iSafeLabelMacPos;
 	int  m_iWholeFreq;
-	BOOL m_bCalc;
+	unsigned char m_bCalc;
 
 	PASS_PARA_SET m_stPassSet;	
 public:
-	virtual void EdmOpSetStart(BOOL bStart)=0;
+	virtual void EdmOpSetStart(unsigned char bStart)=0;
 	virtual void EdmOpCarry()=0;
 	virtual void EdmOpOver()=0;
 	virtual void EdmOpStageRestart()=0;
-	virtual void EdmOpSetTest(BOOL bTest)=0;
+	virtual void EdmOpSetTest(unsigned char bTest)=0;
 	
 	void SetEdmOpFile(QString sPath,QString sFile);
 	void CalcDigitCmd();
 	void SetEdmOpElec(QString str,MAC_ELEC_PARA elec);
 	void SetPassPara(float,float,int,int);
 protected:
-	BOOL EdmOpErr();
+	unsigned char EdmOpErr();
 };
 
 

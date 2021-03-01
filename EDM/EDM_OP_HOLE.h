@@ -44,35 +44,35 @@ typedef struct  isaMAC_OPERATE_PASS_CTRL
 	int iVoltage;
 	long int iVoltageSum;
 	int iPosMax;
-	BOOL bStop;
-	BOOL bPassLowSet;
+	unsigned char bStop;
+	unsigned char bPassLowSet;
 
 	int iFeedEntry;
-	BOOL bEntryOver;
-	BOOL bEntrySet;
+	unsigned char bEntryOver;
+	unsigned char bEntrySet;
 	int iHighTimeCnt;
 	int iFiltCnt;
 
 	int iPassRelWork;
 
-	BOOL bPoleSet;
-	BOOL bPole;
-	BOOL bPoleStable;
+	unsigned char bPoleSet;
+	unsigned char bPole;
+	unsigned char bPoleStable;
 
-	BOOL bHighModeStop;
+	unsigned char bHighModeStop;
 }MAC_OPERATE_PASS_CTRL;
 
 typedef struct holeZeroCtrl
 {
-	BOOL bCycleStart;          //阶段开始
-	BOOL bRepeatSec;           //每次重复过程的第二阶段
-	BOOL bWait;                //在等待机械信号电信号同步
-	BOOL bStageLast;           //每一阶段的最后
-	BOOL bMillLast;
-	BOOL bEmptyMove;           //空走命令
-	BOOL bMillLenEnough;       //铣削深度到达
-	BOOL bMillPause;
-	BOOL bSafeLabelExist;
+	unsigned char bCycleStart;          //阶段开始
+	unsigned char bRepeatSec;           //每次重复过程的第二阶段
+	unsigned char bWait;                //在等待机械信号电信号同步
+	unsigned char bStageLast;           //每一阶段的最后
+	unsigned char bMillLast;
+	unsigned char bEmptyMove;           //空走命令
+	unsigned char bMillLenEnough;       //铣削深度到达
+	unsigned char bMillPause;
+	unsigned char bSafeLabelExist;
 	int  iCheckTimeCnt;        //圆度检测时间
 	int  iCheckPos;            //圆度检测位置
 	int  iSleepTimeCnt;        //加工中时间休眠时间计数器
@@ -87,14 +87,14 @@ typedef struct holeZeroCtrl
 typedef struct  holeCtrl
 {
 	int iWaitCnt;                            //机械信号电信号同步
-	BOOL bSynchro;                           //同步位置	
+	unsigned char bSynchro;                           //同步位置	
 	HOLE_ZERO_CTRL stZeroCtrl;               //循环置0模块
 }HOLE_CTRL;
 
 
 class EDM_OP_HOLE : public EDM_OP
 {
-	typedef BOOL (EDM_OP_HOLE::*fEdmOpStage)();
+	typedef unsigned char (EDM_OP_HOLE::*fEdmOpStage)();
 public:
 	EDM_OP_HOLE(MAC_OPERATE_TYPE enOpType);
 	virtual  ~EDM_OP_HOLE();
@@ -106,13 +106,13 @@ private:
 	list<fEdmOpStage>::iterator m_it;
     MAC_PASS_PARA m_stMacPassPara;
 public:
-	virtual void EdmOpSetStart(BOOL bStart);
-	virtual void EdmOpSetTest(BOOL bTest);
+	virtual void EdmOpSetStart(unsigned char bStart);
+	virtual void EdmOpSetTest(unsigned char bTest);
 	virtual void EdmOpCarry();
 	virtual void EdmOpOver();
 	virtual void EdmOpStageRestart();
 protected:
-	void SetEdmHolePower(BOOL bPower,BOOL bPrune,BOOL bOterClose);
+	void SetEdmHolePower(unsigned char bPower,unsigned char bPrune,unsigned char bOterClose);
 	void EdmHoleCarry();
 	void EdmHoleCmdProcess();
 
@@ -123,34 +123,34 @@ protected:
 	void EdmHoleMvCmdProcess();
 private:
 	void SetAllErr();
-	BOOL EdmHoleRise();
-	BOOL EdmHoleUp2Safe();
-	BOOL EdmHoleDownFromSafe();
-	BOOL EdmHoleLocation();
-	BOOL EdmHoleZeroAdjust();
-	BOOL EdmHoleZeroAdjust_Sing();
-	BOOL EdmHolePrune();
-	BOOL EdmHoleOpPage();
-	BOOL EdmHoleMillPage();
-	BOOL EdmHoleRepeat();
-	BOOL EdmHoleRootSleep();
-	BOOL EdmHoleSynchro();
+	unsigned char EdmHoleRise();
+	unsigned char EdmHoleUp2Safe();
+	unsigned char EdmHoleDownFromSafe();
+	unsigned char EdmHoleLocation();
+	unsigned char EdmHoleZeroAdjust();
+	unsigned char EdmHoleZeroAdjust_Sing();
+	unsigned char EdmHolePrune();
+	unsigned char EdmHoleOpPage();
+	unsigned char EdmHoleMillPage();
+	unsigned char EdmHoleRepeat();
+	unsigned char EdmHoleRootSleep();
+	unsigned char EdmHoleSynchro();
     void EdmHolePassCtl();
 
-	BOOL EdmHoleGo2AdjustPos();
-	BOOL EdmHoleReturnOpPos();
-	BOOL EdmHoleGo2StartPos();
-    BOOL EdmHoleResetStartPos();
+	unsigned char EdmHoleGo2AdjustPos();
+	unsigned char EdmHoleReturnOpPos();
+	unsigned char EdmHoleGo2StartPos();
+    unsigned char EdmHoleResetStartPos();
 
 	void CycleOver();
 	void EdmHoleOpTypeInit();
 	void EdmHoleRecover();
 	void EdmOpGoHigh();
-	BOOL EdmOpMvAheadChkLabel();
-	BOOL EdmOpMvWaitChkLabel();
-	BOOL EdmOpMvBackChkLabel();
-	BOOL ExteedTimeAlarm();
-	BOOL PoleLenAlarm();
+	unsigned char EdmOpMvAheadChkLabel();
+	unsigned char EdmOpMvWaitChkLabel();
+	unsigned char EdmOpMvBackChkLabel();
+	unsigned char ExteedTimeAlarm();
+	unsigned char PoleLenAlarm();
 	int GetFirstCmdValOfCLabel();
 };
 

@@ -337,7 +337,7 @@ void Process::HandleOpMsg()
 void Process::HandleEdmOpStatus()
 {
     static int iCmdIndex=-1;
-    static BOOL bOver=FALSE;
+    static unsigned char bOver=FALSE;
     static OP_ERROR op_error = OP_NO_ERR;
     static vector<QString> vCmd;
     static MAP_ELEC_MAN mpElec;
@@ -438,9 +438,9 @@ void Process::timeUpdate()
 
 }
 
-BOOL Process::EDMProcessInit()
+unsigned char Process::EDMProcessInit()
 {
-    BOOL bInit;
+    unsigned char bInit;
     edm =  EDM::GetEdmInstance();
     bInit = edm->EdmInit();
     //edm->GetFileName(strOpName);//从数据库获取filename

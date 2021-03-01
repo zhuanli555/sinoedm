@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     EDMMacInit();
     //×´Ì¬À¸
     statBar = statusBar();
+
     //left
     coordWidget = new CoordWidget();
     //right
@@ -91,6 +92,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 
 MainWindow::~MainWindow()
 {
+    EDM::DelEdm();
 }
 
 void MainWindow::MacUserOperate()
@@ -98,15 +100,15 @@ void MainWindow::MacUserOperate()
     while(true)
     {
         QMutexLocker lock(&mutex);
-        edm->GetEdmComm();
+        //TODO edm->GetEdmComm();
         coordWidget->HandleEdmCycleData();//coordwidget Ñ­»·
         QThread::msleep(20);
     }
 }
 
-BOOL MainWindow::EDMMacInit()
+unsigned char MainWindow::EDMMacInit()
 {
-    BOOL bInit;
+    unsigned char bInit;
     edm =  EDM::GetEdmInstance();
     bInit = edm->EdmInit();
     edm->GetMacPara(&m_stSysSet);
@@ -277,7 +279,6 @@ void MainWindow::edmSendComand()
     cmdDefault.enOrbit = ORBIT_G00;
     cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
     cmdDefault.iFreq = speed;
-
     pCmdHandle = new CmdHandle(FALSE,cmdstr,&stDigitCmd,&cmdDefault);
     delete pCmdHandle;
     stDigitCmd.stOp.bShortDis = TRUE;

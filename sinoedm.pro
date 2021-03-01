@@ -30,6 +30,7 @@ SOURCES += \
     process.cpp \
     program.cpp \
     setting.cpp \
+    EDM/common.cpp\
     EDM/EDM.cpp \
     EDM/EDM_Db.cpp \
     coordwidget.cpp \
@@ -44,7 +45,7 @@ SOURCES += \
     EDM/EDM_OP_HOLE.cpp \
     EDM/EDM_OP_List.cpp \
     EDM/electool.cpp \
-    spindelegate.cpp
+    spindelegate.cpp \
 #    elecoralmodel.cpp \
 #    elecpagemodel.cpp
 

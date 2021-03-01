@@ -2,9 +2,9 @@
 #include "EDM_OP.h"
 #include <math.h>
 
-BOOL EDM_OP::m_bSetPower = FALSE;
-BOOL EDM_OP::m_bStartCount = FALSE;
-BOOL EDM_OP::m_bInOp = FALSE;
+unsigned char EDM_OP::m_bSetPower = FALSE;
+unsigned char EDM_OP::m_bStartCount = FALSE;
+unsigned char EDM_OP::m_bInOp = FALSE;
 
 EDM_OP::EDM_OP()
 {
@@ -42,7 +42,7 @@ EDM_OP::~EDM_OP()
 	}
 }
 
-BOOL EDM_OP::EdmOpErr()
+unsigned char EDM_OP::EdmOpErr()
 {
 	if (m_pEdm->m_stEdmComm.enMvTrouble != MOVE_NO_TROUBLE 
 		|| m_stOpStatus.enErrAll.errOp != OP_NO_ERR

@@ -9,12 +9,12 @@
 
 typedef struct edm_Show_Status
 {
-    BOOL bStop;
+    unsigned char bStop;
     int iStopCnt;
-    BOOL bRTzero;
+    unsigned char bRTzero;
     int iRTzeroLabel;
-    BOOL bOpIn;
-    BOOL bAlarmLimit;
+    unsigned char bOpIn;
+    unsigned char bAlarmLimit;
 }EDM_SHOW_STATUS;
 
 class CoordWidget : public QWidget
@@ -27,12 +27,12 @@ public:
 
 public :
     EDM* edm;
-	BOOL m_bRunThread;
-	BOOL m_bThFirstOver;
-	BOOL m_bThSecOver;
-	BOOL m_bShowBig;
-	BOOL m_bLuoBuTest;
-    BOOL m_bPause;
+	unsigned char m_bRunThread;
+	unsigned char m_bThFirstOver;
+	unsigned char m_bThSecOver;
+	unsigned char m_bShowBig;
+	unsigned char m_bLuoBuTest;
+    unsigned char m_bPause;
 	EDM_COOR_TYPE m_enCoorType;
     EDM_SHOW_STATUS m_stEntileStatus;
 private:

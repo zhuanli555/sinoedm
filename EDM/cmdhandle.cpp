@@ -4,7 +4,7 @@
 #define  EDM_PI 3.1415926
 
 
-CmdHandle::CmdHandle(BOOL bVectCmd,QString strCommand,DIGIT_CMD *pDigitCmd,DIGIT_CMD* pCmdDefault)
+CmdHandle::CmdHandle(unsigned char bVectCmd,QString strCommand,DIGIT_CMD *pDigitCmd,DIGIT_CMD* pCmdDefault)
 {
     if (!bVectCmd)
     {
@@ -53,7 +53,7 @@ void CmdHandle::AnalyseCmdMode(QString &str,DIGIT_CMD *pDigitCmd)
 
     QString strTmp,strCmdWay;
     int iLen;
-    BOOL bMatch;
+    unsigned char bMatch;
 
     for (int i=0;i<3;i++)
     {
@@ -136,16 +136,16 @@ void CmdHandle::AnalyseLastWord(QString &str)
 
 void CmdHandle::WriteCmd2Para(QString strCmd ,DIGIT_CMD *pDigitCmd)
 {
-    BOOL bDot = FALSE;
+    unsigned char bDot = FALSE;
     char ch;
     float fDistaceVal;
     QString strTemp;
-    BOOL bHasDirSymbol = TRUE;
+    unsigned char bHasDirSymbol = TRUE;
     int iLength = strCmd.length();
     int iIndex = FindFirstLabel(strCmd);
     int iMpIndex = 0;
     AxisDigitPara stMoveUser;
-    BOOL bDirMove = FALSE ;
+    unsigned char bDirMove = FALSE ;
 
     if (iIndex == -1)
         return;
@@ -198,9 +198,9 @@ void CmdHandle::WriteCmd2Para(QString strCmd ,DIGIT_CMD *pDigitCmd)
         strTemp.trimmed();
         QStringtoFloat(strTemp,fDistaceVal);
         if (bDot)
-            stMoveUser.iDistance = (DWORD)(fDistaceVal*1000.0);
+            stMoveUser.iDistance = (short)(fDistaceVal*1000.0);
         else
-            stMoveUser.iDistance = (DWORD)fDistaceVal;
+            stMoveUser.iDistance = (short)fDistaceVal;
 
         if (!bDirMove)
             stMoveUser.iDistance = 0- stMoveUser.iDistance;
@@ -250,7 +250,7 @@ int CmdHandle::GetLableIndex(char cComLabel)
 void CmdHandle::QStringtoFloat(QString str,float &fFloat)
 {
     QString strTemp;
-    BOOL bLaw;
+    unsigned char bLaw;
     int iIndex = str.indexOf(".");
     int iIntPart,iFloatPart,iLen;
 
@@ -305,7 +305,7 @@ void CmdHandle::QStringtoFloat(QString str,float &fFloat)
 }
 
 //检查数字书否非法
-int CmdHandle::CheckCmdFig(QString strCmd,BOOL * pLaw)
+int CmdHandle::CheckCmdFig(QString strCmd,unsigned char * pLaw)
 {
     int iLen = strCmd.length();
     int i=0;
@@ -481,16 +481,16 @@ void CmdHandle::Vect2DigitCmd(DIGIT_CMD_VECT* pVectCmd,DIGIT_CMD* pDigitCmd)
 //写入矢量参数
 void CmdHandle::WriteVectCmd2Para(QString strCmd ,DIGIT_CMD_VECT *pVectCmd)
 {
-    BOOL bDot = FALSE;
+    unsigned char bDot = FALSE;
     char ch;
     float fDistaceVal;
     QString strTemp;
-    BOOL bHasDirSymbol = TRUE;
+    unsigned char bHasDirSymbol = TRUE;
     int iLength = strCmd.length();
     int iIndex = FindFirstLabel(strCmd);
     int iMpIndex = 0;
     AxisDigitPara stMoveUser;
-    BOOL bDirMove = FALSE ;
+    unsigned char bDirMove = FALSE ;
 
     if (iIndex == -1)
         return;
@@ -544,11 +544,11 @@ void CmdHandle::WriteVectCmd2Para(QString strCmd ,DIGIT_CMD_VECT *pVectCmd)
         fDistaceVal = strTemp.toFloat();
         if (stMoveUser.iLabel<3)
         {
-            stMoveUser.iDistance = (DWORD)(fDistaceVal*1000.0);
+            stMoveUser.iDistance = (short)(fDistaceVal*1000.0);
         }
         else
         {
-            stMoveUser.iDistance = (DWORD)(fDistaceVal*100000.0);
+            stMoveUser.iDistance = (short)(fDistaceVal*100000.0);
         }
 
 
@@ -614,13 +614,13 @@ int CmdHandle::FindAndCalSpeed(QString strCmd)
     return iIndex;
 }
 
-int CmdHandle::FindAndCalDepth(QString strCmd,DWORD& dwDepth)
+int CmdHandle::FindAndCalDepth(QString strCmd,short& dwDepth)
 {
     int iLength = strCmd.length();
     QString strTemp;
     int iIndex= -1;
     char ch;
-    BOOL bDot = FALSE;
+    unsigned char bDot = FALSE;
     float fDistaceVal= 0;
     for (int i=0;i<iLength;i++)
     {
@@ -636,16 +636,16 @@ int CmdHandle::FindAndCalDepth(QString strCmd,DWORD& dwDepth)
     bDot = HasDot(strTemp);
     QStringtoFloat(strTemp,fDistaceVal);
     if (bDot)
-        dwDepth = (DWORD)(fDistaceVal*1000.0);
+        dwDepth = (short)(fDistaceVal*1000.0);
     else
-        dwDepth = (DWORD)fDistaceVal;
+        dwDepth = (short)fDistaceVal;
 
     return iIndex;
 }
 
 //从合法字符串中查找小数点
 //这里的合法字符串只包含带有轴标志的数字字符串，例如“-x987.124”
-BOOL CmdHandle::HasDot(QString strCmd)
+unsigned char CmdHandle::HasDot(QString strCmd)
 {
     int iLength =strCmd.length();
     char ch;
@@ -739,7 +739,7 @@ void CmdHandle::DigitCmd2QString(DIGIT_CMD *pCmd,QString& strCmd)
 }
 
 
-int CmdHandle::GetAntanAngle(BOOL bFourQuant,float fSon,float fMon)
+int CmdHandle::GetAntanAngle(unsigned char bFourQuant,float fSon,float fMon)
 {
     double dAngle;
 
@@ -774,7 +774,7 @@ int CmdHandle::GetAntanAngle(BOOL bFourQuant,float fSon,float fMon)
     return 0;
 }
 
-int CmdHandle::GetALabel_xDis(int iLabel_A,int iRadius,BOOL bAntiClockWise)
+int CmdHandle::GetALabel_xDis(int iLabel_A,int iRadius,unsigned char bAntiClockWise)
 {
     int iDis=0;
     if (!bAntiClockWise)
@@ -783,7 +783,7 @@ int CmdHandle::GetALabel_xDis(int iLabel_A,int iRadius,BOOL bAntiClockWise)
     return iDis;
 }
 
-int CmdHandle::GetALabel_zDis(int iLabel_A,int iRadius,BOOL bAntiClockWise)
+int CmdHandle::GetALabel_zDis(int iLabel_A,int iRadius,unsigned char bAntiClockWise)
 {
     int iDis=0;
     if (!bAntiClockWise)
@@ -792,7 +792,7 @@ int CmdHandle::GetALabel_zDis(int iLabel_A,int iRadius,BOOL bAntiClockWise)
     return iDis;
 }
 
-int CmdHandle::GetCLabel_xDis(int iLabel_C,int iRadius,BOOL bAntiClockWise)
+int CmdHandle::GetCLabel_xDis(int iLabel_C,int iRadius,unsigned char bAntiClockWise)
 {
     int iDis=0;
     if (!bAntiClockWise)
@@ -801,7 +801,7 @@ int CmdHandle::GetCLabel_xDis(int iLabel_C,int iRadius,BOOL bAntiClockWise)
     return iDis;
 }
 
-int CmdHandle::GetCLabel_yDis(int iLabel_C,int iRadius,BOOL bAntiClockWise)
+int CmdHandle::GetCLabel_yDis(int iLabel_C,int iRadius,unsigned char bAntiClockWise)
 {
     int iDis=0;
     if (!bAntiClockWise)
@@ -971,12 +971,12 @@ void CmdHandle::GetElecParaFromQString(QString strCmd,QString& strName,MAC_ELEC_
 }
 
 
-BOOL CmdHandle::ReadCmdFromFile(QString strPath,QString strFile,vector<QString>* pVector,MAP_ELEC_MAN* pMap)
+unsigned char CmdHandle::ReadCmdFromFile(QString strPath,QString strFile,vector<QString>* pVector,MAP_ELEC_MAN* pMap)
 {
     QString	  strFullName =  strPath + "/" + strFile;
     QFile inFile(strFullName);
-    BOOL bHeadRv = FALSE;
-    BOOL bHeadStart = FALSE;
+    unsigned char bHeadRv = FALSE;
+    unsigned char bHeadStart = FALSE;
     QString str;
     QString strName;
     MAC_ELEC_PARA stElec;
@@ -1048,8 +1048,8 @@ int CmdHandle::PercentStr2int(QString str)
     int iLen = str.length();
     QString strTmp="";
     char ch;
-    BOOL bDot =FALSE;
-    BOOL bPer = FALSE;
+    unsigned char bDot =FALSE;
+    unsigned char bPer = FALSE;
     for (int i=0;i<iLen;i++)
     {
         ch = str.at(i).unicode();
