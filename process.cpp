@@ -246,7 +246,7 @@ void Process::MacProcessOperate()
 {
     while (true)
     {
-        QMutexLocker lock(&mutex);
+        mutex.lock();
         if (edm)
         {
             HandleOpMsg();
@@ -257,6 +257,7 @@ void Process::MacProcessOperate()
                 edmOpList->CarryOn();
             }
         }
+        mutex.unlock();
         QThread::msleep(20);
     }
     EDM_OP_List::DeleteEdmOpList();

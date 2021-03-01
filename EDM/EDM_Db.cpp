@@ -55,9 +55,14 @@ void EDM_Db::GetEdmCommPara(MAC_COMMON *pComm, int iWorkIndex)
 		i++;
 	}
 #else
-	pComm->stMoveCtrlComm[0].iMachPos = 0;
-	pComm->stMoveCtrlComm[0].bDirMove = 1;
-	pComm->stMoveCtrlComm[0].iWorkPosSet = 0;
+    int i =0 ;
+    for(;i<MAC_LABEL_COUNT;i++)
+    {
+        pComm->stMoveCtrlComm[i].iMachPos = 0;
+        pComm->stMoveCtrlComm[i].bDirMove = 1;
+        pComm->stMoveCtrlComm[i].iWorkPosSet = 0;
+    }
+
 #endif
 }
 
@@ -134,26 +139,32 @@ iLowerPos,iTopPos,iLocateArea,bDirectMotor from label");
 		i++;
 	}
 #else
-	pInt->stAxisCtrlKp[0].stSoftPara.cSymbol = 'x';
-	pInt->stAxisCtrlKp[0].stSoftPara.bUse = 1;
-	pInt->stAxisCtrlKp[0].stChiBuVal.iChiBu = 2;
-	pInt->stAxisCtrlKp[0].stSoftPara.bPosMonitor = 0;
-	pInt->stAxisCtrlKp[0].stSoftPara.iRasterLinear = 0;
-	pInt->stAxisCtrlKp[0].stSoftPara.iPosPrecision = 0;
-	pInt->stAxisCtrlKp[0].stSoftPara.bLimitNoUse = 0;
-	pInt->stAxisCtrlKp[0].stSoftPara.iZeroMakeUp = 0;
-	pInt->stAxisCtrlKp[0].stSoftPara.iLowerPos = 0;
-	pInt->stAxisCtrlKp[0].stSoftPara.iTopPos = 400000;
-	pInt->stAxisCtrlKp[0].stSoftPara.iLocateArea = 0;
-	pInt->stAxisCtrlKp[0].stSoftPara.bDirectMotor = 0;
+	int i = 0;
+    char chs[MAC_LABEL_COUNT]={'X','Y','C','W','A','B','Z'};
+	for(;i<MAC_LABEL_COUNT;i++)
+	{
+        pInt->stAxisCtrlKp[i].stSoftPara.cSymbol = chs[i];
+        pInt->stAxisCtrlKp[i].stSoftPara.bUse = 1;
+        pInt->stAxisCtrlKp[i].stChiBuVal.iChiBu = 2;
+        pInt->stAxisCtrlKp[i].stSoftPara.bPosMonitor = 0;
+        pInt->stAxisCtrlKp[i].stSoftPara.iRasterLinear = 0;
+        pInt->stAxisCtrlKp[i].stSoftPara.iPosPrecision = 0;
+        pInt->stAxisCtrlKp[i].stSoftPara.bLimitNoUse = 0;
+        pInt->stAxisCtrlKp[i].stSoftPara.iZeroMakeUp = 0;
+        pInt->stAxisCtrlKp[i].stSoftPara.iLowerPos = 0;
+        pInt->stAxisCtrlKp[i].stSoftPara.iTopPos = 400000;
+        pInt->stAxisCtrlKp[i].stSoftPara.iLocateArea = 0;
+        pInt->stAxisCtrlKp[i].stSoftPara.bDirectMotor = 0;
 
-	pSet->iSetChiBu[0] = pInt->stAxisCtrlKp[0].stChiBuVal.iChiBu;
-	pSet->bSetUse[0] = pInt->stAxisCtrlKp[0].stSoftPara.bUse;
-	pSet->bSetLimitNoUse[0] = pInt->stAxisCtrlKp[0].stSoftPara.bLimitNoUse;
-	pSet->iSetZeroMakeUp[0] = pInt->stAxisCtrlKp[0].stSoftPara.iZeroMakeUp;
-	pSet->bPosMonitor[0] = pInt->stAxisCtrlKp[0].stSoftPara.bPosMonitor;
-	pSet->iRasterLinear[0] = pInt->stAxisCtrlKp[0].stSoftPara.iRasterLinear;
-	pSet->iPosPrecision[0] = pInt->stAxisCtrlKp[0].stSoftPara.iPosPrecision;
+        pSet->iSetChiBu[i] = pInt->stAxisCtrlKp[i].stChiBuVal.iChiBu;
+        pSet->bSetUse[i] = pInt->stAxisCtrlKp[i].stSoftPara.bUse;
+        pSet->bSetLimitNoUse[i] = pInt->stAxisCtrlKp[i].stSoftPara.bLimitNoUse;
+        pSet->iSetZeroMakeUp[i] = pInt->stAxisCtrlKp[i].stSoftPara.iZeroMakeUp;
+        pSet->bPosMonitor[i] = pInt->stAxisCtrlKp[i].stSoftPara.bPosMonitor;
+        pSet->iRasterLinear[i] = pInt->stAxisCtrlKp[i].stSoftPara.iRasterLinear;
+        pSet->iPosPrecision[i] = pInt->stAxisCtrlKp[i].stSoftPara.iPosPrecision;
+	}
+	
 #endif
 }
 
@@ -228,12 +239,17 @@ void EDM_Db::GetAllCoor(int a[][6])
 		i++;
 	}
 #else
-	a[0][0] = 0;
-	a[0][1] = 0;
-	a[0][2] = 0;
-	a[0][3] = 0;
-	a[0][4] = 0;
-	a[0][5] = 0;
+	int i = 0;
+	for(;i<MAC_LABEL_COUNT;i++)
+	{
+		a[i][0] = 0;
+		a[i][1] = 0;
+		a[i][2] = 0;
+		a[i][3] = 0;
+		a[i][4] = 0;
+		a[i][5] = 0;
+	}
+	
 #endif
 }
 

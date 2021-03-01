@@ -28,7 +28,6 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     EDMMacInit();
     //×´Ì¬À¸
     statBar = statusBar();
-
     //left
     coordWidget = new CoordWidget();
     //right
@@ -99,9 +98,13 @@ void MainWindow::MacUserOperate()
 {
     while(true)
     {
-        QMutexLocker lock(&mutex);
-        //TODO edm->GetEdmComm();
-        coordWidget->HandleEdmCycleData();//coordwidget Ñ­»·
+        mutex.lock();
+        if(edm)
+        {
+            //TODO edm->GetEdmComm();
+            coordWidget->HandleEdmCycleData();//coordwidget Ñ­»·
+        }
+        mutex.unlock();
         QThread::msleep(20);
     }
 }
