@@ -198,9 +198,9 @@ void CmdHandle::WriteCmd2Para(QString strCmd ,DIGIT_CMD *pDigitCmd)
         strTemp.trimmed();
         QStringtoFloat(strTemp,fDistaceVal);
         if (bDot)
-            stMoveUser.iDistance = (short)(fDistaceVal*1000.0);
+            stMoveUser.iDistance = (long)(fDistaceVal*1000.0);
         else
-            stMoveUser.iDistance = (short)fDistaceVal;
+            stMoveUser.iDistance = (long)fDistaceVal;
 
         if (!bDirMove)
             stMoveUser.iDistance = 0- stMoveUser.iDistance;
@@ -250,29 +250,23 @@ int CmdHandle::GetLableIndex(char cComLabel)
 void CmdHandle::QStringtoFloat(QString str,float &fFloat)
 {
     QString strTemp;
-    unsigned char bLaw;
+    bool bLaw = true;
     int iIndex = str.indexOf(".");
     int iIntPart,iFloatPart,iLen;
-
     fFloat = 0;
     if (iIndex != -1)
     {
         strTemp = str.left(iIndex);
         CheckCmdFig(strTemp,&bLaw);
-        if (!bLaw)
+        if (bLaw == false)
             return;
         iIntPart = strTemp.toInt();
         iLen = str.length()-iIndex-1;
-        str.right(iLen);//获取小数点后的数字
+        strTemp = str.right(iLen);//获取小数点后的数字
         if (iLen>=4)
-            str =str.left(3);
-        iIndex = CheckCmdFig(strTemp,&bLaw);
-        if (!bLaw)
-        {
-            strTemp = strTemp.left(iIndex);
-        }
-        iFloatPart = str.toInt();
+            strTemp =strTemp.left(3);
 
+        iFloatPart = strTemp.toInt();
         switch(iLen)
         {
         case 1:
@@ -305,17 +299,17 @@ void CmdHandle::QStringtoFloat(QString str,float &fFloat)
 }
 
 //检查数字书否非法
-int CmdHandle::CheckCmdFig(QString strCmd,unsigned char * pLaw)
+int CmdHandle::CheckCmdFig(QString strCmd,bool* pLaw)
 {
     int iLen = strCmd.length();
     int i=0;
-    QChar ch;
+    char ch;
     for (;i<iLen;i++)
     {
-        ch = strCmd.at(i);
+        ch = strCmd.at(i).unicode();
         if (ch<'0' || ch >'9')
         {
-            *pLaw =FALSE;
+            *pLaw =false;
             return i;
         }
     }

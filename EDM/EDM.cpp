@@ -208,24 +208,24 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
 	bool bSwitchOver = false;
     QString str;	
 
-	// if (m_iWorkIndex != (int)pMacUser->enCoor)
-	// {
-	// 	if (SwitchWorkIndex((int)pMacUser->enCoor))
-	// 	{
-	// 		bSwitchOver = true;
-	// 	}
-	// 	else
-	// 		return false;
-	// }
+    if (m_iWorkIndex != (int)pMacUser->enCoor)
+    {
+        if (SwitchWorkIndex((int)pMacUser->enCoor))
+        {
+            bSwitchOver = true;
+        }
+        else
+            return false;
+    }
 
-	// if (bSwitchOver)
-	// {
-	// 	for (int i=0;i<50000;i++)
-	// 	{
-	// 	}
-	// }
-
-    //AutoClearMakeUpVal(pMacUser);
+    if (bSwitchOver)
+    {
+        for (int i=0;i<50000;i++)
+        {
+        }
+    }
+    CmdHandle::DigitCmd2QString(pMacUser,str);
+    qDebug()<<str;
     dwStatus = ioctl(fd,IOC_MOVEPARA_FROM_USER,pMacUser);
     if (dwStatus==1)
     {

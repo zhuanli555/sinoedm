@@ -45,7 +45,7 @@ private:
     int FindAndCalSpeed(QString strCmd);
     int FindAndCalDepth(QString strCmd,short& dwDepth);
     void QStringtoFloat(QString str,float &fFloat);
-    int CheckCmdFig(QString strCmd,unsigned char *pLaw);
+    int CheckCmdFig(QString strCmd,bool* pLaw);
     void AnalyseLastWord(QString &str);
     unsigned char HasDot(QString strCmd);
 
