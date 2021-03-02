@@ -138,7 +138,6 @@ public:
 	MAC_SYSTEM_SET m_stSysSet;
 	int m_iWorkIndex;
 	bool m_bMachFault;
-	bool m_bOffLine;
 
     QString m_strSysPath;
     map<int,int> m_mpMakeUp_C;

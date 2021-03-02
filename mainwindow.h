@@ -19,6 +19,10 @@
 #include "coordwidget.h"
 #include "alarmsignal.h"
 #include "axissetdialog.h"
+#include "process.h"
+#include "program.h"
+#include "setting.h"
+#include "unionzero.h"
 #include "EDM/cmdhandle.h"
 
 class MainWindow : public QMainWindow
@@ -45,9 +49,10 @@ private:
 
     QThread* tThread;
     QMutex mutex;
-    QMenu* processMenu;
-    QMenu* programMenu;
-    QMenu* settingMenu;
+    Process* process;
+    Program* program;
+    Setting* setting;
+    UnionZero* unionZero;
     QStatusBar* statBar;
     QTextEdit* alarmText;
     QAction* processAction;

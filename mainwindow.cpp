@@ -9,10 +9,6 @@
 #include <QTextCodec>
 #include <QApplication>
 #include <QDesktopWidget>
-#include "process.h"
-#include "program.h"
-#include "setting.h"
-#include "unionzero.h"
 #include <QtConcurrent>
 
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
@@ -74,13 +70,6 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     createActions();
     createMenus();
     //设置多线程信号
-
-//    tThread = new QThread();
-//    edm->moveToThread(tThread);
-//    connect(tThread,&QThread::finished,tThread,&QObject::deleteLater);
-//    connect(tThread,&QThread::finished,edm,&QObject::deleteLater);
-//    tThread->start();
-    //设置多线
     QtConcurrent::run(this,&MainWindow::MacUserOperate);
     //设置定时器
     QTimer *t = new QTimer(this);
@@ -91,7 +80,19 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 
 MainWindow::~MainWindow()
 {
-    EDM::DelEdm();
+    if(edm)
+    {
+        edm->EdmStop();
+        edm->EdmClose();
+        EDM::DelEdm();
+    }
+    emit coordWidget->close();
+    emit alarmSignal->close();
+    emit axisDialog->close();
+    emit process->close();
+    emit program->close();
+    emit setting->close();
+    emit unionZero->close();
 }
 
 void MainWindow::MacUserOperate()
@@ -101,7 +102,7 @@ void MainWindow::MacUserOperate()
         mutex.lock();
         if(edm)
         {
-            //TODO edm->GetEdmComm();
+            edm->GetEdmComm();
             coordWidget->HandleEdmCycleData();//coordwidget 循环
         }
         mutex.unlock();
@@ -245,25 +246,25 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 void MainWindow::renderToProcess()
 {
-    Process* process = new Process();
+    process = new Process();
     process->show();
 }
 
 void MainWindow::renderToProgram()
 {
-    Program* program = new Program();
+    program = new Program();
     program->show();
 }
 
 void MainWindow::renderToSetting()
 {
-    Setting* setting = new Setting();
+    setting = new Setting();
     setting->show();
 }
 
 void MainWindow::renderToUnionZero()
 {
-    UnionZero* unionZero = new UnionZero();
+    unionZero = new UnionZero();
     int res = unionZero->exec();
     if(res != QDialog::Accepted)return;
     unionZero->show();
@@ -278,7 +279,7 @@ void MainWindow::edmSendComand()
     int speed = speedValue->currentText().toInt();
     cmdstr = commandLine->text();
     memset(&cmdDefault,0,sizeof(DIGIT_CMD));
-    cmdDefault.enAim = AIM_G90;
+    cmdDefault.enAim = AIM_G91;
     cmdDefault.enOrbit = ORBIT_G00;
     cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
     cmdDefault.iFreq = speed;

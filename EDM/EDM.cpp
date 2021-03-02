@@ -26,7 +26,6 @@ EDM::EDM(QObject *parent):QObject(parent)
     m_pEdmAdoSys = new EDM_Db();
 	m_bMachFault = FALSE;
     m_strMakeUpFile = "";
-	m_bOffLine = false;
 }
 
 
@@ -105,11 +104,6 @@ bool EDM::GetEdmComm()
 {
     short dwStatus;
     dwStatus = ioctl(fd,IOC_COMM_TO_USER,&m_stEdmComm);
-	if (m_bOffLine)
-	{
-		return true;
-	}
-
 	return dwStatus==1;
 }
 
@@ -212,12 +206,7 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
 {
 	short dwStatus;
 	bool bSwitchOver = false;
-    QString str;
-
-	// if (m_bOffLine)
-	// {
-	// 	return true;
-	// }	
+    QString str;	
 
 	// if (m_iWorkIndex != (int)pMacUser->enCoor)
 	// {
@@ -312,7 +301,7 @@ bool EDM::EdmStopMove(bool bStatus)
 		 m_stStatus.bStop = bStatus;
 
 		return true;
-	}	
+    }
 	return false;
 }
 

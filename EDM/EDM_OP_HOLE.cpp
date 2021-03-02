@@ -180,23 +180,19 @@ void EDM_OP_HOLE::EdmOpCarry()
 		{
 			m_pOpFile->SetEdmElecIndex(m_stOpStatus.iCmdIndex+1);
 		}
-
-		if (!m_pEdm->m_bOffLine)
+		if (m_pOpFile)
 		{
-			if (m_pOpFile)
+			m_stOpStatus.enErrAll.errFile = m_pOpFile->m_enOpFileErr;
+		}
+		
+		if (EdmOpErr())
+		{
+			EdmHoleRecover();
+			if (m_stOpStatus.enErrAll.errOp==OP_LEN_POLE)
 			{
-				m_stOpStatus.enErrAll.errFile = m_pOpFile->m_enOpFileErr;
+				EdmOpGoHigh();
 			}
-			
-			if (EdmOpErr())
-			{
-				EdmHoleRecover();
-				if (m_stOpStatus.enErrAll.errOp==OP_LEN_POLE)
-				{
-					EdmOpGoHigh();
-				}
-				return;
-			}
+			return;
 		}		
 
 		if (m_stOpStatus.bStart)
@@ -838,7 +834,7 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 		m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
 		m_stOpCtrl.stZeroCtrl.bWait = FALSE;
 
-		if (PoleLenAlarm() && !m_pEdm->m_bOffLine)
+		if (PoleLenAlarm())
 		{
 			SetEdmHolePower(FALSE,FALSE,FALSE);	
 			return FALSE;
@@ -1226,13 +1222,6 @@ unsigned char EDM_OP_HOLE::EdmHoleMillPage()
 	if (m_stOpStatus.iCmdIndex >= m_pOpFile->m_vCmd.size())
 	{
 		m_stOpStatus.iCmdIndex = 0;
-		if (m_pEdm->m_bOffLine)
-		{
-			m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
-			m_stOpStatus.stCycle.bPauseCmd = TRUE;
-			m_stOpStatus.bStart = FALSE;
-			return TRUE;
-		}
 	}
 
 	m_stOpStatus.stCycle.iCycleIndex = 5;
