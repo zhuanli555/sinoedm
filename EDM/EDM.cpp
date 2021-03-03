@@ -224,8 +224,6 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
         {
         }
     }
-    CmdHandle::DigitCmd2QString(pMacUser,str);
-    qDebug()<<str;
     dwStatus = ioctl(fd,IOC_MOVEPARA_FROM_USER,pMacUser);
     if (dwStatus==1)
     {
@@ -582,7 +580,7 @@ bool EDM::EdmRotate(bool bSwitch,bool bOpen,int iSpeed,bool bDir)
 	return false;
 }
 
-
+//电源
 bool EDM::EdmPower(bool bOpen)
 {
 	if (bOpen)
@@ -596,7 +594,7 @@ bool EDM::EdmPower(bool bOpen)
 	return true;
 }
 
-
+//修电级
 bool EDM::EdmPrune(bool bOpen)
 {
 	if (bOpen)
@@ -609,13 +607,13 @@ bool EDM::EdmPrune(bool bOpen)
 	return true;
 }
 
-
+//beep告警
 bool EDM::EdmHummer(bool bOpen)
 {
 	if (bOpen)
-        m_stEdmInterfaceOut.btO188 &=0xDF;
+        m_stEdmInterfaceOut.btO188 &=0x7F;
 	else
-        m_stEdmInterfaceOut.btO188 |=0x20;
+        m_stEdmInterfaceOut.btO188 |=0x80;
 
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 

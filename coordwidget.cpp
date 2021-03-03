@@ -14,7 +14,7 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     bLabel = new QLabel("B");
     float zero = 0.000;
     QString tmp1 = QString("%1").arg("-123.567");
-    QString tmp2 = QString("%1").arg(zero,8,'g',3);
+    QString tmp2 = QString("%1").arg(zero,8,'f',3);
     xValue = new QLabel(tmp1);
     yValue = new QLabel(tmp2);
     zValue = new QLabel(tmp2);
@@ -64,18 +64,19 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     //setStyleSheet("QLabel{background-color:yellow}");
     QString xstyle = "font-size:40px;";
     QString wstyle = "font-size:28px;";
+    //yLabel->setStyleSheet("font-size:40px;border-image:url(bj.png);");
     xLabel->setStyleSheet(xstyle);
-    yLabel->setStyleSheet("font-size:40px;border-image:url(bj.png);");
-    zLabel->setStyleSheet("font-size:40px;border-image:url(fxbj.png);");
+    yLabel->setStyleSheet(xstyle);
+    zLabel->setStyleSheet(xstyle);
     wLabel->setStyleSheet(wstyle);
-    aLabel->setStyleSheet("font-size:40px;border-image:url(bj.png);");
-    bLabel->setStyleSheet("font-size:40px;border-image:url(zxbj.png);");
-    xValue->setStyleSheet("font-size:40px;");
-    yValue->setStyleSheet("font-size:40px;");
-    zValue->setStyleSheet("font-size:40px;");
-    wValue->setStyleSheet("font-size:40px;");
-    aValue->setStyleSheet("font-size:40px;");
-    bValue->setStyleSheet("font-size:40px;");
+    aLabel->setStyleSheet(xstyle);
+    bLabel->setStyleSheet(xstyle);
+    xValue->setStyleSheet(xstyle);
+    yValue->setStyleSheet(xstyle);
+    zValue->setStyleSheet(xstyle);
+    wValue->setStyleSheet(xstyle);
+    aValue->setStyleSheet(xstyle);
+    bValue->setStyleSheet(xstyle);
     xMValue->setStyleSheet("color:blue;font-size:24px;");
     yMValue->setStyleSheet("color:blue;font-size:24px;");
     zMValue->setStyleSheet("color:blue;font-size:24px;");
@@ -120,17 +121,17 @@ void CoordWidget::ShowData(const MAC_COMMON& stMaccomm,int iRelLabel[])
             if(i == 0)
             {
                 fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
-                str = QString("%1").arg(fTmp,8,'g',3);
+                str = QString("%1").arg(fTmp,8,'f',3);
                 xMValue->setText(str);
                 fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
-                str = QString("%1").arg(fTmp,8,'g',3);
+                str = QString("%1").arg(fTmp,8,'f',3);
                 xValue->setText(str);
             }else if (i == 1) {
                 fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
-                str = QString("%1").arg(fTmp,8,'g',3);
+                str = QString("%1").arg(fTmp,8,'f',3);
                 yMValue->setText(str);
                 fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
-                str = QString("%1").arg(fTmp,8,'g',3);
+                str = QString("%1").arg(fTmp,8,'f',3);
                 yValue->setText(str);
             }
         }

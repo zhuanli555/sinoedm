@@ -263,9 +263,8 @@ void CmdHandle::QStringtoFloat(QString str,float &fFloat)
         iIntPart = strTemp.toInt();
         iLen = str.length()-iIndex-1;
         strTemp = str.right(iLen);//获取小数点后的数字
-        if (iLen>=4)
-            strTemp =strTemp.left(3);
-
+        if(strTemp == ".")strTemp="0";
+        if(iLen>=4)strTemp =strTemp.left(3);
         iFloatPart = strTemp.toInt();
         switch(iLen)
         {
