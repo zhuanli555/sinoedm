@@ -3,10 +3,21 @@
 
 #include <QWidget>
 #include "EDM/EDM.h"
+#include "EDM/EDM_OP_List.h"
 #include <QLabel>
 #include <QGridLayout>
 #include <QList>
 #include <EDM/EDM.h>
+
+typedef struct edm_Show_Status
+{
+    unsigned char bStop;
+    int iStopCnt;
+    unsigned char bRTzero;
+    int iRTzeroLabel;
+    unsigned char bOpIn;
+    unsigned char bAlarmLimit;
+}EDM_SHOW_STATUS;
 
 class AlarmSignal : public QWidget
 {
@@ -15,27 +26,34 @@ public:
     explicit AlarmSignal(QWidget *parent = nullptr);
     int addAlarm(const QString &text);
     void removeAlarm(int index);
-
+    void reSort();
+    void EdmStatusSignChange();
+public:
+    EDM_SHOW_STATUS m_stEntileStatus;
 private:
     QGridLayout* mainLayout;
     EDM *edm;
+    EDM_OP_List* edmOpList;
     QLabel* purgeValue;
     QLabel* shakeValue;
     QLabel* protectValue;
     QLabel* speedValue;
-    QLabel* highFreqValue;
-    QLabel* rotateValue;
+    QLabel* lowPumpValue;
     QLabel* fixElecValue;
+    QLabel* pauseValue;
     QList<QLabel*> alarmList;
+    bool bPause;
 private:
-    void reSort();
+
 signals:
 
 public slots:
     void edmProtect();
     void edmPurge();
     void edmShake();
-    void edmHighFreq();
+    void edmLowerPump();
+    void edmPause();
+    void edmStop();
 };
 
 #endif // ALARMSIGNAL_H

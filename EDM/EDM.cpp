@@ -55,25 +55,27 @@ EDM::~EDM()
     }
 }
 
-bool EDM::EdmInit()
+unsigned long EDM::EdmInit()
 {
 	short dwStatus;
 
-	m_stEdmInterfaceOut.btO144 = 0x07;
-	m_stEdmInterfaceOut.btO140 = 0xFF;
+    m_stEdmInterfaceOut.btO140 = 0xFF;
+    m_stEdmInterfaceOut.btO144 = 0xFD;
 	m_stEdmInterfaceOut.btO184 = 0xFF;
 	m_stEdmInterfaceOut.btO188 = 0xFF;
 	m_stEdmInterfaceOut.btO18C = 0x07;//中断号设置
 	m_stEdmInterfaceOut.btO190 = 0xFB;
+    m_stEdmInterfaceOut.btO198 = 0x7F;//控制电流档位
 	m_stEdmInterfaceOut.btO199 = 0xBF;
-	m_stEdmInterfaceOut.btO1C4 = 0xFF;
+    m_stEdmInterfaceOut.btO1C0 = 0xFF;
+    m_stEdmInterfaceOut.btO1C4 = 0xFF;
 
 	fd = ::open("/dev/short",O_RDWR);
     if(fd < 0)
     {
 		EdmClose();
 		qDebug()<<"open /dev/short failed";
-        return false;
+        return 0;
     }
     ::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
     EdmReadMacPara();
@@ -83,10 +85,10 @@ bool EDM::EdmInit()
         dwStatus = ioctl(fd,IOC_KP_INIT,&m_stEdmKpInt);
 		if (dwStatus ==1)
 		{
-			return true;
+			return 1;
 		}
     }
-	return false;
+	return 0;
 }
 
 void EDM::GetMacPara(MAC_SYSTEM_SET* pSysSet)
@@ -94,10 +96,10 @@ void EDM::GetMacPara(MAC_SYSTEM_SET* pSysSet)
 	memcpy(pSysSet,&m_stSysSet,sizeof(MAC_SYSTEM_SET));
 }
 
-bool EDM::EdmClose()
+unsigned long EDM::EdmClose()
 {
     ::close(fd);
-	return true;
+	return 1;
 }
 
 bool EDM::GetEdmComm()
@@ -143,7 +145,7 @@ bool EDM::GetEdmStatusData()
     dwStatus = ioctl(fd,IOC_INTERFACE_IN,&m_stEdmInterfaceIn);
 	if (dwStatus==1)
 	{
-		m_bMachFault = false;
+		m_bMachFault = FALSE;
 		memcpy(&m_stEdmShowData.stEdmInterfaceIn,&m_stEdmInterfaceIn,sizeof(MAC_INTERFACE_IN));
 		m_stStatus.bDirect = CalcDirectBool(&m_stEdmShowData.stEdmInterfaceIn);
 		for (iLabel=0;iLabel<MAC_LABEL_COUNT;iLabel++)
@@ -283,10 +285,10 @@ void EDM::EdmStop()
 	CloseHardWare();
 	memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
 	memset(&m_stAdjustCircle,0,sizeof(ADJUST_CIRCLE));
-	EdmStopMove(true);
+	EdmStopMove(TRUE);
 }
 
-bool EDM::EdmStopMove(bool bStatus)
+bool EDM::EdmStopMove(unsigned long bStatus)
 {
 	short dwStatus;
     QString str = "stop move";
@@ -306,7 +308,7 @@ bool EDM::EdmStopMove(bool bStatus)
 
 void EDM::EdmStopSignClose()
 {
-	m_stStatus.bStop = false;
+	m_stStatus.bStop = FALSE;
 }
 
 
@@ -317,7 +319,7 @@ bool EDM::EdmRtZero(int iLabel)
 	if (m_stEdmComm.enMvStatus==RULE_RTZERO)
 		return false;
 
-	m_stEdmOpEntile.bRtZero = true;
+	m_stEdmOpEntile.bRtZero = TRUE;
     m_stEdmOpEntile.iLabel = iLabel;
     dwStatus = ioctl(fd,IOC_MAC_OPERATE,&m_stEdmOpEntile);
 	if (dwStatus == 1)
@@ -331,12 +333,12 @@ void EDM::EdmZeroSignClose()
 {
 	if (m_stEdmComm.enMvStatus != RULE_RTZERO)
 	{
-		m_stEdmOpEntile.bRtZero = false;
+		m_stEdmOpEntile.bRtZero = FALSE;
 		m_stEdmOpEntile.iLabel = -1;
 	}	
 }
 
-bool EDM::EdmSetProtect(bool bProtect)
+bool EDM::EdmSetProtect(unsigned long bProtect)
 {
 	short dwStatus;
 
@@ -431,7 +433,7 @@ int EDM::HandBoxProcess()
 
 	if (bStop && !bHas)
 	{
-		EdmStopMove(false);
+		EdmStopMove(FALSE);
 		bStop = FALSE;			
 	}
 
@@ -466,7 +468,7 @@ void EDM::CloseHardWare()
 }
 
 
-bool EDM::EdmLowPump(bool bOpen)
+bool EDM::EdmLowPump(unsigned long bOpen)
 {
     QString str;
 	if (bOpen)
@@ -486,28 +488,7 @@ bool EDM::EdmLowPump(bool bOpen)
 	return true;
 }
 
-
-bool EDM::EdmHighPump(bool bOpen)
-{
-    QString str;
-	if (bOpen)
-	{
-		m_stEdmInterfaceOut.btO188 &=0xFB;
-		str = "open high pump";
-	}
-	else
-	{
-		m_stEdmInterfaceOut.btO188 |=0x04;
-		str = "close high pump";
-	}
-
-	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
-	m_stStatus.bPumpHigh = bOpen;
-
-	return true;
-}
-
-bool EDM::EdmSetShake(bool bShake)
+bool EDM::EdmSetShake(unsigned long bShake)
 {
     QString str;
     if (bShake)
@@ -539,54 +520,13 @@ int EDM::GetRAxisFreq(int iSpeed)
 	return iFreq;
 }
 
-bool EDM::EdmRotate(bool bSwitch,bool bOpen,int iSpeed,bool bDir)
-{
-	short dwStatus;
-    QString str;
-	MAC_ROTATE_PARA stRotate;
-
-	if (bSwitch)
-	{
-		if (bOpen)
-		{
-            m_stEdmInterfaceOut.btO188 &=0xEF;
-			str = "open rotate";
-		}
-		else
-		{
-            m_stEdmInterfaceOut.btO188 |=0x10;
-			str = "close rotate";
-		}
-
-		::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
-		m_stStatus.bRotate = bOpen;
-
-		return true;
-	}
-
-	stRotate.bRotate = bOpen;
-	stRotate.iFreq = iSpeed;
-	stRotate.bDir = bDir;
-	if (iSpeed==-1)
-	    stRotate.iFreq = m_stSysSet.stSetNoneLabel.iRAxisSpeed;
-		
-	stRotate.iFreq = GetRAxisFreq(stRotate.iFreq);
-	dwStatus = ioctl(fd,IOC_ROTATE_CTL,&stRotate);
-	if (dwStatus ==1)
-	{
-		m_stStatus.bRotate = bOpen;
-		return true;
-	}	
-	return false;
-}
-
 //电源
-bool EDM::EdmPower(bool bOpen)
+bool EDM::EdmPower(unsigned long bOpen)
 {
 	if (bOpen)
-        m_stEdmInterfaceOut.btO188 &=0xFB;
+        m_stEdmInterfaceOut.btO188 &=0xFD;
 	else
-        m_stEdmInterfaceOut.btO188 |=0x04;
+        m_stEdmInterfaceOut.btO188 |=0x02;
 
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	m_stStatus.bPower = bOpen;
@@ -594,13 +534,13 @@ bool EDM::EdmPower(bool bOpen)
 	return true;
 }
 
-//修电级
-bool EDM::EdmPrune(bool bOpen)
+//修电级 true是正常加工 false是反修
+bool EDM::EdmPrune(unsigned long bOpen)
 {
 	if (bOpen)
-        m_stEdmInterfaceOut.btO188 &=0xF7;
+        m_stEdmInterfaceOut.btO188 &=0xFE;
 	else
-        m_stEdmInterfaceOut.btO188 |=0x08;
+        m_stEdmInterfaceOut.btO188 |=0x01;
 
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	m_stStatus.bPrune = bOpen;
@@ -608,7 +548,7 @@ bool EDM::EdmPrune(bool bOpen)
 }
 
 //beep告警
-bool EDM::EdmHummer(bool bOpen)
+bool EDM::EdmHummer(unsigned long bOpen)
 {
 	if (bOpen)
         m_stEdmInterfaceOut.btO188 &=0x7F;
@@ -620,7 +560,7 @@ bool EDM::EdmHummer(bool bOpen)
 	return true;
 }
 
-bool EDM::EdmRedLump(bool bRed)
+bool EDM::EdmRedLump(unsigned long bRed)
 {
 	static bool bStatictRed = false;
 
@@ -637,7 +577,7 @@ bool EDM::EdmRedLump(bool bRed)
 	return true;
 }
 
-bool EDM::EdmYellowLump(bool bYellow)
+bool EDM::EdmYellowLump(unsigned long bYellow)
 {
 	static bool bStatictYellow = false;
 	if (bStatictYellow != bYellow)
@@ -966,14 +906,14 @@ void EDM::EdmAxisAdjust()
 		{
 			if (m_stAxisAdjust.bOver)
 			{
-				EdmSetProtect(true);
+				EdmSetProtect(TRUE);
 				memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
 				return;
 			}
 
 			if (m_stAxisAdjust.iAdjustCnt>=iADJUST)
 			{
-				EdmSetProtect(false);
+				EdmSetProtect(FALSE);
 
 				memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
 				stDigitCmd.iFreq = 2500;
@@ -995,7 +935,7 @@ void EDM::EdmAxisAdjust()
 
 			if (m_stAxisAdjust.iStage ==0)
 			{
-				if (EdmSetProtect(false))
+				if (EdmSetProtect(FALSE))
 				{
 					if (m_stAxisAdjust.bDir)
 						iAim = 500;
@@ -1019,7 +959,7 @@ void EDM::EdmAxisAdjust()
 			}
 			else if (m_stAxisAdjust.iStage==1)
 			{
-				if (EdmSetProtect(true))
+				if (EdmSetProtect(TRUE))
 				{
 					if (m_stAxisAdjust.bDir == FALSE)
 						iAim = -500000;
@@ -1043,9 +983,9 @@ void EDM::EdmAxisAdjust()
 			{
 				if (m_stStatus.bDirect)
 				{
-					if (EdmSetProtect(false))
+					if (EdmSetProtect(FALSE))
 					{
-						while (!EdmStopMove(false))
+						while (!EdmStopMove(FALSE))
 						{
 						}
 						if (m_stAxisAdjust.bDir)
@@ -1077,9 +1017,9 @@ void EDM::EdmAxisAdjust()
 			{
 				if (!m_stStatus.bDirect)
 				{
-					if (EdmSetProtect(false))
+					if (EdmSetProtect(FALSE))
 					{
-						while (!EdmStopMove(false))
+						while (!EdmStopMove(FALSE))
 						{
 						}						
 						GetEdmComm();
@@ -1145,7 +1085,7 @@ void EDM::EdmAxisAdjustCircleInside()
 			if (m_stAdjustCircle.bOver)
 			{
 				memset(&m_stAdjustCircle,0,sizeof(ADJUST_CIRCLE));
-				EdmSetProtect(true);
+				EdmSetProtect(TRUE);
 			}
 
 			if (m_stAdjustCircle.iIndex>3)
@@ -1156,7 +1096,7 @@ void EDM::EdmAxisAdjustCircleInside()
 
 			if (m_stAdjustCircle.iIndexCnt==4)
 			{
-				while (!EdmSetProtect(false))
+				while (!EdmSetProtect(FALSE))
 				{					
 				}
 				iVal_Center[0] = (m_stAdjustCircle.iVal_X[0] + m_stAdjustCircle.iVal_X[1])/2;
@@ -1211,7 +1151,7 @@ void EDM::EdmAxisAdjustCircleInside()
 				{
 					m_stAdjustCircle.iVal_X[m_stAdjustCircle.iIndexCnt] = m_stEdmComm.stMoveCtrlComm[0].iMachPos;
 					m_stAdjustCircle.iVal_Y[m_stAdjustCircle.iIndexCnt] = m_stEdmComm.stMoveCtrlComm[1].iMachPos;
-					while (!EdmSetProtect(false))
+					while (!EdmSetProtect(FALSE))
 					{						
 					}
 					stDigitCmd.iFreq = 10000;
@@ -1275,7 +1215,7 @@ void EDM::EdmAxisAdjustCircleOutSide()
 			if (m_stAdjustCircle.bOver)
 			{
 				memset(&m_stAdjustCircle,0,sizeof(ADJUST_CIRCLE));
-				EdmSetProtect(true);
+				EdmSetProtect(TRUE);
 			}
 
 			if (m_stAdjustCircle.iIndex>4)
@@ -1286,7 +1226,7 @@ void EDM::EdmAxisAdjustCircleOutSide()
 
 			if (m_stAdjustCircle.iIndexCnt==4)
 			{
-				while (!EdmSetProtect(false))
+				while (!EdmSetProtect(FALSE))
 				{					
 				}
 				iVal_Center[0] = (m_stAdjustCircle.iVal_X[0] + m_stAdjustCircle.iVal_X[1])/2;
@@ -1377,7 +1317,7 @@ void EDM::EdmAxisAdjustCircleOutSide()
 				{
 					m_stAdjustCircle.iVal_X[m_stAdjustCircle.iIndexCnt] = m_stEdmComm.stMoveCtrlComm[0].iMachPos;
 					m_stAdjustCircle.iVal_Y[m_stAdjustCircle.iIndexCnt] = m_stEdmComm.stMoveCtrlComm[1].iMachPos;
-					while (!EdmSetProtect(false))
+					while (!EdmSetProtect(FALSE))
 					{						
 					}
 					stDigitCmd.iFreq = 10000;

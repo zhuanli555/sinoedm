@@ -55,9 +55,9 @@ private:
     QMutex mutex;
     Program* program;
     QStatusBar* statBar;
+    QAction* stopAction;
     QAction* processAction;
     QAction* imitateAction;
-    QAction* pauseAction;
     //left
     CoordWidget* coordWidget;
     //right
@@ -106,7 +106,7 @@ protected:
 protected slots:
 
     void timeUpdate();
-    void pause();
+    void edmStop();
     void programProcess();
     void imitateProcess();
     void insertRow();

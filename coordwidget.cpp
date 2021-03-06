@@ -29,18 +29,24 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     aMValue = new QLabel(tmp2);
     bMValue = new QLabel(tmp2);
 
+    xLabel->setAlignment(Qt::AlignVCenter);
+    yLabel->setAlignment(Qt::AlignVCenter);
+    zLabel->setAlignment(Qt::AlignVCenter);
+    wLabel->setAlignment(Qt::AlignVCenter);
+    aLabel->setAlignment(Qt::AlignVCenter);
+    bLabel->setAlignment(Qt::AlignVCenter);
     xValue->setAlignment(Qt::AlignRight);
     yValue->setAlignment(Qt::AlignRight);
     zValue->setAlignment(Qt::AlignRight);
-    xMValue->setAlignment(Qt::AlignRight);
-    yMValue->setAlignment(Qt::AlignRight);
-    zMValue->setAlignment(Qt::AlignRight);
     wValue->setAlignment(Qt::AlignRight);
     aValue->setAlignment(Qt::AlignRight);
     bValue->setAlignment(Qt::AlignRight);
-    wMValue->setAlignment(Qt::AlignRight);
-    aMValue->setAlignment(Qt::AlignRight);
-    bMValue->setAlignment(Qt::AlignRight);
+    xMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    yMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    zMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    wMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    aMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    bMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
     leftLayout = new QGridLayout(this);
     leftLayout->addWidget(xLabel,0,0);
@@ -168,14 +174,92 @@ void CoordWidget::SaveData()
     }
 }
 
+void CoordWidget::ShowMacUserStatus()
+{
+    QLabel* labels[MAC_LABEL_COUNT] = {xLabel,yLabel,nullptr,wLabel,aLabel,bLabel,zLabel};
+    static unsigned long bPosLimit[MAC_LABEL_COUNT] = {0};
+    static unsigned long bNegLimit[MAC_LABEL_COUNT] = {0};
+    static unsigned long bAlarm[MAC_LABEL_COUNT] = {0};
+    for (int i=0;i<MAC_LABEL_COUNT;i++)
+    {
+        if(i==2)continue;
+        if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit != bPosLimit[i])
+        {
+            bPosLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit;
+            if(bPosLimit[i])
+            {
+                if(i==3)//w轴区别对待
+                {
+                    labels[i]->setStyleSheet("font-size:28px;border-image:url(zx.png);");
+                }else{
+                    labels[i]->setStyleSheet("font-size:40px;border-image:url(zx.png);");
+                }
+
+            }else{
+                if(i==3)//w轴区别对待
+                {
+                    labels[i]->setStyleSheet("font-size:28px");
+                }else{
+                    labels[i]->setStyleSheet("font-size:40px");
+                }
+            }
+        }
+        //负限
+        if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bNegLimit)
+        {
+            bNegLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bNegLimit;
+            if(bNegLimit[i])
+            {
+                if(i==3)//w轴区别对待
+                {
+                    labels[i]->setStyleSheet("font-size:28px;border-image:url(fx.png);");
+                }else{
+                    labels[i]->setStyleSheet("font-size:40px;border-image:url(fx.png);");
+                }
+
+            }else{
+                if(i==3)//w轴区别对待
+                {
+                    labels[i]->setStyleSheet("font-size:28px");
+                }else{
+                    labels[i]->setStyleSheet("font-size:40px");
+                }
+            }
+        }
+        //轴报警
+
+        if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bAlarm)
+        {
+            bAlarm[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bAlarm;
+            if(bAlarm[i])
+            {
+                if(i==3)//w轴区别对待
+                {
+                    labels[i]->setStyleSheet("font-size:28px;border-image:url(bj.png);");
+                }else{
+                    labels[i]->setStyleSheet("font-size:40px;border-image:url(bj.png);");
+                }
+
+            }else{
+                if(i==3)//w轴区别对待
+                {
+                    labels[i]->setStyleSheet("font-size:28px");
+                }else{
+                    labels[i]->setStyleSheet("font-size:40px");
+                }
+            }
+        }
+    }
+}
+
 void CoordWidget::HandleEdmCycleData()
 {
+    edm->GetEdmComm();
     edm->GetEdmStatusData();
     SaveData();              //存储数据
     //SendComand2Edm();        //发送命令行数据
     ShowAxisData();          //显示数据
-    //ShowMacUserStatus();	 //状态显示
-    //EdmHandKeyProcess();
+    ShowMacUserStatus();	 //状态显示
     edm->EdmAxisAdjust();
     edm->EdmAxisAdjustCircle();
 }

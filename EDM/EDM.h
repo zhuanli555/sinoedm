@@ -79,33 +79,33 @@ typedef struct edmAdjustCircle
 //轴运动使用的控制参数硬件参数
 typedef struct  edmAxis_Hard_Ctl
 {	
-	bool bPosLimit;              //正限位
-	bool bNegLimit;              //负限位
-	bool bAlarm;                 //轴报警
+	unsigned long bPosLimit;              //正限位
+	unsigned long bNegLimit;              //负限位
+	unsigned long bAlarm;                 //轴报警
 }Axis_Hard_Ctl;
 
 typedef struct  edmMove_Hard_Para
 {
 	Axis_Hard_Ctl stHardCtlUser[MAC_LABEL_COUNT];
-	bool           bDirect;
+	unsigned long           bDirect;
 }Move_Hard_Para;
 
 typedef struct  edmMac_Status
 {
-	bool bStop;       //总停
-	bool bPumpLow;    //低压泵
-	bool bPumpHigh;   //高压泵
-    bool bShake;      //振动
-	bool bPower;      //高频
-	bool bPrune;      //修电极
-	bool bDirect;     //短路
-	bool bRotate;     //旋转
-	bool bLowPressure;//欠水压
-	bool bRalarm;    //R轴报警
-	bool bLubricate;  //润滑报警
-	bool bAxisOffset; //轴偏差
-	bool bKeyShut;    //键锁定
-	bool bNoProtect;  //防撞保护取反
+	unsigned long bStop;       //总停
+	unsigned long bPumpLow;    //低压泵
+	unsigned long bPumpHigh;   //高压泵
+    unsigned long bShake;      //振动
+	unsigned long bPower;      //高频
+	unsigned long bPrune;      //修电极
+	unsigned long bDirect;     //短路
+	unsigned long bRotate;     //旋转
+	unsigned long bLowPressure;//欠水压
+	unsigned long bRalarm;    //R轴报警
+	unsigned long bLubricate;  //润滑报警
+	unsigned long bAxisOffset; //轴偏差
+	unsigned long bKeyShut;    //键锁定
+	unsigned long bNoProtect;  //防撞保护取反
 }Mac_Status;
 
 typedef struct edmEDM_ALL_DATA
@@ -137,7 +137,7 @@ public:
 	MAC_KPINT m_stEdmKpInt;
 	MAC_SYSTEM_SET m_stSysSet;
 	int m_iWorkIndex;
-	bool m_bMachFault;
+	unsigned long m_bMachFault;
 
     QString m_strSysPath;
     map<int,int> m_mpMakeUp_C;
@@ -158,8 +158,8 @@ private:
 
     QString m_strMakeUpFile;
 public:
-	bool EdmInit();
-	bool EdmClose();
+	unsigned long EdmInit();
+	unsigned long EdmClose();
 	void GetMacPara(MAC_SYSTEM_SET* pSysSet);
 	bool GetEdmComm();
 	bool GetEdmMacPassPara(MAC_PASS_PARA* pPass);
@@ -172,7 +172,7 @@ public:
 	
 	void CloseHardWare();
 
-	bool EdmStopMove(bool bStatus);
+	bool EdmStopMove(unsigned long bStatus);
 	void EdmStopSignClose();
 	void EdmZeroSignClose();
 	void EdmSaveMacComm();
@@ -190,7 +190,6 @@ public:
     bool GetMakeUpVal(int iVal_C,int* pVal);
 
 private:
-	bool EdmRedLump(bool bRed);
 	void EdmReadMacPara();
 	int  WriteByteToReg(int iCtrAdd,unsigned char btCtrVal);
 	unsigned char ReadByteFromReg(int iCtrAdd);
@@ -212,15 +211,14 @@ public:
 	bool SaveMacPara(MAC_SYSTEM_SET* pSysSet);
     void test_inter();
 public slots:
-	bool EdmSetProtect(bool bProtect);
-	bool EdmLowPump(bool bOpen);
-	bool EdmHighPump(bool bOpen);
-    bool EdmSetShake(bool bShake);
-	bool EdmRotate(bool bSwitch,bool bOpen,int iSpeed,bool bDir);
-	bool EdmPower(bool bOpen);
-	bool EdmPrune(bool bOpen);
-	bool EdmHummer(bool bOpen);	
-	bool EdmYellowLump(bool bYellow);
+	bool EdmSetProtect(unsigned long bProtect);
+	bool EdmLowPump(unsigned long bOpen);
+    bool EdmSetShake(unsigned long bShake);
+	bool EdmPower(unsigned long bOpen);
+	bool EdmPrune(unsigned long bOpen);
+	bool EdmHummer(unsigned long bOpen);	
+    bool EdmRedLump(unsigned long bRed);
+	bool EdmYellowLump(unsigned long bYellow);
     void EdmStop();
     bool EdmRtZero(int iLabel);
     bool EdmSendMovePara(DIGIT_CMD* pMacUser);

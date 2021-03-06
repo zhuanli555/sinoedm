@@ -43,7 +43,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-//TODO
+
 //车电极
 typedef struct edmMacOther
 {
@@ -370,33 +370,29 @@ typedef struct isaMAC_HANDLE_ENTILE
 
 typedef struct isaMAC_INTERFACE_IN
 {
-	unsigned char btI140; 
-	unsigned char btI144;
-	unsigned char btI148;
-	unsigned char btI184;
-	unsigned char btI188;
-	unsigned char btI18C;
-	unsigned char btI18D;	
-	unsigned char btI1C4;
-	unsigned char btI1C8;
-	unsigned char btI1A6;
-	unsigned char btI1A7;
-	unsigned char btI310;
-	unsigned char btI312;
-	unsigned char btI15C;//shineng
-	unsigned char btI1DC;//shineng
+    unsigned char btI140;
+    unsigned char btI144;
+    unsigned char btI148;
+    unsigned char btI184;
+    unsigned char btI188;
+    unsigned char btI1C0;
+    unsigned char btI1C4;
+    unsigned char btI1C8;
 }MAC_INTERFACE_IN;
 
 typedef struct  isaMAC_INTERFACE_OUT
 {
+    unsigned char btO140;//x,y,z
+    unsigned char btO144;
 	unsigned char btO184;
 	unsigned char btO188;
+    unsigned char btO18C;//中断
 	unsigned char btO190;
-	unsigned char btO18C;//中断
-	unsigned char btO199;
-	unsigned char btO144;
-	unsigned char btO1C4;	
-	unsigned char btO140;//x,y,z
+    unsigned char btO198;
+    unsigned char btO199;
+    unsigned char btO1C0;
+    unsigned char btO1C4;
+
 }MAC_INTERFACE_OUT;
 
 typedef struct isaMAC_SYSTEM_SET_NONE_LABEL

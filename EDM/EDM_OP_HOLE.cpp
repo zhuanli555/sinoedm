@@ -229,8 +229,7 @@ void EDM_OP_HOLE::SetAllErr()
 
 
 void EDM_OP_HOLE::EdmOpOver()
-{	
-	m_pEdm->CloseHardWare();
+{
 	EdmHoleRecover();
 	EDM_OP::m_bInOp = FALSE;
 	EDM_OP::m_bStartCount = FALSE;
@@ -1468,7 +1467,6 @@ void EDM_OP_HOLE::EdmHolePassCtl()
 	if (!m_stMacPassPara.bOver)
 		return;
 
-    //TODOm_stOpCtrl.stZeroCtrl.stPassCtl.iVoltage = ReadVoltage();
     m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltage = 0;
 
 	if (++m_stOpCtrl.stZeroCtrl.stPassCtl.iFiltCnt<5)
@@ -1788,9 +1786,8 @@ void EDM_OP_HOLE::CycleOver()
 void EDM_OP_HOLE::EdmHoleRecover()
 {
 	DIGIT_CMD cmd;
-	EDM_OP::m_bSetPower = FALSE;
-	m_pEdm->CloseHardWare();
-
+    EDM_OP::m_bSetPower = FALSE;
+    m_pEdm->CloseHardWare();
 	if (m_enOpType == OP_TYPE_NONE || EDM_OP::m_bInOp==FALSE)
 	{
 		return;
@@ -1842,25 +1839,19 @@ void EDM_OP_HOLE::EdmHoleRecover()
 
 void EDM_OP_HOLE::SetEdmHolePower(unsigned char bPower,unsigned char bPrune,unsigned char bOtherClose)
 {
-	unsigned char bRotate = TRUE;
 	unsigned char bLowPump = FALSE;
-	unsigned char bOther = TRUE;
 
 	EDM_OP::m_bSetPower = bPower;	
 
 	if (bPower)
 	{
-		bRotate = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.bRotateValidate;
 		bLowPump = m_pEdm->m_stSysSet.stSetNoneLabel.bLowPumpUnion;
-		bOther = TRUE;
 	}
 	else
 	{
 		bPrune = FALSE;
 		if (bOtherClose)
 		{
-			bOther = FALSE;
-			bRotate = FALSE;
 			bLowPump = FALSE;
 		}
 	}
@@ -1870,9 +1861,7 @@ void EDM_OP_HOLE::SetEdmHolePower(unsigned char bPower,unsigned char bPrune,unsi
 
 	if (bPower || bOtherClose)
 	{
-		m_pEdm->EdmHighPump(bOther);
 		m_pEdm->EdmLowPump(bLowPump);
-		m_pEdm->EdmRotate(true,bRotate,-1,false);	
 	}		
 }
 
@@ -2013,7 +2002,6 @@ unsigned char EDM_OP_HOLE::EdmOpMvAheadChkLabel()
 	} 
 	else if (enMode==CHECK_ELASTIC)
 	{
-        //TODOm_stOpCtrl.stZeroCtrl.iCheckPos = m_pEdm->GetNLabelMac();
         m_stOpCtrl.stZeroCtrl.iCheckPos = 0;
 		if (m_stOpCtrl.stZeroCtrl.iCheckPos >=1980)
 		{
@@ -2057,7 +2045,6 @@ unsigned char EDM_OP_HOLE::EdmOpMvWaitChkLabel()
 	} 
 	else if (enMode==CHECK_ELASTIC)
 	{
-        //TODO m_stOpCtrl.stZeroCtrl.iCheckPos = m_pEdm->GetNLabelMac();
         m_stOpCtrl.stZeroCtrl.iCheckPos = 0;
 		iVal = m_pEdm->m_stEdmComm.stMoveCtrlComm[0].iMachPos + m_stOpCtrl.stZeroCtrl.iCheckPos;
 	}

@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QTextCodec>
 #include <QPushButton>
-#include "spindelegate.h"
 
 ElecParaTable::ElecParaTable(QSqlRelationalTableModel *elecpage, QSqlTableModel *elecoral,QString name,QWidget *parent)
     : QTableView(parent)
@@ -10,8 +9,6 @@ ElecParaTable::ElecParaTable(QSqlRelationalTableModel *elecpage, QSqlTableModel 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
     QPushButton *addButton = new QPushButton("add",this);
     QPushButton *delButton = new QPushButton("del",this);
-    SpinDelegate spinDelegate;
-    setItemDelegateForColumn(3,&spinDelegate);
     //add table header
     _model = new QStandardItemModel(6,9,this);
     _model->setHeaderData(0,Qt::Horizontal, QString::fromLocal8Bit("±‹¿í"));

@@ -24,7 +24,6 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     EDMProcessInit();
     //状态栏
     statBar = statusBar();
-    bPause = 1;
     //left
     coordWidget = new CoordWidget();
     //right
@@ -217,13 +216,19 @@ void Process::createMenus()
       background-color:rgb(89,87,87);margin:2px 2px;color:yellow;}\
        QMenuBar::item:selected{background-color:rgb(235,110,36);}\
         QMenuBar::item:pressed{background-color:rgb(235,110,6);border:1px solid rgb(60,60,60);}");
+    myMenu->addAction(stopAction);
     myMenu->addAction(processAction);
     myMenu->addAction(imitateAction);
-    myMenu->addAction(pauseAction);
+
 }
 
 void Process::createActions()
 {
+    stopAction = new QAction(QString::fromLocal8Bit("总停(ESC)"),this);
+    stopAction->setShortcut(tr("ESC"));
+    stopAction->setStatusTip(tr("总停"));
+    connect(stopAction,&QAction::triggered,this,&Process::edmStop);
+
     processAction = new QAction(QString::fromLocal8Bit("编程加工(F1)"),this);
     processAction->setShortcut(tr("F1"));
     processAction->setStatusTip("编程加工");
@@ -233,11 +238,6 @@ void Process::createActions()
     imitateAction->setShortcut(tr("F2"));
     imitateAction->setStatusTip("模拟加工");
     connect(imitateAction,&QAction::triggered,this,&Process::imitateProcess);
-
-    pauseAction = new QAction(QString::fromLocal8Bit("暂停(F3)"),this);
-    pauseAction->setShortcut(tr("F3"));
-    pauseAction->setStatusTip("暂停");
-    connect(pauseAction,&QAction::triggered,this,&Process::pause);
 
 }
 
@@ -260,7 +260,6 @@ void Process::MacProcessOperate()
         mutex.unlock();
         QThread::msleep(20);
     }
-    EDM_OP_List::DeleteEdmOpList();
 }
 
 //处理各个类型的加工
@@ -413,13 +412,6 @@ void Process::HandleEdmOpStatus()
     }
 }
 
-void Process::pause()
-{
-    if (!edmOpList->m_pEdmOp)return;
-    bPause = !bPause;
-    edmOpList->m_pEdmOp->EdmOpSetStart(bPause);
-}
-
 void Process::programProcess()
 {
     enType = OP_HOLE_PROGRAME;
@@ -443,15 +435,11 @@ unsigned char Process::EDMProcessInit()
 {
     unsigned char bInit;
     edm =  EDM::GetEdmInstance();
-    bInit = edm->EdmInit();
-    //edm->GetFileName(strOpName);//从数据库获取filename
-    edm->m_strSysPath = path;
-    strOpName = gFilename;
     edmOpList = EDM_OP_List::GetEdmOpListPtr();
     edmOp = edmOpList->m_pEdmOp;
     edmOpList->SetEdmOpFile(path,strOpName);
     //从数据库载入
-    //todo
+    //TODO
     return bInit;
 }
 
@@ -459,31 +447,35 @@ void Process::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {
     case Qt::Key_Escape:
-        close();
+        edmStop();
         break;
     case Qt::Key_F4:
         alarmSignal->edmPurge();
         break;
     case Qt::Key_F5:
-        alarmSignal->edmHighFreq();
+        alarmSignal->edmLowerPump();
         break;
     case Qt::Key_F6:
-        alarmSignal->edmProtect();
-        break;
-    case Qt::Key_F7:
         alarmSignal->edmShake();
         break;
-    case Qt::Key_F8:
+    case Qt::Key_F7:
         alarmSignal->edmProtect();
-        break;
-    case Qt::Key_F9:
-        close();
         break;
     case Qt::Key_F10:
         showFileText();
+        break;
+    case Qt::Key_F12:
+        close();
+        break;
+
     default:
         break;
     }
+}
+
+void Process::edmStop()
+{
+    alarmSignal->edmStop();
 }
 
 void Process::showFileText()

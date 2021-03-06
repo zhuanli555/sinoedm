@@ -6,26 +6,29 @@ AlarmSignal::AlarmSignal(QWidget *parent) : QWidget(parent)
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
     setMaximumWidth(600);
     edm = EDM::GetEdmInstance();
+    edmOpList = EDM_OP_List::GetEdmOpListPtr();
+    bPause = false;
+    memset(&m_stEntileStatus,0,sizeof(EDM_SHOW_STATUS));
     purgeValue = new QLabel(QString::fromLocal8Bit("³åÒº(F4)"));
-    highFreqValue = new QLabel(QString::fromLocal8Bit("¸ßÆµ(F5)"));
+    lowPumpValue = new QLabel(QString::fromLocal8Bit("µÍÑ¹±Ã(F5)"));
     shakeValue = new QLabel(QString::fromLocal8Bit("Õñ¶¯(F6)"));
     protectValue = new QLabel(QString::fromLocal8Bit("·À×²±£»¤(F7)"));
-    rotateValue = new QLabel(QString::fromLocal8Bit("Ðý×ª(F8)"));
+    pauseValue = new QLabel(QString::fromLocal8Bit("ÔÝÍ£(F8)"));
 
     mainLayout = new QGridLayout(this);
     mainLayout->setSpacing(20);
     mainLayout->addWidget(purgeValue,0,0);
-    mainLayout->addWidget(highFreqValue,1,0);
+    mainLayout->addWidget(lowPumpValue,1,0);
     mainLayout->addWidget(shakeValue,2,0);
     mainLayout->addWidget(protectValue,3,0);
-    mainLayout->addWidget(rotateValue,4,0);
-
+    mainLayout->addWidget(pauseValue,4,0);
     protectValue->setMaximumWidth(85);
-    purgeValue->setStyleSheet("background-color:red;");
-    shakeValue->setStyleSheet("background-color:red;");
+    purgeValue->setStyleSheet("background-color:green;");
+    lowPumpValue->setStyleSheet("background-color:green;");
+    shakeValue->setStyleSheet("background-color:green;");
     protectValue->setStyleSheet("background-color:green;");
-    highFreqValue->setStyleSheet("background-color:green;");
-    rotateValue->setStyleSheet("background-color:red;");
+    pauseValue->setStyleSheet("background-color:green;");
+
 }
 
 int AlarmSignal::addAlarm(const QString &text)
@@ -56,9 +59,44 @@ void AlarmSignal::reSort()
     }
 }
 
+void AlarmSignal::EdmStatusSignChange()
+{
+    static unsigned long bDirect = FALSE;
+    if (edm->m_stEdmShowData.stStatus.bStop || m_stEntileStatus.bStop)
+    {
+        if (++m_stEntileStatus.iStopCnt >= 10)
+        {
+            m_stEntileStatus.iStopCnt = 0;
+            m_stEntileStatus.bStop = FALSE;
+            edm->EdmStopSignClose();
+        }
+    }
+
+    if (m_stEntileStatus.bRTzero)
+    {
+        if (edm->m_stEdmShowData.stComm.enMvStatus == RULE_MOVE_OVER)
+        {
+            m_stEntileStatus.bRTzero = FALSE;
+            edm->EdmZeroSignClose();
+        }
+    }
+    else
+    {
+        if (edm->m_stEdmShowData.stComm.enMvStatus == RULE_RTZERO)
+        {
+            m_stEntileStatus.bRTzero = TRUE;
+        }
+    }
+
+    if (bDirect != edm->m_stEdmShowData.stStatus.bDirect)
+    {
+        bDirect = edm->m_stEdmShowData.stStatus.bDirect;
+        edm->EdmHummer(bDirect);
+    }
+}
+
 void AlarmSignal::edmPurge()
 {
-
     edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);//µÍÑ¹ ³åÒº£¿
     if(edm->m_stEdmShowData.stStatus.bPumpLow)
     {
@@ -69,31 +107,17 @@ void AlarmSignal::edmPurge()
     }
 }
 
-void AlarmSignal::edmHighFreq()
+void AlarmSignal::edmLowerPump()
 {
-    edm->EdmPower(!edm->m_stEdmShowData.stStatus.bPower);
-    if(edm->m_stEdmShowData.stStatus.bPower)
+    edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);//µÍÑ¹
+    if(edm->m_stEdmShowData.stStatus.bPumpLow)
     {
-        highFreqValue->setStyleSheet("background-color:red;");
+        lowPumpValue->setStyleSheet("background-color:red;");
     }
     else{
-        highFreqValue->setStyleSheet("background-color:green;");
+        lowPumpValue->setStyleSheet("background-color:green;");
     }
 }
-
-void AlarmSignal::edmProtect()
-{
-    //¶àÏß³Ì
-    edm->EdmSetProtect(edm->m_stEdmShowData.stStatus.bNoProtect);
-    if(edm->m_stEdmShowData.stStatus.bNoProtect)
-    {
-        protectValue->setStyleSheet("background-color:green;");
-    }else{
-        protectValue->setStyleSheet("background-color:red;");
-    }
-}
-
-
 
 void AlarmSignal::edmShake()
 {
@@ -104,5 +128,50 @@ void AlarmSignal::edmShake()
     }else{
         shakeValue->setStyleSheet("background-color:red;");
     }
+}
+
+
+void AlarmSignal::edmProtect()
+{
+    edm->EdmSetProtect(edm->m_stEdmShowData.stStatus.bNoProtect);
+    if(edm->m_stEdmShowData.stStatus.bNoProtect)
+    {
+        protectValue->setStyleSheet("background-color:green;");
+    }else{
+        protectValue->setStyleSheet("background-color:red;");
+    }
+}
+
+void AlarmSignal::edmPause()
+{
+    if (!m_stEntileStatus.bOpIn || m_stEntileStatus.bRTzero)
+    {
+        return;
+    }
+    bPause = !bPause;
+    if(bPause)
+    {
+        pauseValue->setStyleSheet("background-color:red;");
+        pauseValue->setText(QString::fromLocal8Bit("¼ÌÐø(F8)"));
+    }else{
+        pauseValue->setStyleSheet("background-color:green;");
+        pauseValue->setText(QString::fromLocal8Bit("ÔÝÍ£(F8)"));
+    }
+    if (!edmOpList->m_pEdmOp)
+        return;
+    edmOpList->m_pEdmOp->EdmOpSetStart(bPause);
+}
+
+void AlarmSignal::edmStop()
+{
+    if (m_stEntileStatus.bStop)
+            return;
+    m_stEntileStatus.bStop = TRUE;
+    if (!m_stEntileStatus.bOpIn)
+    {
+        edm->EdmStop();
+    }
+    m_stEntileStatus.bOpIn = FALSE;
+    edmOpList->EdmOpListOver();
 }
 

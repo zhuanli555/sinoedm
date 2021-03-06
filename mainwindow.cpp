@@ -31,8 +31,8 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     axisSet = new QPushButton(QString::fromLocal8Bit("轴置数Ctrl/?"));
     axisZero = new QPushButton(QString::fromLocal8Bit("轴清零Alt/?"));
     findCenter = new QPushButton(QString::fromLocal8Bit("找中心(F)"));
-    //connect(findCenter,&QPushButton::clicked,this,&MainWindow::edmFindCenter);
-
+    //添加一个lineedit 记录发送的命令
+    commandText = new QTextEdit();
     rightLayout = new QGridLayout();
     rightLayout->setSpacing(20);
     rightLayout->addWidget(axisSet,0,0);
@@ -63,7 +63,8 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     mainLayout->setSpacing(10);
     mainLayout->addWidget(coordWidget,0,0);
     mainLayout->addLayout(rightLayout,0,1);
-    mainLayout->addLayout(bottomLayout,1,0,1,2);
+    mainLayout->addWidget(commandText,1,0,1,2);
+    mainLayout->addLayout(bottomLayout,2,0,1,2);
     mainLayout->setColumnStretch(0,1);//设置1:1
     mainLayout->setColumnStretch(1,1);
     widget->setLayout(mainLayout);
@@ -86,26 +87,26 @@ MainWindow::~MainWindow()
         edm->EdmClose();
         EDM::DelEdm();
     }
-    emit coordWidget->close();
-    emit alarmSignal->close();
-    emit axisDialog->close();
-    emit process->close();
-    emit program->close();
-    emit setting->close();
-    emit unionZero->close();
+    coordWidget->close();
+    alarmSignal->close();
+    axisDialog->close();
+    process->close();
+    program->close();
+    setting->close();
+    unionZero->close();
 }
 
 void MainWindow::MacUserOperate()
 {
     while(true)
     {
-        mutex.lock();
         if(edm)
         {
-            edm->GetEdmComm();
-            coordWidget->HandleEdmCycleData();//coordwidget 循环
+            mutex.lock();
+            coordWidget->HandleEdmCycleData();//机床命令周期性处理
+            alarmSignal->EdmStatusSignChange();//机床信号周期性处理
+            mutex.unlock();
         }
-        mutex.unlock();
         QThread::msleep(20);
     }
 }
@@ -123,11 +124,11 @@ unsigned char MainWindow::EDMMacInit()
 
 void MainWindow::timeUpdate()
 {
-    QDateTime t = QDateTime::currentDateTime();
-    int tt = t.toTime_t();
-    float ll = tt%1000000;
-    QString s = QString::number(ll/1000,'f',3);
-    statBar->showMessage(s);
+//    QDateTime t = QDateTime::currentDateTime();
+//    int tt = t.toTime_t();
+//    float ll = tt%1000000;
+//    QString s = QString::number(ll/1000,'f',3);
+//    statBar->showMessage(s);
     //发送command循环
     //其他循环
     //测试alarm
@@ -137,19 +138,24 @@ void MainWindow::timeUpdate()
 
 void MainWindow::createActions()
 {
+    stopAction = new QAction(QString::fromLocal8Bit("总停(ESC)"),this);
+    stopAction->setShortcut(tr("ESC"));
+    stopAction->setStatusTip(tr("总停"));
+    connect(stopAction,&QAction::triggered,this,&MainWindow::edmStop);
+
     processAction = new QAction(QString::fromLocal8Bit("加工(F1)"),this);
     processAction->setShortcut(tr("F1"));
-    processAction->setStatusTip("加工文件");
+    processAction->setStatusTip(tr("加工文件"));
     connect(processAction,&QAction::triggered,this,&MainWindow::renderToProcess);
 
     unionZeroAction = new QAction(QString::fromLocal8Bit("回零(F2)"),this);
     unionZeroAction->setShortcut(tr("F2"));
-    unionZeroAction->setStatusTip("回零");
+    unionZeroAction->setStatusTip(tr("回零"));
     connect(unionZeroAction,&QAction::triggered,this,&MainWindow::renderToUnionZero);
 
     programAction = new QAction(QString::fromLocal8Bit("编程(F3)"),this);
     programAction->setShortcut(tr("F3"));
-    programAction->setStatusTip("编程文件");
+    programAction->setStatusTip(tr("编程文件"));
     connect(programAction,&QAction::triggered,this,&MainWindow::renderToProgram);
 
     settingAction = new QAction(QString::fromLocal8Bit("设置(F10)"),this);
@@ -166,10 +172,13 @@ void MainWindow::createMenus()
       background-color:rgb(89,87,87);margin:2px 2px;color:yellow;}\
        QMenuBar::item:selected{background-color:rgb(235,110,36);}\
         QMenuBar::item:pressed{background-color:rgb(235,110,6);border:1px solid rgb(60,60,60);}");
+    myMenu->addAction(stopAction);
     myMenu->addAction(processAction);
     myMenu->addAction(unionZeroAction);
     myMenu->addAction(programAction);
     myMenu->addAction(settingAction);
+    //add stop menu,close menu
+
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
@@ -225,17 +234,18 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
     switch (e->key()) {
     case Qt::Key_Escape:
-        close();
-        break;
+        edmStop();break;
     case Qt::Key_F4:
         alarmSignal->edmPurge();break;
     case Qt::Key_F5:
-        alarmSignal->edmProtect();break;
+        alarmSignal->edmLowerPump();break;
     case Qt::Key_F6:
         alarmSignal->edmShake();break;
     case Qt::Key_F7:
         alarmSignal->edmProtect();break;
     case Qt::Key_F8:
+        alarmSignal->edmPause();break;
+    case Qt::Key_F12:
         close();break;
     default:
         break;
@@ -270,6 +280,11 @@ void MainWindow::renderToUnionZero()
     unionZero->show();
 }
 
+void MainWindow::edmStop()
+{
+    alarmSignal->edmStop();
+}
+
 void MainWindow::edmSendComand()
 {
     static DIGIT_CMD stDigitCmd;
@@ -278,6 +293,7 @@ void MainWindow::edmSendComand()
     QString cmdstr;
     int speed = speedValue->currentText().toInt();
     cmdstr = commandLine->text();
+    commandText->append(cmdstr);
     memset(&cmdDefault,0,sizeof(DIGIT_CMD));
     cmdDefault.enAim = AIM_G91;
     cmdDefault.enOrbit = ORBIT_G00;

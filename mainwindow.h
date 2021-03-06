@@ -54,13 +54,13 @@ private:
     Setting* setting;
     UnionZero* unionZero;
     QStatusBar* statBar;
-    QTextEdit* alarmText;
+    QTextEdit* commandText;
+    QAction* stopAction;
     QAction* processAction;
     QAction* unionZeroAction;
     QAction* programAction;
     QAction* settingAction;
     QAction* purgeAction;
-    QAction* shakeAction;
     //left
     CoordWidget* coordWidget;
     //right
@@ -83,14 +83,15 @@ private:
     QHBoxLayout* bottomLayout;
 protected:
     void keyPressEvent(QKeyEvent *e) override;
-
+    void timeUpdate();
 protected slots:
+
     void renderToProcess();
     void renderToProgram();
     void renderToSetting();
     void renderToUnionZero();
+    void edmStop();
     void edmSendComand();
-    void timeUpdate();
 };
 
 #endif // MAINWINDOW_H

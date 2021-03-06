@@ -71,8 +71,7 @@ SOURCES       = main.cpp \
 		EDM/EDM_OP_File.cpp \
 		EDM/EDM_OP_HOLE.cpp \
 		EDM/EDM_OP_List.cpp \
-		EDM/electool.cpp \
-		spindelegate.cpp moc_mainwindow.cpp \
+		EDM/electool.cpp moc_mainwindow.cpp \
 		moc_process.cpp \
 		moc_program.cpp \
 		moc_setting.cpp \
@@ -81,8 +80,7 @@ SOURCES       = main.cpp \
 		moc_codeeditor.cpp \
 		moc_alarmsignal.cpp \
 		moc_elecparatable.cpp \
-		moc_EDM_OP_List.cpp \
-		moc_spindelegate.cpp
+		moc_EDM_OP_List.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		process.o \
@@ -103,7 +101,6 @@ OBJECTS       = main.o \
 		EDM_OP_HOLE.o \
 		EDM_OP_List.o \
 		electool.o \
-		spindelegate.o \
 		moc_mainwindow.o \
 		moc_process.o \
 		moc_program.o \
@@ -113,8 +110,7 @@ OBJECTS       = main.o \
 		moc_codeeditor.o \
 		moc_alarmsignal.o \
 		moc_elecparatable.o \
-		moc_EDM_OP_List.o \
-		moc_spindelegate.o
+		moc_EDM_OP_List.o
 DIST          = ../qt5/5.12.1/gcc_64/mkspecs/features/spec_pre.prf \
 		../qt5/5.12.1/gcc_64/mkspecs/common/unix.conf \
 		../qt5/5.12.1/gcc_64/mkspecs/common/linux.conf \
@@ -325,8 +321,7 @@ DIST          = ../qt5/5.12.1/gcc_64/mkspecs/features/spec_pre.prf \
 		EDM/EDM_OP_File.h \
 		EDM/EDM_OP_HOLE.h \
 		EDM/EDM_OP_List.h \
-		EDM/electool.h \
-		spindelegate.h main.cpp \
+		EDM/electool.h main.cpp \
 		mainwindow.cpp \
 		process.cpp \
 		program.cpp \
@@ -345,8 +340,7 @@ DIST          = ../qt5/5.12.1/gcc_64/mkspecs/features/spec_pre.prf \
 		EDM/EDM_OP_File.cpp \
 		EDM/EDM_OP_HOLE.cpp \
 		EDM/EDM_OP_List.cpp \
-		EDM/electool.cpp \
-		spindelegate.cpp
+		EDM/electool.cpp
 QMAKE_TARGET  = sinoedm
 DESTDIR       = 
 TARGET        = sinoedm
@@ -768,8 +762,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../qt5/5.12.1/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents mainwindow.h process.h program.h setting.h EDM/common.h EDM/EDM.h EDM/EDM_Db.h EDM/initdb.h coordwidget.h unionzero.h codeeditor.h axissetdialog.h EDM/cmdhandle.h alarmsignal.h elecparatable.h EDM/EDM_OP.h EDM/EDM_OP_File.h EDM/EDM_OP_HOLE.h EDM/EDM_OP_List.h EDM/electool.h spindelegate.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp mainwindow.cpp process.cpp program.cpp setting.cpp EDM/common.cpp EDM/EDM.cpp EDM/EDM_Db.cpp coordwidget.cpp unionzero.cpp codeeditor.cpp axissetdialog.cpp EDM/cmdhandle.cpp alarmsignal.cpp elecparatable.cpp EDM/EDM_OP.cpp EDM/EDM_OP_File.cpp EDM/EDM_OP_HOLE.cpp EDM/EDM_OP_List.cpp EDM/electool.cpp spindelegate.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents mainwindow.h process.h program.h setting.h EDM/common.h EDM/EDM.h EDM/EDM_Db.h EDM/initdb.h coordwidget.h unionzero.h codeeditor.h axissetdialog.h EDM/cmdhandle.h alarmsignal.h elecparatable.h EDM/EDM_OP.h EDM/EDM_OP_File.h EDM/EDM_OP_HOLE.h EDM/EDM_OP_List.h EDM/electool.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp mainwindow.cpp process.cpp program.cpp setting.cpp EDM/common.cpp EDM/EDM.cpp EDM/EDM_Db.cpp coordwidget.cpp unionzero.cpp codeeditor.cpp axissetdialog.cpp EDM/cmdhandle.cpp alarmsignal.cpp elecparatable.cpp EDM/EDM_OP.cpp EDM/EDM_OP_File.cpp EDM/EDM_OP_HOLE.cpp EDM/EDM_OP_List.cpp EDM/electool.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -801,9 +795,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: ../qt5/5.12.1/gcc_64/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h ../qt5/5.12.1/gcc_64/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_mainwindow.cpp moc_process.cpp moc_program.cpp moc_setting.cpp moc_EDM.cpp moc_coordwidget.cpp moc_codeeditor.cpp moc_alarmsignal.cpp moc_elecparatable.cpp moc_EDM_OP_List.cpp moc_spindelegate.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_process.cpp moc_program.cpp moc_setting.cpp moc_EDM.cpp moc_coordwidget.cpp moc_codeeditor.cpp moc_alarmsignal.cpp moc_elecparatable.cpp moc_EDM_OP_List.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_mainwindow.cpp moc_process.cpp moc_program.cpp moc_setting.cpp moc_EDM.cpp moc_coordwidget.cpp moc_codeeditor.cpp moc_alarmsignal.cpp moc_elecparatable.cpp moc_EDM_OP_List.cpp moc_spindelegate.cpp
+	-$(DEL_FILE) moc_mainwindow.cpp moc_process.cpp moc_program.cpp moc_setting.cpp moc_EDM.cpp moc_coordwidget.cpp moc_codeeditor.cpp moc_alarmsignal.cpp moc_elecparatable.cpp moc_EDM_OP_List.cpp
 moc_mainwindow.cpp: mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QMainWindow \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qmainwindow.h \
@@ -1107,10 +1101,34 @@ moc_mainwindow.cpp: mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QWidget \
 		../qt5/5.12.1/gcc_64/include/QtGui/QImage \
 		alarmsignal.h \
+		EDM/EDM_OP_List.h \
+		EDM/EDM_OP_HOLE.h \
+		EDM/EDM_OP.h \
+		EDM/EDM_OP_File.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QList \
 		axissetdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QDialog \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
+		process.h \
+		../qt5/5.12.1/gcc_64/include/QtSql/QSqlRelationalTableModel \
+		../qt5/5.12.1/gcc_64/include/QtSql/QSqlTableModel \
+		../qt5/5.12.1/gcc_64/include/QtCore/QModelIndex \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QTableView \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qtableview.h \
+		program.h \
+		codeeditor.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QPlainTextEdit \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qplaintextedit.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qabstracttextdocumentlayout.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qtextlayout.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qglyphrun.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qrawfont.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qfontdatabase.h \
+		elecparatable.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QStandardItemModel \
+		../qt5/5.12.1/gcc_64/include/QtGui/qstandarditemmodel.h \
+		setting.h \
+		unionzero.h \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
 	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
@@ -1431,11 +1449,11 @@ moc_process.cpp: process.h \
 		coordwidget.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QImage \
 		alarmsignal.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/QList \
 		EDM/EDM_OP_List.h \
 		EDM/EDM_OP_HOLE.h \
 		EDM/EDM_OP.h \
 		EDM/EDM_OP_File.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QList \
 		elecparatable.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QStandardItemModel \
 		../qt5/5.12.1/gcc_64/include/QtGui/qstandarditemmodel.h \
@@ -2626,6 +2644,10 @@ moc_alarmsignal.cpp: alarmsignal.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		EDM/EDM_OP_List.h \
+		EDM/EDM_OP_HOLE.h \
+		EDM/EDM_OP.h \
+		EDM/EDM_OP_File.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLabel \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlabel.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QGridLayout \
@@ -3182,129 +3204,6 @@ moc_EDM_OP_List.cpp: EDM/EDM_OP_List.h \
 		../qt5/5.12.1/gcc_64/bin/moc
 	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include EDM/EDM_OP_List.h -o moc_EDM_OP_List.cpp
 
-moc_spindelegate.cpp: spindelegate.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/QItemDelegate \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qitemdelegate.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtguiglobal.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qglobal.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qconfig-bootstrapped.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qconfig.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qtcore-config.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsystemdetection.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qprocessordetection.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qcompilerdetection.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qtypeinfo.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsysinfo.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qlogging.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qflags.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qatomic.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qbasicatomic.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qatomic_bootstrap.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qgenericatomic.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qatomic_cxx11.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qatomic_msvc.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qglobalstatic.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qmutex.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qnumeric.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qversiontagging.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtgui-config.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qtwidgets-config.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qobject.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qobjectdefs.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qnamespace.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstring.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qchar.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qbytearray.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qrefcount.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qarraydata.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringliteral.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringalgorithms.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringview.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringbuilder.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qlist.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qalgorithms.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qiterator.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qhashfunctions.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qpair.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qbytearraylist.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringlist.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qregexp.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringmatcher.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qcoreevent.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qscopedpointer.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qmetatype.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qvarlengtharray.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qcontainerfwd.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qobject_impl.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qstyleoption.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qlocale.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qvariant.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qmap.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qdebug.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qhash.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qtextstream.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qiodevice.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qvector.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qpoint.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qset.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qcontiguouscache.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsharedpointer.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qshareddata.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qwidget.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qwindowdefs.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qwindowdefs_win.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qmargins.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpaintdevice.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qrect.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsize.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpalette.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qcolor.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qrgb.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qrgba64.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qbrush.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qmatrix.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpolygon.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qregion.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qdatastream.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qline.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtransform.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpainterpath.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qimage.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpixelformat.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpixmap.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qfont.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qfontmetrics.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qfontinfo.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qsizepolicy.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qcursor.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qkeysequence.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qevent.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qurl.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qurlquery.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qfile.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qfiledevice.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qvector2d.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtouchdevice.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qvalidator.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qregularexpression.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qicon.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qslider.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractslider.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qstyle.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qtabbar.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qtabwidget.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qrubberband.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qframe.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qabstractitemmodel.h \
-		moc_predefs.h \
-		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include spindelegate.h -o moc_spindelegate.cpp
-
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
@@ -3624,10 +3523,34 @@ main.o: main.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QWidget \
 		../qt5/5.12.1/gcc_64/include/QtGui/QImage \
 		alarmsignal.h \
+		EDM/EDM_OP_List.h \
+		EDM/EDM_OP_HOLE.h \
+		EDM/EDM_OP.h \
+		EDM/EDM_OP_File.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QList \
 		axissetdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QDialog \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
+		process.h \
+		../qt5/5.12.1/gcc_64/include/QtSql/QSqlRelationalTableModel \
+		../qt5/5.12.1/gcc_64/include/QtSql/QSqlTableModel \
+		../qt5/5.12.1/gcc_64/include/QtCore/QModelIndex \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QTableView \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qtableview.h \
+		program.h \
+		codeeditor.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QPlainTextEdit \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qplaintextedit.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qabstracttextdocumentlayout.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qtextlayout.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qglyphrun.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qrawfont.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qfontdatabase.h \
+		elecparatable.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QStandardItemModel \
+		../qt5/5.12.1/gcc_64/include/QtGui/qstandarditemmodel.h \
+		setting.h \
+		unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QApplication \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qapplication.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qdesktopwidget.h \
@@ -3938,24 +3861,14 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QWidget \
 		../qt5/5.12.1/gcc_64/include/QtGui/QImage \
 		alarmsignal.h \
+		EDM/EDM_OP_List.h \
+		EDM/EDM_OP_HOLE.h \
+		EDM/EDM_OP.h \
+		EDM/EDM_OP_File.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QList \
 		axissetdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QDialog \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
-		EDM/initdb.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/QKeyEvent \
-		../qt5/5.12.1/gcc_64/include/QtCore/QTimer \
-		../qt5/5.12.1/gcc_64/include/QtCore/QDateTime \
-		../qt5/5.12.1/gcc_64/include/QtCore/QDebug \
-		../qt5/5.12.1/gcc_64/include/QtCore/QTextCodec \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/QApplication \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qapplication.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qguiapplication.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qinputmethod.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/QDesktopWidget \
 		process.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/QSqlRelationalTableModel \
 		../qt5/5.12.1/gcc_64/include/QtSql/QSqlTableModel \
@@ -3971,15 +3884,25 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qglyphrun.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qrawfont.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qfontdatabase.h \
-		EDM/EDM_OP_List.h \
-		EDM/EDM_OP_HOLE.h \
-		EDM/EDM_OP.h \
-		EDM/EDM_OP_File.h \
 		elecparatable.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QStandardItemModel \
 		../qt5/5.12.1/gcc_64/include/QtGui/qstandarditemmodel.h \
 		setting.h \
 		unionzero.h \
+		EDM/initdb.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QKeyEvent \
+		../qt5/5.12.1/gcc_64/include/QtCore/QTimer \
+		../qt5/5.12.1/gcc_64/include/QtCore/QDateTime \
+		../qt5/5.12.1/gcc_64/include/QtCore/QDebug \
+		../qt5/5.12.1/gcc_64/include/QtCore/QTextCodec \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QApplication \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qapplication.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qguiapplication.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qinputmethod.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QDesktopWidget \
 		../qt5/5.12.1/gcc_64/include/QtConcurrent/QtConcurrent \
 		../qt5/5.12.1/gcc_64/include/QtConcurrent/QtConcurrentDepends \
 		../qt5/5.12.1/gcc_64/include/QtConcurrent/qtconcurrentcompilertest.h \
@@ -4349,11 +4272,11 @@ process.o: process.cpp ../qt5/5.12.1/gcc_64/include/QtCore/QDebug \
 		coordwidget.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QImage \
 		alarmsignal.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/QList \
 		EDM/EDM_OP_List.h \
 		EDM/EDM_OP_HOLE.h \
 		EDM/EDM_OP.h \
 		EDM/EDM_OP_File.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QList \
 		elecparatable.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QStandardItemModel \
 		../qt5/5.12.1/gcc_64/include/QtGui/qstandarditemmodel.h
@@ -5710,7 +5633,8 @@ unionzero.o: unionzero.cpp unionzero.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QKeyEvent \
-		../qt5/5.12.1/gcc_64/include/QtCore/QTextCodec
+		../qt5/5.12.1/gcc_64/include/QtCore/QTextCodec \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QStyleOption
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o unionzero.o unionzero.cpp
 
 codeeditor.o: codeeditor.cpp ../qt5/5.12.1/gcc_64/include/QtWidgets/QtWidgets \
@@ -6999,6 +6923,10 @@ alarmsignal.o: alarmsignal.cpp alarmsignal.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		EDM/EDM_OP_List.h \
+		EDM/EDM_OP_HOLE.h \
+		EDM/EDM_OP.h \
+		EDM/EDM_OP_File.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLabel \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlabel.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QGridLayout \
@@ -7282,9 +7210,7 @@ elecparatable.o: elecparatable.cpp elecparatable.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QTextCodec \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QPushButton \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qpushbutton.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractbutton.h \
-		spindelegate.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/QItemDelegate
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractbutton.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o elecparatable.o elecparatable.cpp
 
 EDM_OP.o: EDM/EDM_OP.cpp EDM/EDM_OP.h \
@@ -8365,129 +8291,6 @@ electool.o: EDM/electool.cpp EDM/electool.h \
 		EDM/common.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o electool.o EDM/electool.cpp
 
-spindelegate.o: spindelegate.cpp spindelegate.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/QItemDelegate \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qitemdelegate.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtguiglobal.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qglobal.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qconfig-bootstrapped.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qconfig.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qtcore-config.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsystemdetection.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qprocessordetection.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qcompilerdetection.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qtypeinfo.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsysinfo.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qlogging.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qflags.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qatomic.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qbasicatomic.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qatomic_bootstrap.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qgenericatomic.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qatomic_cxx11.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qatomic_msvc.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qglobalstatic.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qmutex.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qnumeric.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qversiontagging.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtgui-config.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qtwidgets-config.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qobject.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qobjectdefs.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qnamespace.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstring.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qchar.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qbytearray.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qrefcount.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qarraydata.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringliteral.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringalgorithms.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringview.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringbuilder.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qlist.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qalgorithms.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qiterator.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qhashfunctions.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qpair.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qbytearraylist.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringlist.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qregexp.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qstringmatcher.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qcoreevent.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qscopedpointer.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qmetatype.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qvarlengtharray.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qcontainerfwd.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qobject_impl.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qstyleoption.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qlocale.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qvariant.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qmap.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qdebug.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qhash.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qtextstream.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qiodevice.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qvector.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qpoint.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qset.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qcontiguouscache.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsharedpointer.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qshareddata.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qwidget.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qwindowdefs.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qwindowdefs_win.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qmargins.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpaintdevice.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qrect.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qsize.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpalette.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qcolor.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qrgb.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qrgba64.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qbrush.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qmatrix.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpolygon.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qregion.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qdatastream.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qline.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtransform.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpainterpath.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qimage.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpixelformat.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpixmap.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qfont.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qfontmetrics.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qfontinfo.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qsizepolicy.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qcursor.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qkeysequence.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qevent.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qurl.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qurlquery.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qfile.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qfiledevice.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qvector2d.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtouchdevice.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qvalidator.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qregularexpression.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qicon.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qslider.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractslider.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qstyle.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qtabbar.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qtabwidget.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qrubberband.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qframe.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/qabstractitemmodel.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/QSpinBox \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qspinbox.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o spindelegate.o spindelegate.cpp
-
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
 
@@ -8517,9 +8320,6 @@ moc_elecparatable.o: moc_elecparatable.cpp
 
 moc_EDM_OP_List.o: moc_EDM_OP_List.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_EDM_OP_List.o moc_EDM_OP_List.cpp
-
-moc_spindelegate.o: moc_spindelegate.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_spindelegate.o moc_spindelegate.cpp
 
 ####### Install
 

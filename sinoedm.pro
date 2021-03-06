@@ -45,7 +45,6 @@ SOURCES += \
     EDM/EDM_OP_HOLE.cpp \
     EDM/EDM_OP_List.cpp \
     EDM/electool.cpp \
-    spindelegate.cpp \
 #    elecoralmodel.cpp \
 #    elecpagemodel.cpp
 
@@ -69,8 +68,7 @@ HEADERS += \
     EDM/EDM_OP_File.h \
     EDM/EDM_OP_HOLE.h \
     EDM/EDM_OP_List.h \
-    EDM/electool.h \
-    spindelegate.h
+    EDM/electool.h
 #    //elecoralmodel.h \
 #    //elecpagemodel.h
 
