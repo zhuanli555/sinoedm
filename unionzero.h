@@ -14,7 +14,8 @@ public:
 
 public:
     EDM* edm;
-
+public:
+    void setFlag(int workflag){this->workflag = workflag;}
 private:
     QGridLayout* mainLayout;
     QLabel* w;
@@ -25,13 +26,7 @@ private:
     QLabel* wa;
     QLabel* wb;
     QLabel* wc;
-    QLabel* m;
-    QLabel* mx;
-    QLabel* my;
-    QLabel* mw;
-    QLabel* ma;
-    QLabel* mb;
-    QLabel* mc;
+    int workflag;//工作零标志
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

@@ -60,7 +60,8 @@ private:
     QAction* unionZeroAction;
     QAction* programAction;
     QAction* settingAction;
-    QAction* purgeAction;
+    QAction* workZeroAction;
+    QAction* exitAction;
     //left
     CoordWidget* coordWidget;
     //right
@@ -90,6 +91,7 @@ protected slots:
     void renderToProgram();
     void renderToSetting();
     void renderToUnionZero();
+    void renderToWorkZero();
     void edmStop();
     void edmSendComand();
 };

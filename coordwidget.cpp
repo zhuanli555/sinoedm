@@ -205,7 +205,7 @@ void CoordWidget::ShowMacUserStatus()
             }
         }
         //¸ºÏÞ
-        if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bNegLimit)
+        if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bNegLimit!=bNegLimit[i])
         {
             bNegLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bNegLimit;
             if(bNegLimit[i])
@@ -228,7 +228,7 @@ void CoordWidget::ShowMacUserStatus()
         }
         //Öá±¨¾¯
 
-        if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bAlarm)
+        if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bAlarm!=bAlarm[i])
         {
             bAlarm[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bAlarm;
             if(bAlarm[i])

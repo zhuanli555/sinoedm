@@ -12,7 +12,7 @@ unsigned long CalcLimitBool(MAC_INTERFACE_IN *pIn,int iLabel,unsigned long bDir,
 														,{0x10,0x20}//c
 														,{0x40,0x01}//w
 														,{0x10,0x20}//A
-														,{0x40,0x80}};
+														,{0x40,0x80}};//B
 	switch(iLabel)
 	{
 	case 0://X

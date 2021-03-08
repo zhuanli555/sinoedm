@@ -12,20 +12,13 @@ UnionZero::UnionZero(QWidget *parent) : QDialog(parent)
     edm = EDM::GetEdmInstance();
 
     esc = new QLabel(QString::fromLocal8Bit("·µ»Ø\n(Esc)"));
-    w = new QLabel(QString::fromLocal8Bit("Öá»Ø¹¤×÷ÁãÎ»"));
-    wx =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñxÖá\n(x)"));
-    wy =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñyÖá\n(y)"));
-    ww =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñwÖá\n(w)"));
-    wc =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñcÖá\n(c)"));
-    wa =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñaÖá\n(a)"));
-    wb =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñbÖá\n(b)"));
-    m = new QLabel(QString::fromLocal8Bit("Öá»Ø»úÐµÁãÎ»"));
-    mx =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñxÖá\n(Ctrl-x)"));
-    my =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñyÖá\n(Ctrl-y)"));
-    mw =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñwÖá\n(Ctrl-w)"));
-    mc =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñcÖá\n(Ctrl-c)"));
-    ma =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñaÖá\n(Ctrl-a)"));
-    mb =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñbÖá\n(Ctrl-b)"));
+    w = new QLabel(QString::fromLocal8Bit("Ñ¡ÔñÖá:"));
+    wx =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñXÖá\n(x)"));
+    wy =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñYÖá\n(y)"));
+    wc =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñCÖá\n(c)"));
+    ww =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñWÖá\n(w)"));
+    wa =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñAÖá\n(a)"));
+    wb =  new QLabel(QString::fromLocal8Bit("Ñ¡ÔñBÖá\n(b)"));
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(esc,0,0,1,1);
     mainLayout->addWidget(w,0,1,1,2);
@@ -35,17 +28,9 @@ UnionZero::UnionZero(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(wc,2,0);
     mainLayout->addWidget(wa,2,1);
     mainLayout->addWidget(wb,2,2);
-    QFrame *line = new QFrame();
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-    mainLayout->addWidget(line,3,0,1,3);
-    mainLayout->addWidget(m,4,1,1,2);
-    mainLayout->addWidget(mx,5,0);
-    mainLayout->addWidget(my,5,1);
-    mainLayout->addWidget(mw,5,2);
-    mainLayout->addWidget(mc,6,0);
-    mainLayout->addWidget(ma,6,1);
-    mainLayout->addWidget(mb,6,2);
+//    QFrame *line = new QFrame();
+//    line->setFrameShape(QFrame::HLine);
+//    line->setFrameShadow(QFrame::Sunken);
 
 }
 
@@ -58,11 +43,11 @@ void UnionZero::keyPressEvent(QKeyEvent *e)
 {
     int i = 0;
     int tmp;
-    int keyUnion[] = {Qt::Key_X,Qt::Key_Y,Qt::Key_W,Qt::Key_C,Qt::Key_A,Qt::Key_B};
+    int keyUnion[] = {Qt::Key_X,Qt::Key_Y,Qt::Key_C,Qt::Key_W,Qt::Key_A,Qt::Key_B};
     static DIGIT_CMD stDigitCmd;
     if (e->key() == Qt::Key_Escape)
         close();
-    if (e->modifiers() == Qt::ControlModifier){
+    if (workflag == 0){
         //»Ø»úÐµÁã
         tmp = e->key();
         for(i=0;i < 6;i++)

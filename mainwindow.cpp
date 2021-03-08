@@ -28,16 +28,14 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     coordWidget = new CoordWidget();
     //right
     alarmSignal = new AlarmSignal();
-    axisSet = new QPushButton(QString::fromLocal8Bit("轴置数Ctrl/?"));
-    axisZero = new QPushButton(QString::fromLocal8Bit("轴清零Alt/?"));
+    axisSet = new QPushButton(QString::fromLocal8Bit("轴置数Ctrl-/"));
     findCenter = new QPushButton(QString::fromLocal8Bit("找中心(F)"));
     //添加一个lineedit 记录发送的命令
     commandText = new QTextEdit();
     rightLayout = new QGridLayout();
     rightLayout->setSpacing(20);
     rightLayout->addWidget(axisSet,0,0);
-    rightLayout->addWidget(axisZero,1,0);
-    rightLayout->addWidget(findCenter,2,0);
+    rightLayout->addWidget(findCenter,1,0);
     rightLayout->addWidget(alarmSignal,0,1,6,1);
     findCenter->setMaximumWidth(85);
     rightLayout->setSizeConstraint(QLayout::SetFixedSize);
@@ -87,13 +85,13 @@ MainWindow::~MainWindow()
         edm->EdmClose();
         EDM::DelEdm();
     }
-    coordWidget->close();
-    alarmSignal->close();
-    axisDialog->close();
-    process->close();
-    program->close();
-    setting->close();
-    unionZero->close();
+    delete coordWidget;
+    delete alarmSignal;
+    delete axisDialog;
+    delete process;
+    delete program;
+    delete setting;
+    delete unionZero;
 }
 
 void MainWindow::MacUserOperate()
@@ -148,9 +146,9 @@ void MainWindow::createActions()
     processAction->setStatusTip(tr("加工文件"));
     connect(processAction,&QAction::triggered,this,&MainWindow::renderToProcess);
 
-    unionZeroAction = new QAction(QString::fromLocal8Bit("回零(F2)"),this);
+    unionZeroAction = new QAction(QString::fromLocal8Bit("回机械零(F2)"),this);
     unionZeroAction->setShortcut(tr("F2"));
-    unionZeroAction->setStatusTip(tr("回零"));
+    unionZeroAction->setStatusTip(tr("回机械零"));
     connect(unionZeroAction,&QAction::triggered,this,&MainWindow::renderToUnionZero);
 
     programAction = new QAction(QString::fromLocal8Bit("编程(F3)"),this);
@@ -158,10 +156,20 @@ void MainWindow::createActions()
     programAction->setStatusTip(tr("编程文件"));
     connect(programAction,&QAction::triggered,this,&MainWindow::renderToProgram);
 
+    workZeroAction = new QAction(QString::fromLocal8Bit("回工作零(Ctrl-R)"),this);
+    workZeroAction->setShortcut(tr("Ctrl+R"));
+    workZeroAction->setStatusTip(tr("回工作零"));
+    connect(workZeroAction,&QAction::triggered,this,&MainWindow::renderToWorkZero);
+
     settingAction = new QAction(QString::fromLocal8Bit("设置(F10)"),this);
     settingAction->setShortcut(tr("F10"));
     settingAction->setStatusTip("设置");
     connect(settingAction,&QAction::triggered,this,&MainWindow::renderToSetting);
+
+    exitAction = new QAction(QString::fromLocal8Bit("退出(Ctrl-Q)"),this);
+    exitAction->setShortcut(QKeySequence::Quit);
+    exitAction->setStatusTip("退出");
+    connect(exitAction,&QAction::triggered,this,&MainWindow::close);
 
 }
 
@@ -176,7 +184,9 @@ void MainWindow::createMenus()
     myMenu->addAction(processAction);
     myMenu->addAction(unionZeroAction);
     myMenu->addAction(programAction);
+    myMenu->addAction(workZeroAction);
     myMenu->addAction(settingAction);
+    myMenu->addAction(exitAction);
     //add stop menu,close menu
 
 }
@@ -204,33 +214,6 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
             }
         }
     }
-    //轴清零
-    if((e->modifiers() == Qt::AltModifier) && (e->key() == Qt::Key_Slash)){
-
-        axisDialog = new AxisSetDialog();
-        axisDialog->exec();
-    }else{
-        if((e->modifiers() == Qt::AltModifier) && (e->key() == Qt::Key_X ||
-                                                       e->key() == Qt::Key_Y ||
-                                                       e->key() == Qt::Key_W ||
-                                                       e->key() == Qt::Key_Z ||
-                                                       e->key() == Qt::Key_A ||
-                                                       e->key() == Qt::Key_B)){
-
-            //TODO这部分代码不应该放在这
-            QChar m_str(e->key());
-            CmdHandle *pCmdHandle;
-            static DIGIT_CMD stDigitCmd;
-            DIGIT_CMD cmdDefault;
-            QString cmd = "G90 G00";
-            cmd += m_str;
-            cmd += "0";
-            cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
-            pCmdHandle = new CmdHandle(FALSE,cmd,&stDigitCmd,&cmdDefault);
-            delete pCmdHandle;
-            edm->EdmSendMovePara(&stDigitCmd);
-        }
-    }
 
     switch (e->key()) {
     case Qt::Key_Escape:
@@ -245,8 +228,6 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         alarmSignal->edmProtect();break;
     case Qt::Key_F8:
         alarmSignal->edmPause();break;
-    case Qt::Key_F12:
-        close();break;
     default:
         break;
     }
@@ -275,9 +256,19 @@ void MainWindow::renderToSetting()
 void MainWindow::renderToUnionZero()
 {
     unionZero = new UnionZero();
+    unionZero->setFlag(0);
     int res = unionZero->exec();
     if(res != QDialog::Accepted)return;
-    unionZero->show();
+    delete unionZero;
+}
+
+void MainWindow::renderToWorkZero()
+{
+    unionZero = new UnionZero();
+    unionZero->setFlag(1);
+    int res = unionZero->exec();
+    if(res != QDialog::Accepted)return;
+    delete unionZero;
 }
 
 void MainWindow::edmStop()
