@@ -2,17 +2,17 @@
 /**
  * 正限负限
  * iLabel：轴标志号 0:X轴；1:Y轴；2:C轴；3:w轴；4:A轴；5:B轴；6:z轴；
- * bDir:1为负限，0为正限
+ * bDir:1为正限，0为负限
 */
 unsigned long CalcLimitBool(MAC_INTERFACE_IN *pIn,int iLabel,unsigned long bDir,unsigned long bDirectMotor)
 {
 	unsigned long bLimit=1;
-	static unsigned char btLimit[MAC_LABEL_COUNT][2] = {{0x01,0x02}//x
-														,{0x04,0x08}//y
-														,{0x10,0x20}//c
-														,{0x40,0x01}//w
-														,{0x10,0x20}//A
-														,{0x40,0x80}};//B
+	static unsigned char btLimit[MAC_LABEL_COUNT][2] = {{0x02,0x01}//x
+														,{0x08,0x04}//y
+														,{0x20,0x10}//c
+														,{0x01,0x40}//w
+														,{0x20,0x10}//A
+														,{0x80,0x40}};//B
 	switch(iLabel)
 	{
 	case 0://X
@@ -23,9 +23,9 @@ unsigned long CalcLimitBool(MAC_INTERFACE_IN *pIn,int iLabel,unsigned long bDir,
 	case 3://w
 		{
 			if (bDir)
-				bLimit=pIn->btI188 & btLimit[iLabel][bDir];
-			else
 				bLimit=pIn->btI184 & btLimit[iLabel][bDir];
+			else
+				bLimit=pIn->btI188 & btLimit[iLabel][bDir];
 		}
 		break;	
 	case 4://A

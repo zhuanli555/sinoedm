@@ -194,6 +194,7 @@ void CoordWidget::ShowMacUserStatus()
         if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit != bPosLimit[i])
         {
             bPosLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit;
+            qDebug()<<bPosLimit[i]<<i;
             if(bPosLimit[i])
             {
                 shows[i]->setStyleSheet("border-image:url(zx.png);");

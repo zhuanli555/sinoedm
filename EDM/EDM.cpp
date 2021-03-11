@@ -162,6 +162,7 @@ bool EDM::GetEdmStatusData()
 				{
 					m_stEdmShowData.stHardCtl.stHardCtlUser[iLabel].bPosLimit = FALSE;
 					m_stEdmShowData.stHardCtl.stHardCtlUser[iLabel].bNegLimit = FALSE;
+					qDebug()<<"hhh";
 				}
 				else
 				{
