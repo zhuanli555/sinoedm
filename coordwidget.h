@@ -38,22 +38,29 @@ private:
     QImage img;
     QLabel* xLabel;
     QLabel* yLabel;
-    QLabel* zLabel;
-    QLabel* xValue;
-    QLabel* yValue;
-    QLabel* zValue;
-    QLabel* xMValue;
-    QLabel* yMValue;
-    QLabel* zMValue;
+    QLabel* cLabel;
     QLabel* wLabel;
     QLabel* aLabel;
     QLabel* bLabel;
+    QLabel* xValue;
+    QLabel* yValue;
+    QLabel* cValue;
     QLabel* wValue;
     QLabel* aValue;
     QLabel* bValue;
+    QLabel* xMValue;
+    QLabel* yMValue;
+    QLabel* cMValue;
     QLabel* wMValue;
     QLabel* aMValue;
     QLabel* bMValue;
+
+    QLabel* xShow;
+    QLabel* yShow;
+    QLabel* cShow;
+    QLabel* wShow;
+    QLabel* aShow;
+    QLabel* bShow;
 
 protected:
 signals:

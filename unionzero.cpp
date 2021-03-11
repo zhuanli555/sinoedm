@@ -1,37 +1,68 @@
 #include "unionzero.h"
 #include <QtGui/QKeyEvent>
 #include <QTextCodec>
+#include <QDialogButtonBox>
 
 UnionZero::UnionZero(QWidget *parent) : QDialog(parent)
 {
-    setGeometry(400,100,300,400);
+
+}
+
+UnionZero::UnionZero(int key, QWidget *parent) : QDialog(parent)
+{
+    setGeometry(400, 100, 300, 400);
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
-    setWindowTitle(QString::fromLocal8Bit("轴回零位"));
+    setWindowTitle(QString::fromLocal8Bit("轴选择"));
     setStyleSheet("QLabel{\
-          border:3px solid rgb(60,60,60);margin:2px 2px;}");
+                    border:3px solid rgb(60,60,60);margin:2px 2px;}");
     edm = EDM::GetEdmInstance();
-
-    esc = new QLabel(QString::fromLocal8Bit("返回\n(Esc)"));
-    w = new QLabel(QString::fromLocal8Bit("选择轴:"));
-    wx =  new QLabel(QString::fromLocal8Bit("选择X轴\n(x)"));
-    wy =  new QLabel(QString::fromLocal8Bit("选择Y轴\n(y)"));
-    wc =  new QLabel(QString::fromLocal8Bit("选择C轴\n(c)"));
-    ww =  new QLabel(QString::fromLocal8Bit("选择W轴\n(w)"));
-    wa =  new QLabel(QString::fromLocal8Bit("选择A轴\n(a)"));
-    wb =  new QLabel(QString::fromLocal8Bit("选择B轴\n(b)"));
+    workflag = key;
+    group = new QButtonGroup(this);
+    wx = new QCheckBox(QString::fromLocal8Bit("选择X轴\n(x)"));
+    wy = new QCheckBox(QString::fromLocal8Bit("选择Y轴\n(y)"));
+    wc = new QCheckBox(QString::fromLocal8Bit("选择C轴\n(c)"));
+    ww = new QCheckBox(QString::fromLocal8Bit("选择W轴\n(w)"));
+    wa = new QCheckBox(QString::fromLocal8Bit("选择A轴\n(a)"));
+    wb = new QCheckBox(QString::fromLocal8Bit("选择B轴\n(b)"));
+    wall = new QCheckBox(QString::fromLocal8Bit("选择全部"));
+    group->addButton(wx, 0);
+    group->addButton(wy, 1);
+    group->addButton(wc, 2);
+    group->addButton(ww, 3);
+    group->addButton(wa, 4);
+    group->addButton(wb, 5);
+    connect(group, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &UnionZero::buttonGroupClicked);
+    connect(wall, &QCheckBox::clicked, this, &UnionZero::chooseAll);
     mainLayout = new QGridLayout(this);
-    mainLayout->addWidget(esc,0,0,1,1);
-    mainLayout->addWidget(w,0,1,1,2);
-    mainLayout->addWidget(wx,1,0);
-    mainLayout->addWidget(wy,1,1);
-    mainLayout->addWidget(ww,1,2);
-    mainLayout->addWidget(wc,2,0);
-    mainLayout->addWidget(wa,2,1);
-    mainLayout->addWidget(wb,2,2);
-//    QFrame *line = new QFrame();
-//    line->setFrameShape(QFrame::HLine);
-//    line->setFrameShadow(QFrame::Sunken);
+    mainLayout->addWidget(wx, 0, 0);
+    mainLayout->addWidget(wy, 0, 1);
+    mainLayout->addWidget(ww, 0, 2);
+    mainLayout->addWidget(wc, 1, 0);
+    mainLayout->addWidget(wa, 1, 1);
+    mainLayout->addWidget(wb, 1, 2);
+    QFrame *line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    mainLayout->addWidget(line, 2, 0, 1, 3);
 
+    QDialogButtonBox *button = new QDialogButtonBox(this);
+    button->addButton(QString::fromLocal8Bit("确认"), QDialogButtonBox::YesRole);
+    button->addButton(QString::fromLocal8Bit("取消"), QDialogButtonBox::NoRole);
+    connect(button, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(button, SIGNAL(rejected()), this, SLOT(reject()));
+    if (workflag == 2) //轴置数
+    {
+        label2 = new QLabel(QString::fromLocal8Bit("输入值:"));
+        lineEdit = new QLineEdit;
+        mainLayout->addWidget(label2, 3, 0);
+        mainLayout->addWidget(lineEdit, 3, 1);
+        mainLayout->addWidget(wall, 3, 2);
+        mainLayout->addWidget(button, 4, 0, 1, 3);
+    }
+    else
+    {
+        mainLayout->addWidget(button, 3, 0, 1, 3);
+    }
 }
 
 UnionZero::~UnionZero()
@@ -39,44 +70,77 @@ UnionZero::~UnionZero()
 
 }
 
-void UnionZero::keyPressEvent(QKeyEvent *e)
+void UnionZero::axisWorkZero(int label)
+{
+    DIGIT_CMD stDigitCmd;
+    memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
+    stDigitCmd.enAim = AIM_G90;
+    stDigitCmd.enOrbit = ORBIT_G00;
+    stDigitCmd.enCoor = edm->m_stEdmShowData.enCoorType;
+    stDigitCmd.stOp.bShortDis = TRUE;
+    stDigitCmd.iAxisCnt++;
+    stDigitCmd.stAxisDigit[0].iDistance = 0;
+    stDigitCmd.stAxisDigit[0].iLabel = label;
+    edm->EdmSendMovePara(&stDigitCmd);
+}
+
+void UnionZero::chooseAll()
+{
+    for(int i= 0;i<MAC_LABEL_COUNT;i++)bZero[i] = true;
+}
+
+void UnionZero::buttonGroupClicked(int index)
+{
+    if(index == -1)return;
+    bZero[index] = true;
+}
+
+void UnionZero::accept()
 {
     int i = 0;
-    int tmp;
-    int keyUnion[] = {Qt::Key_X,Qt::Key_Y,Qt::Key_C,Qt::Key_W,Qt::Key_A,Qt::Key_B};
-    static DIGIT_CMD stDigitCmd;
-    if (e->key() == Qt::Key_Escape)
-        close();
     if (workflag == 0){
         //回机械零
-        tmp = e->key();
-        for(i=0;i < 6;i++)
+        for(i = 0;i < MAC_LABEL_COUNT;i++)
         {
-            if(tmp == keyUnion[i])
+            if(bZero[i])
             {
                 edm->EdmRtZero(i);
             }
         }
-        accept();
     }
-    else{
+    else if(workflag == 1)
+    {
         //回工作零
-        tmp = e->key();
-        for(i=0;i < 6;i++)
+        for(i = 0;i < MAC_LABEL_COUNT;i++)
         {
-            if(tmp == keyUnion[i])
+            if(bZero[i])
             {
-                memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
-                stDigitCmd.enAim = AIM_G90;
-                stDigitCmd.enOrbit = ORBIT_G00;
-                stDigitCmd.enCoor = edm->m_stEdmShowData.enCoorType;
-                stDigitCmd.stOp.bShortDis = TRUE;
-                stDigitCmd.iAxisCnt++;
-                stDigitCmd.stAxisDigit[0].iDistance = 0;
-                stDigitCmd.stAxisDigit[0].iLabel = i;
-                edm->EdmSendMovePara(&stDigitCmd);
+                axisWorkZero(i);
             }
         }
-        accept();
+    }else
+    {
+        CmdHandle *pCmdHandle;
+        static DIGIT_CMD stDigitCmd;
+        QChar chas[MAC_LABEL_COUNT]={'X','Y','C','W','A','B'};
+        QString sVal = "0";
+        DIGIT_CMD cmdDefault;
+        cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
+        QString cmd = "G92 G00";
+        if(!lineEdit->text().isEmpty())sVal = lineEdit->text();
+        for(i = 0;i<MAC_LABEL_COUNT;i++)
+        {
+            if(bZero[i])
+            {
+                cmd += chas[i];
+                cmd += sVal;
+            }
+
+        }
+        pCmdHandle = new CmdHandle(FALSE,cmd,&stDigitCmd,&cmdDefault);
+        delete pCmdHandle;
+        edm->EdmSendMovePara(&stDigitCmd);
     }
+    return QDialog::accept();
 }
+

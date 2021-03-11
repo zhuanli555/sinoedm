@@ -8,7 +8,7 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     setMaximumWidth(600);
     xLabel = new QLabel("X");
     yLabel = new QLabel("Y");
-    zLabel = new QLabel("Z");
+    cLabel = new QLabel("C");
     wLabel = new QLabel("W");
     aLabel = new QLabel("A");
     bLabel = new QLabel("B");
@@ -17,10 +17,10 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     QString tmp2 = QString("%1").arg(zero,8,'f',3);
     xValue = new QLabel(tmp1);
     yValue = new QLabel(tmp2);
-    zValue = new QLabel(tmp2);
+    cValue = new QLabel(tmp2);
     xMValue = new QLabel(tmp1);
     yMValue = new QLabel(tmp2);
-    zMValue = new QLabel(tmp2);
+    cMValue = new QLabel(tmp2);
 
     wValue = new QLabel(tmp1);
     aValue = new QLabel(tmp2);
@@ -29,69 +29,76 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     aMValue = new QLabel(tmp2);
     bMValue = new QLabel(tmp2);
 
+    xShow = new QLabel();
+    yShow = new QLabel();
+    cShow = new QLabel();
+    wShow = new QLabel();
+    aShow = new QLabel();
+    bShow = new QLabel();
+
     xLabel->setAlignment(Qt::AlignVCenter);
     yLabel->setAlignment(Qt::AlignVCenter);
-    zLabel->setAlignment(Qt::AlignVCenter);
+    cLabel->setAlignment(Qt::AlignVCenter);
     wLabel->setAlignment(Qt::AlignVCenter);
     aLabel->setAlignment(Qt::AlignVCenter);
     bLabel->setAlignment(Qt::AlignVCenter);
     xValue->setAlignment(Qt::AlignRight);
     yValue->setAlignment(Qt::AlignRight);
-    zValue->setAlignment(Qt::AlignRight);
+    cValue->setAlignment(Qt::AlignRight);
     wValue->setAlignment(Qt::AlignRight);
     aValue->setAlignment(Qt::AlignRight);
     bValue->setAlignment(Qt::AlignRight);
     xMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     yMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-    zMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    cMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     wMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     aMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     bMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
     leftLayout = new QGridLayout(this);
-    leftLayout->addWidget(xLabel,0,0);
+    leftLayout->addWidget(xLabel,0,0);leftLayout->addWidget(xShow,0,3);
     leftLayout->addWidget(xValue,0,1);
     leftLayout->addWidget(xMValue,0,2);
-    leftLayout->addWidget(yLabel,1,0);
+    leftLayout->addWidget(yLabel,1,0);leftLayout->addWidget(yShow,0,3);
     leftLayout->addWidget(yValue,1,1);
     leftLayout->addWidget(yMValue,1,2);
-    leftLayout->addWidget(zLabel,2,0);
-    leftLayout->addWidget(zValue,2,1);
-    leftLayout->addWidget(zMValue,2,2);
-    leftLayout->addWidget(wLabel,3,0);
+    leftLayout->addWidget(cLabel,2,0);leftLayout->addWidget(cShow,0,3);
+    leftLayout->addWidget(cValue,2,1);
+    leftLayout->addWidget(cMValue,2,2);
+    leftLayout->addWidget(wLabel,3,0);leftLayout->addWidget(wShow,0,3);
     leftLayout->addWidget(wValue,3,1);
     leftLayout->addWidget(wMValue,3,2);
-    leftLayout->addWidget(aLabel,4,0);
+    leftLayout->addWidget(aLabel,4,0);leftLayout->addWidget(aShow,0,3);
     leftLayout->addWidget(aValue,4,1);
     leftLayout->addWidget(aMValue,4,2);
-    leftLayout->addWidget(bLabel,5,0);
+    leftLayout->addWidget(bLabel,5,0);leftLayout->addWidget(bShow,0,3);
     leftLayout->addWidget(bValue,5,1);
     leftLayout->addWidget(bMValue,5,2);
     //setStyleSheet("QLabel{background-color:yellow}");
     QString xstyle = "font-size:40px;";
     QString wstyle = "font-size:28px;";
-    //yLabel->setStyleSheet("font-size:40px;border-image:url(bj.png);");
+    //bShow->setStyleSheet("border-image:url(zx.png);")
     xLabel->setStyleSheet(xstyle);
     yLabel->setStyleSheet(xstyle);
-    zLabel->setStyleSheet(xstyle);
+    cLabel->setStyleSheet(xstyle);
     wLabel->setStyleSheet(wstyle);
     aLabel->setStyleSheet(xstyle);
     bLabel->setStyleSheet(xstyle);
     xValue->setStyleSheet(xstyle);
     yValue->setStyleSheet(xstyle);
-    zValue->setStyleSheet(xstyle);
+    cValue->setStyleSheet(xstyle);
     wValue->setStyleSheet(xstyle);
     aValue->setStyleSheet(xstyle);
     bValue->setStyleSheet(xstyle);
     xMValue->setStyleSheet("color:blue;font-size:24px;");
     yMValue->setStyleSheet("color:blue;font-size:24px;");
-    zMValue->setStyleSheet("color:blue;font-size:24px;");
+    cMValue->setStyleSheet("color:blue;font-size:24px;");
     wMValue->setStyleSheet("color:blue;font-size:24px;");
     aMValue->setStyleSheet("color:blue;font-size:24px;");
     bMValue->setStyleSheet("color:blue;font-size:24px;");
     xLabel->setMaximumWidth(85);
     yLabel->setMaximumWidth(85);
-    zLabel->setMaximumWidth(85);
+    cLabel->setMaximumWidth(85);
     wLabel->setMaximumWidth(85);
     aLabel->setMaximumWidth(85);
     bLabel->setMaximumWidth(85);
@@ -176,7 +183,8 @@ void CoordWidget::SaveData()
 
 void CoordWidget::ShowMacUserStatus()
 {
-    QLabel* labels[MAC_LABEL_COUNT] = {xLabel,yLabel,nullptr,wLabel,aLabel,bLabel,zLabel};
+    QLabel* labels[MAC_LABEL_COUNT] = {xLabel,yLabel,nullptr,wLabel,aLabel,bLabel,cLabel};
+    QLabel* shows[MAC_LABEL_COUNT] = {xShow,yShow,nullptr,wShow,aShow,bShow,cShow};
     static unsigned long bPosLimit[MAC_LABEL_COUNT] = {0};
     static unsigned long bNegLimit[MAC_LABEL_COUNT] = {0};
     static unsigned long bAlarm[MAC_LABEL_COUNT] = {0};
@@ -188,20 +196,10 @@ void CoordWidget::ShowMacUserStatus()
             bPosLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit;
             if(bPosLimit[i])
             {
-                if(i==3)//w轴区别对待
-                {
-                    labels[i]->setStyleSheet("font-size:28px;border-image:url(zx.png);");
-                }else{
-                    labels[i]->setStyleSheet("font-size:40px;border-image:url(zx.png);");
-                }
-
+                shows[i]->setStyleSheet("border-image:url(zx.png);");
             }else{
-                if(i==3)//w轴区别对待
-                {
-                    labels[i]->setStyleSheet("font-size:28px");
-                }else{
-                    labels[i]->setStyleSheet("font-size:40px");
-                }
+
+                shows[i]->setStyleSheet("");
             }
         }
         //负限
@@ -210,20 +208,10 @@ void CoordWidget::ShowMacUserStatus()
             bNegLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bNegLimit;
             if(bNegLimit[i])
             {
-                if(i==3)//w轴区别对待
-                {
-                    labels[i]->setStyleSheet("font-size:28px;border-image:url(fx.png);");
-                }else{
-                    labels[i]->setStyleSheet("font-size:40px;border-image:url(fx.png);");
-                }
-
+                shows[i]->setStyleSheet("border-image:url(fx.png);");
             }else{
-                if(i==3)//w轴区别对待
-                {
-                    labels[i]->setStyleSheet("font-size:28px");
-                }else{
-                    labels[i]->setStyleSheet("font-size:40px");
-                }
+
+                shows[i]->setStyleSheet("");
             }
         }
         //轴报警

@@ -36,7 +36,6 @@ SOURCES += \
     coordwidget.cpp \
     unionzero.cpp \
     codeeditor.cpp \
-    axissetdialog.cpp \
     EDM/cmdhandle.cpp \
     alarmsignal.cpp \
     elecparatable.cpp \
@@ -44,9 +43,7 @@ SOURCES += \
     EDM/EDM_OP_File.cpp \
     EDM/EDM_OP_HOLE.cpp \
     EDM/EDM_OP_List.cpp \
-    EDM/electool.cpp \
-#    elecoralmodel.cpp \
-#    elecpagemodel.cpp
+    EDM/electool.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -60,7 +57,6 @@ HEADERS += \
     coordwidget.h \
     unionzero.h \
     codeeditor.h \
-    axissetdialog.h \
     EDM/cmdhandle.h \
     alarmsignal.h \
     elecparatable.h \
@@ -69,8 +65,6 @@ HEADERS += \
     EDM/EDM_OP_HOLE.h \
     EDM/EDM_OP_List.h \
     EDM/electool.h
-#    //elecoralmodel.h \
-#    //elecpagemodel.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
