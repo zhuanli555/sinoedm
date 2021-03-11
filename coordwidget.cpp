@@ -56,24 +56,24 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     bMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 
     leftLayout = new QGridLayout(this);
-    leftLayout->addWidget(xLabel,0,0);leftLayout->addWidget(xShow,0,3);
+    leftLayout->addWidget(xLabel,0,0);
     leftLayout->addWidget(xValue,0,1);
-    leftLayout->addWidget(xMValue,0,2);
-    leftLayout->addWidget(yLabel,1,0);leftLayout->addWidget(yShow,0,3);
+    leftLayout->addWidget(xMValue,0,2);leftLayout->addWidget(xShow,0,3);
+    leftLayout->addWidget(yLabel,1,0);
     leftLayout->addWidget(yValue,1,1);
-    leftLayout->addWidget(yMValue,1,2);
-    leftLayout->addWidget(cLabel,2,0);leftLayout->addWidget(cShow,0,3);
+    leftLayout->addWidget(yMValue,1,2);leftLayout->addWidget(yShow,1,3);
+    leftLayout->addWidget(cLabel,2,0);
     leftLayout->addWidget(cValue,2,1);
-    leftLayout->addWidget(cMValue,2,2);
-    leftLayout->addWidget(wLabel,3,0);leftLayout->addWidget(wShow,0,3);
+    leftLayout->addWidget(cMValue,2,2);leftLayout->addWidget(cShow,2,3);
+    leftLayout->addWidget(wLabel,3,0);
     leftLayout->addWidget(wValue,3,1);
-    leftLayout->addWidget(wMValue,3,2);
-    leftLayout->addWidget(aLabel,4,0);leftLayout->addWidget(aShow,0,3);
+    leftLayout->addWidget(wMValue,3,2);leftLayout->addWidget(wShow,3,3);
+    leftLayout->addWidget(aLabel,4,0);
     leftLayout->addWidget(aValue,4,1);
-    leftLayout->addWidget(aMValue,4,2);
-    leftLayout->addWidget(bLabel,5,0);leftLayout->addWidget(bShow,0,3);
+    leftLayout->addWidget(aMValue,4,2);leftLayout->addWidget(aShow,4,3);
+    leftLayout->addWidget(bLabel,5,0);
     leftLayout->addWidget(bValue,5,1);
-    leftLayout->addWidget(bMValue,5,2);
+    leftLayout->addWidget(bMValue,5,2);leftLayout->addWidget(bShow,5,3);
     //setStyleSheet("QLabel{background-color:yellow}");
     QString xstyle = "font-size:40px;";
     QString wstyle = "font-size:28px;";
@@ -194,7 +194,6 @@ void CoordWidget::ShowMacUserStatus()
         if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit != bPosLimit[i])
         {
             bPosLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit;
-            qDebug()<<bPosLimit[i]<<i;
             if(bPosLimit[i])
             {
                 shows[i]->setStyleSheet("border-image:url(zx.png);");
