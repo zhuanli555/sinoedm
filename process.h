@@ -25,7 +25,6 @@
 #include "EDM/cmdhandle.h"
 #include "EDM/EDM_OP_List.h"
 #include "elecparatable.h"
-#include "processthread.h"
 
 class Process : public QMainWindow
 {
@@ -102,7 +101,8 @@ private:
     QSqlRelationalTableModel *elecPageModel;
     QSqlTableModel *elecOralModel;
 
-    ProcessThread* m_thread;
+    QFuture<void> macPr;
+    bool m_quit = false;
 protected:
     void keyPressEvent(QKeyEvent *) override;
 

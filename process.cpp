@@ -15,6 +15,7 @@
 extern QString path;
 Process::Process(QWidget *parent): QMainWindow(parent)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
     QWidget* widget = new QWidget();
     this->setCentralWidget(widget);
@@ -162,19 +163,19 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     createActions();
     createMenus();
     //设置多线程
-    //QFuture<void> macPr = QtConcurrent::run(this,&Process::MacProcessOperate);
-    //macPr.waitForFinished();
-    m_thread = new ProcessThread;
-    m_thread->start();
-    //设置定时器设置20ms
+    macPr = QtConcurrent::run(this,&Process::MacProcessOperate);
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&Process::timeUpdate);
-    t->start(20);
+    t->start(1000);
 }
 
 Process::~Process()
 {
-    EDM_OP_List::DeleteEdmOpList();
+
+    mutex.lock();
+    m_quit = true;
+    mutex.unlock();
+    macPr.waitForFinished();
 }
 
 void Process::insertRow()
@@ -246,22 +247,21 @@ void Process::createActions()
 //加工线程
 void Process::MacProcessOperate()
 {
-    while (true)
+    while (!m_quit)
     {
-        mutex.lock();
         if (edm)
         {
-            HandleOpMsg();
+            mutex.lock();
             HandleEdmOpStatus();
-
             if (edmOpList)
             {
                 edmOpList->CarryOn();
             }
+            mutex.unlock();
         }
-        mutex.unlock();
         QThread::msleep(20);
     }
+    EDM_OP_List::DeleteEdmOpList();
 }
 
 //处理各个类型的加工
@@ -430,7 +430,6 @@ void Process::imitateProcess()
 
 void Process::timeUpdate()
 {
-
 }
 
 unsigned char Process::EDMProcessInit()
@@ -482,7 +481,7 @@ void Process::edmStop()
 
 void Process::showFileText()
 {
-    gFilename = QFileDialog::getOpenFileName(this,"open File",path);
+    gFilename = QFileDialog::getOpenFileName(this,"open File",path,"*", nullptr,QFileDialog::DontUseSheet|QFileDialog::DontUseNativeDialog);
     QFileInfo info(gFilename);
     m_strElecName = info.fileName();
     if (!gFilename.isEmpty())

@@ -43,9 +43,7 @@ SOURCES += \
     EDM/EDM_OP_File.cpp \
     EDM/EDM_OP_HOLE.cpp \
     EDM/EDM_OP_List.cpp \
-    EDM/electool.cpp \
-    userthread.cpp \
-    processthread.cpp
+    EDM/electool.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -66,9 +64,7 @@ HEADERS += \
     EDM/EDM_OP_File.h \
     EDM/EDM_OP_HOLE.h \
     EDM/EDM_OP_List.h \
-    EDM/electool.h \
-    userthread.h \
-    processthread.h
+    EDM/electool.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

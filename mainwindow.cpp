@@ -75,9 +75,8 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     createActions();
     createMenus();
     //设置多线程信号
-    //macUserHandle = QtConcurrent::run(this,&MainWindow::MacUserOperate);
-    m_thread = new UserThread;
-    m_thread->start();
+    macUserHandle = QtConcurrent::run(this,&MainWindow::MacUserOperate);
+
     //设置定时器
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
@@ -93,20 +92,25 @@ MainWindow::~MainWindow()
         edm->EdmClose();
         EDM::DelEdm();
     }
+    mutex.lock();
+    m_quit = true;
+    mutex.unlock();
+    macUserHandle.waitForFinished();
 }
 
 void MainWindow::MacUserOperate()
 {
-    while(true)
+    while(!m_quit)
     {
         if(edm)
         {
             mutex.lock();
             coordWidget->HandleEdmCycleData();//机床命令周期性处理
             alarmSignal->EdmStatusSignChange();//机床信号周期性处理
+
             mutex.unlock();
         }
-        QThread::msleep(20);
+        QThread::msleep(35);
     }
 }
 
@@ -126,12 +130,9 @@ unsigned char MainWindow::EDMMacInit()
 
 void MainWindow::timeUpdate()
 {
-//debug
-    if(bPrint)
+    if(bPrint)//打印接口
     {
         printInterface();
-    }else{
-        if(tv1->width()>0)tv1->setMaximumWidth(0);
     }
 }
 
@@ -214,8 +215,13 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     case Qt::Key_F8:
         alarmSignal->edmPause();break;
     case Qt::Key_F12:
-        //TODO
-        bPrint = !bPrint;break;
+    {
+        bPrint = !bPrint;
+        if(!bPrint){
+            if(tv1->width()>0)tv1->setMaximumWidth(0);
+        }
+        break;
+    }
     default:
         break;
     }

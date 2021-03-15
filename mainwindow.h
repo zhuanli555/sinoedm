@@ -24,7 +24,6 @@
 #include "program.h"
 #include "setting.h"
 #include "unionzero.h"
-#include "userthread.h"
 
 class MainWindow : public QMainWindow
 {
@@ -90,7 +89,7 @@ private:
     QComboBox* speedValue;
     QHBoxLayout* bottomLayout;
 
-    UserThread* m_thread;
+    bool m_quit = false;
 protected:
     void keyPressEvent(QKeyEvent *e) override;
     void timeUpdate();
