@@ -28,11 +28,13 @@ public:
     void removeAlarm(int index);
     void reSort();
     void EdmStatusSignChange();
+    static AlarmSignal* getInstance();
 public:
     EDM_SHOW_STATUS m_stEntileStatus;
 private:
     QGridLayout* mainLayout;
     EDM *edm;
+    static AlarmSignal* m_alarmSig;
     EDM_OP_List* edmOpList;
     QLabel* purgeValue;
     QLabel* shakeValue;

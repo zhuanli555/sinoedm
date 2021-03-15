@@ -73,12 +73,3 @@ unsigned long CalcDirectBool(MAC_INTERFACE_IN *pIn)
 
 	return bDirect;//¶ÌÂ·BOOLÖµ
 }
-
-unsigned long CalcCheckBool(MAC_INTERFACE_IN *pIn)
-{
-	unsigned long bCheck = 1;
-
-	bCheck = !(pIn->btI144 & 0x08);
-
-	return bCheck;
-}

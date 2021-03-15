@@ -25,9 +25,9 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     //状态栏
     statBar = statusBar();
     //left
-    coordWidget = new CoordWidget();
+    coordWidget = CoordWidget::getInstance();
     //right
-    alarmSignal = new AlarmSignal();
+    alarmSignal = AlarmSignal::getInstance();
     fileLabel = new QLabel(QString::fromLocal8Bit("加工文件名(F10)"));
     fileText = new QPlainTextEdit;
     fileText->setReadOnly(true);
@@ -162,8 +162,10 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     createActions();
     createMenus();
     //设置多线程
-    QFuture<void> macPr = QtConcurrent::run(this,&Process::MacProcessOperate);
+    //QFuture<void> macPr = QtConcurrent::run(this,&Process::MacProcessOperate);
     //macPr.waitForFinished();
+    m_thread = new ProcessThread;
+    m_thread->start();
     //设置定时器设置20ms
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&Process::timeUpdate);

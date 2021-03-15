@@ -25,6 +25,7 @@
 #include "EDM/cmdhandle.h"
 #include "EDM/EDM_OP_List.h"
 #include "elecparatable.h"
+#include "processthread.h"
 
 class Process : public QMainWindow
 {
@@ -59,12 +60,12 @@ private:
     QAction* processAction;
     QAction* imitateAction;
     //left
-    CoordWidget* coordWidget;
+    CoordWidget* coordWidget = nullptr;
     //right
     QString gFilename;
     QLabel *fileLabel;
     QPlainTextEdit* fileText;
-    AlarmSignal* alarmSignal;
+    AlarmSignal* alarmSignal = nullptr;
     QGridLayout* rightLayout;
     //bottom
     QHBoxLayout* bottomLayout;
@@ -100,6 +101,8 @@ private:
     QLabel *elecProcess;
     QSqlRelationalTableModel *elecPageModel;
     QSqlTableModel *elecOralModel;
+
+    ProcessThread* m_thread;
 protected:
     void keyPressEvent(QKeyEvent *) override;
 

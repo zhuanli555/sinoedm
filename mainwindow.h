@@ -24,6 +24,7 @@
 #include "program.h"
 #include "setting.h"
 #include "unionzero.h"
+#include "userthread.h"
 
 class MainWindow : public QMainWindow
 {
@@ -49,6 +50,7 @@ private:
     int m_iOpenTimeOp;
     MAC_INTERFACE_IN mIn;
     MAC_INTERFACE_OUT mOut;
+    QFuture<void> macUserHandle;
     QThread* tThread;
     QMutex mutex;
     Process* process;
@@ -66,9 +68,9 @@ private:
     QAction* workZeroAction;
     QAction* exitAction;
     //left
-    CoordWidget* coordWidget;
+    CoordWidget* coordWidget = nullptr;
     //right
-    AlarmSignal* alarmSignal;
+    AlarmSignal* alarmSignal = nullptr;
     QLabel* purgeValue;
     QLabel* shakeValue;
     QLabel* protectValue;
@@ -87,6 +89,8 @@ private:
     QLineEdit* commandLine;
     QComboBox* speedValue;
     QHBoxLayout* bottomLayout;
+
+    UserThread* m_thread;
 protected:
     void keyPressEvent(QKeyEvent *e) override;
     void timeUpdate();

@@ -41,7 +41,7 @@ private:
 protected slots:
 
     void chooseAll();
-    void buttonGroupClicked(int);
+    void buttonGroupClicked(QAbstractButton*);
     void accept() override;
 
 };

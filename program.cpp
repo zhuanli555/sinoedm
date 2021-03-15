@@ -9,7 +9,7 @@
 #include <QTextCodec>
 #include <QDebug>
 
-QString path = "/home/zhuanli/cpps/build-sinoedm-Desktop_Qt_5_12_1_GCC_64bit-Debug/processFile";
+QString path = "./processFile";
 Program::Program(QWidget *parent) : QMainWindow(parent)
 {
     setGeometry(0,0,QApplication::desktop()->width(),QApplication::desktop()->height());

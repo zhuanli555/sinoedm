@@ -450,7 +450,6 @@ typedef struct isaMAC_SYSTEM_SET
 unsigned long CalcLimitBool(MAC_INTERFACE_IN *pIn,int iLabel,unsigned long bDir,unsigned long bDirectMotor);
 unsigned long CalcAlarmBool(MAC_INTERFACE_IN *pIn,int iLabel);
 unsigned long CalcDirectBool(MAC_INTERFACE_IN *pIn);
-unsigned long CalcCheckBool(MAC_INTERFACE_IN *pIn);
 
 #ifdef __cplusplus
 }

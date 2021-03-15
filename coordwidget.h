@@ -16,6 +16,7 @@ public:
     explicit CoordWidget(QWidget *parent = nullptr);
     ~CoordWidget();
     void HandleEdmCycleData();
+    static CoordWidget* getInstance();
 
 public :
     EDM* edm;
@@ -33,6 +34,7 @@ private:
     void ShowMacUserStatus();
     void SaveData();
 private:
+    static CoordWidget* m_coordWid;
     //left
     QGridLayout *leftLayout;
     QImage img;

@@ -25,9 +25,9 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     //状态栏
     statBar = statusBar();
     //left
-    coordWidget = new CoordWidget();
+    coordWidget = CoordWidget::getInstance();
     //right
-    alarmSignal = new AlarmSignal();
+    alarmSignal = AlarmSignal::getInstance();
     findCenter = new QPushButton(QString::fromLocal8Bit("找中心(F)"));
     //添加一个lineedit 记录发送的命令
     commandText = new QTextEdit();
@@ -75,7 +75,9 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     createActions();
     createMenus();
     //设置多线程信号
-    QtConcurrent::run(this,&MainWindow::MacUserOperate);
+    //macUserHandle = QtConcurrent::run(this,&MainWindow::MacUserOperate);
+    m_thread = new UserThread;
+    m_thread->start();
     //设置定时器
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
@@ -91,12 +93,6 @@ MainWindow::~MainWindow()
         edm->EdmClose();
         EDM::DelEdm();
     }
-    delete coordWidget;
-    delete alarmSignal;
-    delete process;
-    delete program;
-    delete setting;
-    delete unionZero;
 }
 
 void MainWindow::MacUserOperate()
@@ -231,6 +227,7 @@ void MainWindow::renderToProcess()
 {
     process = new Process();
     process->show();
+
 }
 
 void MainWindow::renderToProgram()

@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QPixmap>
 
+CoordWidget* CoordWidget::m_coordWid = nullptr;
 CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
 {
     edm = EDM::GetEdmInstance();
@@ -108,6 +109,14 @@ CoordWidget::~CoordWidget()
 {
 
 }
+
+CoordWidget* CoordWidget::getInstance()
+{
+    if (!m_coordWid)
+        m_coordWid = new CoordWidget();
+    return m_coordWid;
+}
+
 
 void CoordWidget::ShowAxisData()
 {
