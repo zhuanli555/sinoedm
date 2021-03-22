@@ -47,7 +47,6 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     tab->addTab(createProcessTab(),QString::fromLocal8Bit("加工页面"));
     //main
     QGridLayout *mainLayout =new QGridLayout;
-    mainLayout->setMargin(15);					//设定对话框的边距为15
     mainLayout->setSpacing(10);
     mainLayout->addWidget(coordWidget,0,0);
     mainLayout->addLayout(rightLayout,0,1);
@@ -56,8 +55,9 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     tv1 = new QTableWidget;
     tv1->setMaximumWidth(0);
 
-    mainLayout->addWidget(tab,1,0);
+    mainLayout->addWidget(tab,1,0,1,2);
     mainLayout->addWidget(tv1,1,1);
+
     mainLayout->setColumnStretch(0,1);
     mainLayout->setColumnStretch(1,1);
     widget->setLayout(mainLayout);

@@ -361,7 +361,6 @@ int EDM::EdmHandProcess()
 	return  HandBoxProcess();
 }
 
-//TODO
 //输入：iLabel：轴标志号 0:X轴；1:Y轴；2:C轴；3:W轴；4:A轴；5:B轴；
 int EDM::HandBoxProcess()
 {
@@ -456,7 +455,7 @@ int EDM::HandBoxProcess()
 	}
 //获取速度
     btTmp = m_stEdmInterfaceIn.btI148&0x40;
-	if (btTmp==0 && ++iSpeedSum>6)
+    if (m_stEdmInterfaceIn.btI148 && btTmp==0 && ++iSpeedSum>6)
 	{
 		iSpeedSum = 0;
 		if (++iIndex>=3)
