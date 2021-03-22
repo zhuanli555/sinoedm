@@ -1,6 +1,7 @@
 //EDM_Db.cpp EDM_Db实现文件
 
 #include "EDM_Db.h"
+#include "cmdhandle.h"
 
 void EDM_Db::GetAxisLuoBuData(char cSymbol, int iVal[], int nCount)
 {
@@ -198,83 +199,111 @@ void EDM_Db::SaveEdmKpIntPara(MAC_KPINT *pInt, MAC_SYSTEM_SET *pSet)
 
 void EDM_Db::GetWorkPosSetIndex(int &iIndex)
 {
-#ifdef SQL
-	int i = 0;
 	QString strTmp;
-	strTmp = QString("select workindex from total");
+    strTmp = QString("select workindex from total limit 1");
 	q.exec(strTmp);
 	while (q.next())
 	{
-		iIndex = q.value(0).toInt();
-		i++;
-	}
-#else
-	iIndex = 0;
-#endif
+        iIndex = q.value(0).toInt();
+    }
 }
 
 void EDM_Db::SaveWorkPosSetIndex(int iIndex)
 {
-	//	m_pTableTotal->MoveFirst();
-	//	m_pTableTotal->SetFieldValue("workindex",iIndex);
-	//	m_pTableTotal->Update();
-	//	m_pTableTotal->MoveFirst();
+    QString str;
+    str = QString("update total set workindex=%1").arg(iIndex);
+    q.exec(str);
 }
 
 void EDM_Db::GetAllCoor(int a[][6])
 {
-#ifdef SQL	
 	int i = 0;
 	QString strTmp;
 	strTmp = QString("select iRelSet_0,iRelSet_1,iRelSet_2,iRelSet_3,iRelSet_4,iRelSet_5 from label_var");
 	q.exec(strTmp);
 	while (q.next())
 	{
-		a[i][0] = q.value(0).toInt();
-		a[i][1] = q.value(1).toInt();
-		a[i][2] = q.value(2).toInt();
-		a[i][3] = q.value(3).toInt();
-		a[i][4] = q.value(4).toInt();
-		a[i][5] = q.value(5).toInt();
+        a[i][0] = q.value(0).toInt();
+        a[i][1] = q.value(1).toInt();
+        a[i][2] = q.value(2).toInt();
+        a[i][3] = q.value(3).toInt();
+        a[i][4] = q.value(4).toInt();
+        a[i][5] = q.value(5).toInt();
 		i++;
 	}
-#else
-	int i = 0;
-	for(;i<MAC_LABEL_COUNT;i++)
-	{
-		a[i][0] = 0;
-		a[i][1] = 0;
-		a[i][2] = 0;
-		a[i][3] = 0;
-		a[i][4] = 0;
-		a[i][5] = 0;
-	}
-	
-#endif
 }
 
 void EDM_Db::GetOpName(QString &str)
 {
-#ifdef SQL
-	int i = 0;
 	QString strTmp;
-	strTmp = QString("select filename from total");
+    strTmp = QString("select filename from total where iIndex=0");
 	q.exec(strTmp);
 	while (q.next())
 	{
-		str = q.value(0).toString();
-		i++;
-	}
-#endif
-	str = "edmzhuanli";
+        str = q.value(0).toString();
+    }
 }
 
 void EDM_Db::SaveOpName(QString strName)
 {
-	//	m_pTableTotal->MoveFirst();
-	//	m_pTableTotal->SetFieldValue("filename",strName);
-	//	m_pTableTotal->Update();
-	//	m_pTableTotal->MoveFirst();
+    QString str;
+    str = QString("update total set filename='%1'").arg(strName);
+    q.exec(str);
+}
+
+void EDM_Db::GetElecMan(MAP_ELEC_MAN* pElecMan)
+{
+    QString strTmp,sql;
+    MAC_ELEC_PARA stMacElecPara;
+    sql = QString("select * from elec");
+    q.exec(sql);
+    while (q.next())
+    {
+        memset(&stMacElecPara,0,sizeof(MAC_ELEC_PARA));
+        stMacElecPara.iParaIndex = q.value(0).toInt();
+        strTmp = q.value(1).toString();
+        CmdHandle::GetElecPageParaFromQString(q.value(2).toString(),&(stMacElecPara.stElecPage[0]));
+        CmdHandle::GetElecPageParaFromQString(q.value(3).toString(),&(stMacElecPara.stElecPage[1]));
+        CmdHandle::GetElecPageParaFromQString(q.value(4).toString(),&(stMacElecPara.stElecPage[2]));
+        CmdHandle::GetElecPageParaFromQString(q.value(5).toString(),&(stMacElecPara.stElecPage[3]));
+        CmdHandle::GetElecPageParaFromQString(q.value(6).toString(),&(stMacElecPara.stElecPage[4]));
+        CmdHandle::GetElecPageParaFromQString(q.value(7).toString(),&(stMacElecPara.stElecPage[5]));
+        CmdHandle::GetElecOralParaFromQString(q.value(8).toString(),&(stMacElecPara.stElecOral));
+        pElecMan->insert(pair<QString,MAC_ELEC_PARA>(strTmp,stMacElecPara));
+    }
+}
+
+
+void EDM_Db::SaveElecMan(QString str,MAC_ELEC_PARA* pElec)
+{
+    QString sql;
+    QString str0,str1,str2,str3,str4,str5,strOral;
+    str0 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[0]);
+    str1 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[1]);
+    str2 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[2]);
+    str3 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[3]);
+    str4 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[4]);
+    str5 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[5]);
+    strOral = CmdHandle::GetElecOralPara2QString(&pElec->stElecOral);
+    sql = QString("update elec set elec_page_0='%1',elec_page_1='%2',elec_page_2='%3',elec_page_3='%4',\
+elec_page_4='%5',elec_page_5='%6',elec_oral='%7' where eName='%8'").arg(str0).arg(str1).arg(str2).arg(str3).arg(str4).arg(str5).arg(strOral).arg(str);
+    q.exec(sql);
+}
+
+
+void EDM_Db::NewElecElem(QString str)
+{
+    QString sql;
+    sql = QString("insert into elec(eName) values('%1')").arg(str);
+    q.exec(sql);
+}
+
+
+void EDM_Db::DelElecMan(QString str)
+{
+    QString sql;
+    sql = QString("delete from elec where eName='%1").arg(str);
+    q.exec(sql);
 }
 
 void EDM_Db::SaveMacSystemPara(MAC_SYSTEM_SET *pSet)

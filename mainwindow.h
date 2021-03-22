@@ -22,9 +22,18 @@
 #include "alarmsignal.h"
 #include "process.h"
 #include "program.h"
-#include "setting.h"
+#include "settingdialog.h"
 #include "unionzero.h"
-
+struct testName
+{
+    int a;
+    int b;
+    int c;
+};
+union FILE_READBUFFER{
+    struct testName m_param;
+    char header_pt[sizeof(m_param)];
+};
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -33,16 +42,27 @@ public:
     ~ MainWindow();
 
 public:
-    EDM* edm;
-    MAC_SYSTEM_SET mSysSet;
-    EDM_COOR_TYPE m_enCoorType;
+
 private:
     unsigned char EDMMacInit();
     void MacUserOperate();
+    void MacProcessOperate();
+    void HandleOpMsg();
+    void HandleEdmOpStatus();
+    void showFileText();
     void createMenus();
     void createActions();
+    QWidget* createCommandTab();
+    QWidget* createProcessTab();
     void Char2QStringInBinary(unsigned char btVal,QString &str);
+    void setAxisValue(int label,QString str);
+    void systemSetChangeForCoord();
 private:
+    EDM* edm;
+    MAC_SYSTEM_SET mSysSet;
+    EDM_COOR_TYPE m_enCoorType;
+    EDM_OP_List* edmOpList;
+    EDM_OP* edmOp;
     MAC_SYSTEM_SET m_stSysSet;
     QString m_strOpName;
     int  m_iOpenTime;
@@ -50,11 +70,12 @@ private:
     MAC_INTERFACE_IN mIn;
     MAC_INTERFACE_OUT mOut;
     QFuture<void> macUserHandle;
-    QThread* tThread;
+    QFuture<void> macProcessHandle;
     QMutex mutex;
-    Process* process;
+    QString m_strElecName;
+    QLabel *fileLabel;
     Program* program;
-    Setting* setting;
+    SettingDialog* setting;
     UnionZero* unionZero;
     QStatusBar* statBar;
     QTextEdit* commandText;
@@ -67,9 +88,9 @@ private:
     QAction* workZeroAction;
     QAction* exitAction;
     //left
-    CoordWidget* coordWidget = nullptr;
+    CoordWidget* coordWidget;
     //right
-    AlarmSignal* alarmSignal = nullptr;
+    AlarmSignal* alarmSignal;
     QLabel* purgeValue;
     QLabel* shakeValue;
     QLabel* protectValue;
@@ -78,7 +99,7 @@ private:
     QLabel* fixElecValue;
     QPushButton* axisZero;
     QPushButton* axisSet;
-    QPushButton* findCenter;
+    QPlainTextEdit* fileText;
     QGridLayout* rightLayout;
     //debug
     QTableWidget* tv1;
@@ -87,7 +108,6 @@ private:
     QLabel* commandLabel;
     QLineEdit* commandLine;
     QComboBox* speedValue;
-    QHBoxLayout* bottomLayout;
 
     bool m_quit = false;
 protected:
@@ -104,6 +124,7 @@ protected slots:
     void edmStop();
     void edmSendComand();
     void printInterface();
+    void refresh();
 };
 
 #endif // MAINWINDOW_H

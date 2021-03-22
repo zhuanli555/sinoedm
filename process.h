@@ -32,17 +32,7 @@ class Process : public QMainWindow
 public:
     Process(QWidget *parent = nullptr);
     ~ Process();
-public:
-    QString m_strElecName;
-    unsigned char bPause;
-private:
-    unsigned char EDMProcessInit();
-    void showFileText();
-    void createMenus();
-    void createActions();
-    void MacProcessOperate();
-    void HandleOpMsg();
-    void HandleEdmOpStatus();
+
 private:
     EDM* edm;
     EDM_OP_List* edmOpList;
@@ -59,12 +49,12 @@ private:
     QAction* processAction;
     QAction* imitateAction;
     //left
-    CoordWidget* coordWidget = nullptr;
+    CoordWidget* coordWidget;
     //right
+    AlarmSignal* alarmSignal;
     QString gFilename;
     QLabel *fileLabel;
     QPlainTextEdit* fileText;
-    AlarmSignal* alarmSignal = nullptr;
     QGridLayout* rightLayout;
     //bottom
     QHBoxLayout* bottomLayout;
@@ -101,20 +91,9 @@ private:
     QSqlRelationalTableModel *elecPageModel;
     QSqlTableModel *elecOralModel;
 
-    QFuture<void> macPr;
-    bool m_quit = false;
-protected:
-    void keyPressEvent(QKeyEvent *) override;
 
 protected slots:
 
-    void timeUpdate();
-    void edmStop();
-    void programProcess();
-    void imitateProcess();
-    void insertRow();
-    void deleteRow();
-    void updateActions();
 };
 
 

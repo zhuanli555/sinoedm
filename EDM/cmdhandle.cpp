@@ -862,31 +862,13 @@ QString CmdHandle::GetElecPara2QString(QString strName,MAC_ELEC_PARA* pElecPara)
 
 QString CmdHandle::GetElecPageParaFromQString(QString strCmd,Elec_Page* pElecPage)
 {
-    int iCount=0;
-    QString str,strTmp;
     int iPara[20]={0};
-    char ch;
-    int iLen;
+    int i = 0;
 
-    strCmd.trimmed();
-    strTmp = strCmd;
-    iCount = sizeof(Elec_Page)/sizeof(int);
-    for (int j=0;j<iCount;j++)
-    {
-        iLen = strTmp.length();
-        for(int i=0;i<iLen;i++)
-        {
-            ch = strTmp.at(i).unicode();
-            if (ch==' ')
-            {
-                str = strTmp.left(i);
-                str.trimmed();
-                iPara[j]= str.toInt();
-                strTmp = strTmp.right(iLen-i);
-                strTmp.trimmed();
-                break;
-            }
-        }
+    QString strTmp = strCmd.trimmed();
+    QStringList list = strTmp.split(' ');
+    foreach (const QString &str, list) {
+        iPara[i++] = str.trimmed().toInt();
     }
     memcpy(pElecPage,iPara,sizeof(Elec_Page));
     return strTmp;
@@ -894,73 +876,17 @@ QString CmdHandle::GetElecPageParaFromQString(QString strCmd,Elec_Page* pElecPag
 
 QString CmdHandle::GetElecOralParaFromQString(QString strCmd,Elec_Oral* pElecOral)
 {
-    int iCount=0;
-    QString str,strTmp;
     int iPara[20]={0};
-    char ch;
-    int iLen;
-    int i;
+    int i = 0;
 
-    strCmd.trimmed();
-    strTmp = strCmd;
-    iCount = sizeof(Elec_Oral)/sizeof(int);
-    for (int j=0;j<iCount;j++)
-    {
-        iLen = strTmp.length();
-        for(i=0;i<iLen;i++)
-        {
-            ch = strTmp.at(i).unicode();
-            if (ch==' ')
-            {
-                str = strTmp.left(i);
-                str.trimmed();
-                iPara[j]= str.toInt();
-                strTmp = strTmp.right(iLen-i);
-                strTmp.trimmed();
-                break;
-            }
-        }
-
-        if (i >=iLen)
-        {
-            iPara[j++]= strTmp.toInt();
-            strCmd="";
-            break;
-        }
+    QString strTmp = strCmd.trimmed();
+    QStringList list = strTmp.split(' ');
+    foreach (const QString &str, list) {
+        iPara[i++] = str.trimmed().toInt();
     }
+
     memcpy(pElecOral,iPara,sizeof(Elec_Oral));
     return strTmp;
-}
-
-
-void CmdHandle::GetElecParaFromQString(QString strCmd,QString& strName,MAC_ELEC_PARA* pElecPara)
-{
-    int iCount=0;
-    QString str,strTmp;
-    int iLen;
-    int i;
-    char ch;
-
-    strCmd.trimmed();
-    iLen = strCmd.length();
-    for(i=0;i<iLen;i++)
-    {
-        ch = strCmd.at(i).unicode();
-        if (ch==' ')
-        {
-            strName = strCmd.left(i);
-            strCmd = strCmd.right(iLen-i);
-            break;
-        }
-    }
-
-    for (int i=0;i<OP_HOLE_PAGE_MAX;i++)
-    {
-        strCmd.trimmed();
-        strCmd = GetElecPageParaFromQString(strCmd,&(pElecPara->stElecPage[i]));
-    }
-    strCmd.trimmed();
-    GetElecOralParaFromQString(strCmd,&(pElecPara->stElecOral));
 }
 
 
@@ -995,12 +921,6 @@ unsigned char CmdHandle::ReadCmdFromFile(QString strPath,QString strFile,vector<
 		{
 			bHeadRv = TRUE;
 			continue;
-		}
-
-		if (bHeadStart&& !bHeadRv)
-		{
-			GetElecParaFromQString(str,strName,&stElec);
-			pMap->insert(make_pair(strName,stElec));
 		}
 
 		if (bHeadRv)

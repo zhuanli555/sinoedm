@@ -12,6 +12,7 @@
 
 class UnionZero : public QDialog
 {
+    Q_OBJECT
 public:
     explicit UnionZero(QWidget *parent = nullptr);
     explicit UnionZero(int key, QWidget *parent = 0);
@@ -29,6 +30,7 @@ private:
     QCheckBox* wa;
     QCheckBox* wb;
     QCheckBox* wc;
+    QCheckBox* wz;
     QCheckBox* wall;
     QButtonGroup* group;
     QLineEdit* lineEdit;
@@ -37,7 +39,9 @@ private:
     bool bZero[MAC_LABEL_COUNT] = {false};
 private:
     void axisWorkZero(int label);
-
+signals:
+    void rtZeroSig(int label);
+    void setAxisSig(int label,QString str);
 protected slots:
 
     void chooseAll();

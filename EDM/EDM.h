@@ -190,9 +190,7 @@ public:
     bool GetMakeUpVal(int iVal_C,int* pVal);
 
 private:
-	void EdmReadMacPara();
-	int  WriteByteToReg(int iCtrAdd,unsigned char btCtrVal);
-	unsigned char ReadByteFromReg(int iCtrAdd);
+    void EdmReadMacPara();
 	void SetServoToGive(int iPercent);
     bool GetAxisOffset();
 	int GetSpeed(int iFreq);
@@ -208,8 +206,7 @@ public:
 	bool GetWorkPosSetByIndex(int iIndex,int iWork[]);
 	void ReSetWorkPosSetByIndex(int iIndex,int iWork[]);
 public:
-	bool SaveMacPara(MAC_SYSTEM_SET* pSysSet);
-    void test_inter();
+    bool SaveMacPara(MAC_SYSTEM_SET* pSysSet);
 public slots:
 	bool EdmSetProtect(unsigned long bProtect);
 	bool EdmLowPump(unsigned long bOpen);

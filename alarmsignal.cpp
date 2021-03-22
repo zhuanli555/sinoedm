@@ -15,7 +15,7 @@ AlarmSignal::AlarmSignal(QWidget *parent) : QWidget(parent)
     shakeValue = new QLabel(QString::fromLocal8Bit("振动(F6)"));
     protectValue = new QLabel(QString::fromLocal8Bit("防撞保护(F7)"));
     pauseValue = new QLabel(QString::fromLocal8Bit("暂停(F8)"));
-
+    findCenter = new QLabel(QString::fromLocal8Bit("找中心(F)"));
     mainLayout = new QGridLayout(this);
     mainLayout->setSpacing(20);
     mainLayout->addWidget(purgeValue,0,0);
@@ -23,7 +23,8 @@ AlarmSignal::AlarmSignal(QWidget *parent) : QWidget(parent)
     mainLayout->addWidget(shakeValue,2,0);
     mainLayout->addWidget(protectValue,3,0);
     mainLayout->addWidget(pauseValue,4,0);
-    protectValue->setMaximumWidth(85);
+    mainLayout->addWidget(findCenter,5,0);
+    findCenter->setMaximumWidth(85);
     purgeValue->setStyleSheet("background-color:green;");
     lowPumpValue->setStyleSheet("background-color:green;");
     shakeValue->setStyleSheet("background-color:green;");
@@ -217,6 +218,13 @@ void AlarmSignal::edmShake()
     }
 }
 
+void AlarmSignal::edmHandProcess()
+{
+    if (!m_stEntileStatus.bOpIn && !m_stEntileStatus.bRTzero)
+    {
+        edm->EdmHandProcess();
+    }
+}
 
 void AlarmSignal::edmProtect()
 {

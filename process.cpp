@@ -12,27 +12,20 @@
 
 //微孔机
 
-extern QString path;
+
 Process::Process(QWidget *parent): QMainWindow(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
     QWidget* widget = new QWidget();
     this->setCentralWidget(widget);
-    setWindowTitle(QString::fromLocal8Bit("数控机床v1.0"));
-    setGeometry(0,0,QApplication::desktop()->width(),QApplication::desktop()->height());
-    //获取edm实例 加工多线程
-    EDMProcessInit();
     //状态栏
     statBar = statusBar();
     //left
     coordWidget = CoordWidget::getInstance();
     //right
     alarmSignal = AlarmSignal::getInstance();
-    fileLabel = new QLabel(QString::fromLocal8Bit("加工文件名(F10)"));
-    fileText = new QPlainTextEdit;
-    fileText->setReadOnly(true);
-    fileText->setMaximumWidth(400);
+
     rightLayout = new QGridLayout();
     rightLayout->setSpacing(20);
     rightLayout->addWidget(alarmSignal,0,1,6,1);
@@ -135,8 +128,6 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     addButton = new QPushButton("add");
     delButton = new QPushButton("del");
     QTableView *tableView = new QTableView;
-    connect(addButton,&QPushButton::clicked,this,&Process::insertRow);
-    connect(delButton,&QPushButton::clicked,this,&Process::deleteRow);
     mPtLayout->addWidget(addButton);
     mPtLayout->addWidget(delButton);
     midLayout->addLayout(mPtLayout);
@@ -160,346 +151,45 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     mainLayout->setRowStretch(0,1);
     mainLayout->setRowStretch(1,1);
     widget->setLayout(mainLayout);
-    createActions();
-    createMenus();
-    //设置多线程
-    macPr = QtConcurrent::run(this,&Process::MacProcessOperate);
-    QTimer *t = new QTimer(this);
-    connect(t,&QTimer::timeout,this,&Process::timeUpdate);
-    t->start(1000);
 }
 
 Process::~Process()
 {
 
-    mutex.lock();
-    m_quit = true;
-    mutex.unlock();
-    macPr.waitForFinished();
-}
-
-void Process::insertRow()
-{
-    QModelIndex index = elecParaTable->selectionModel()->currentIndex();
-    QAbstractItemModel *model = elecParaTable->model();
-
-    if (!model->insertRow(index.row()+1, index.parent()))
-        return;
-
-    updateActions();
-
-    for (int column = 0; column < model->columnCount(index.parent()); ++column) {
-        QModelIndex child = model->index(index.row()+1, column, index.parent());
-        model->setData(child, QVariant("[No data]"), Qt::EditRole);
-    }
-}
-
-void Process::deleteRow()
-{
-    QModelIndex index = elecParaTable->selectionModel()->currentIndex();
-    QAbstractItemModel *model = elecParaTable->model();
-    if (model->removeRow(index.row(), index.parent()))
-        updateActions();
-}
-
-void Process::updateActions()
-{
-    bool hasSelection = !elecParaTable->selectionModel()->selection().isEmpty();
-    delButton->setEnabled(hasSelection);
-
-    bool hasCurrent = elecParaTable->selectionModel()->currentIndex().isValid();
-    addButton->setEnabled(hasCurrent);
-
-
-}
-void Process::createMenus()
-{
-    QMenuBar* myMenu = menuBar();
-    myMenu->setStyleSheet("QMenuBar::item{\
-      background-color:rgb(89,87,87);margin:2px 2px;color:yellow;}\
-       QMenuBar::item:selected{background-color:rgb(235,110,36);}\
-        QMenuBar::item:pressed{background-color:rgb(235,110,6);border:1px solid rgb(60,60,60);}");
-    myMenu->addAction(stopAction);
-    myMenu->addAction(processAction);
-    myMenu->addAction(imitateAction);
-
-}
-
-void Process::createActions()
-{
-    stopAction = new QAction(QString::fromLocal8Bit("总停(ESC)"),this);
-    stopAction->setShortcut(tr("ESC"));
-    stopAction->setStatusTip(tr("总停"));
-    connect(stopAction,&QAction::triggered,this,&Process::edmStop);
-
-    processAction = new QAction(QString::fromLocal8Bit("编程加工(F1)"),this);
-    processAction->setShortcut(tr("F1"));
-    processAction->setStatusTip("编程加工");
-    connect(processAction,&QAction::triggered,this,&Process::programProcess);
-
-    imitateAction = new QAction(QString::fromLocal8Bit("模拟加工(F2)"),this);
-    imitateAction->setShortcut(tr("F2"));
-    imitateAction->setStatusTip("模拟加工");
-    connect(imitateAction,&QAction::triggered,this,&Process::imitateProcess);
-
-}
-
-//加工线程
-void Process::MacProcessOperate()
-{
-    while (!m_quit)
-    {
-        if (edm)
-        {
-            mutex.lock();
-            HandleEdmOpStatus();
-            if (edmOpList)
-            {
-                edmOpList->CarryOn();
-            }
-            mutex.unlock();
-        }
-        QThread::msleep(20);
-    }
-    EDM_OP_List::DeleteEdmOpList();
-}
-
-//处理各个类型的加工
-void Process::HandleOpMsg()
-{
-    static string  strElec;
-    static MAC_ELEC_PARA elec;
-    QString strFileName;
-    if (!edmOpList)
-    {
-        return;
-    }
-
-    switch(gMsg)
-    {
-    case MSG_OP:
-        {
-            edmOpList->DeleteEdmOp();
-            edmOpList->SetEdmOpType(enType);
-            edmOpList->ResetEdmOpFile();
-            edmOpList->SetStart(FALSE);
-            edm->CloseHardWare();
-        }
-        break;
-    case MSG_PAUSE:
-        {
-            if (!edmOpList->m_pEdmOp)
-                return;
-//            edmOpList->m_pEdmOp->SetPassPara(m_dlgPassChart.m_fElec
-//                                  ,m_fSpeed
-//                                  ,m_iSpeedFilterCnt
-//                                  ,m_iElecFilterCnt);//设置电参数和速度
-            edmOpList->m_pEdmOp->EdmOpSetStart(FALSE);//设置停止
-
-        }
-        break;
-    case MSG_FILE:
-        {
-        //获取filename
-           edmOpList->SetEdmOpFile(path,gFilename);
-        }
-        break;
-    case MSG_TEST:
-        {
-            if (!edmOpList->m_pEdmOp || !edm->m_stSysSet.stSetNoneLabel.bCycleMeasure)
-                return;
-            edmOpList->m_pEdmOp->EdmOpSetTest(TRUE);
-            edmOpList->m_pEdmOp->EdmOpSetStart(TRUE);
-        }
-        break;
-    case MSG_ELEC:
-        {
-        //获取电参数
-//            strElec = *(string*)(pMsg->wParam);
-//            memcpy(&elec,(MAC_ELEC_PARA*)(pMsg->lParam),sizeof(MAC_ELEC_PARA));
-//            if (!edmOpList->m_pEdmOp)
-//            {
-//                if (((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex >=0 && ((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex < OP_HOLE_PAGE_MAX)
-//                {
-//                    edm->WriteElecPara(&(((MAC_ELEC_PARA*)(pMsg->lParam))->stElecPage[((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex]),"HandleOpMsg");
-//                }
-//            }
-//            else
-//            {
-//                edmOpList->m_pEdmOp->SetEdmOpElec(strElec,elec);
-//            }
-        }
-        break;
-    default:
-        break;
-    }
-}
-
-//处理加工状态
-void Process::HandleEdmOpStatus()
-{
-    static int iCmdIndex=-1;
-    static unsigned char bOver=FALSE;
-    static OP_ERROR op_error = OP_NO_ERR;
-    static vector<QString> vCmd;
-    static MAP_ELEC_MAN mpElec;
-
-    EDM_OP* pOp;
-
-    if (!edmOpList)
-    {
-        return;
-    }
-
-    pOp = edmOpList->m_pEdmOp;
-    if (pOp != edmOp || edmOpList->m_bChange)
-    {
-        edmOp = pOp;
-        edmOpList->m_bChange = FALSE;
-    }
-
-    if (pOp->m_stOpStatus.stCycle.bPauseCmd)
-    {
-        pOp->m_stOpStatus.stCycle.bPauseCmd = FALSE;
-    }
-
-    if(pOp->m_stOpStatus.iCmdIndex != iCmdIndex && EDM_OP::m_bStartCount)
-    {
-        iCmdIndex = pOp->m_stOpStatus.iCmdIndex;
-    }
-
-    if (pOp->m_stOpStatus.stCycle.stPassChart.bClear)
-    {
-        pOp->m_stOpStatus.stCycle.stPassChart.bClear = FALSE;
-    }
-    else
-    {
-        if (pOp->m_stOpStatus.stCycle.stPassChart.bSet)
-        {
-            pOp->m_stOpStatus.stCycle.stPassChart.bSet = FALSE;
-        }
-        else
-        {
-            if (pOp->m_stOpStatus.stCycle.stPassChart.bRealTimeIn)
-            {
-                pOp->m_stOpStatus.stCycle.stPassChart.bRealTimeIn = FALSE;
-            }
-        }
-    }
-
-
-    if (pOp->m_stOpStatus.enErrAll.errOp != op_error )
-    {
-        op_error = pOp->m_stOpStatus.enErrAll.errOp;
-        edm->EdmYellowLump( !(pOp->m_stOpStatus.enErrAll.errOp==OP_NO_ERR));
-    }
-
-//    m_dlgOpStatus.SetOpStatusPara(pOp->m_stOpStatus.iCmdIndex
-//                                  ,pOp->m_stOpStatus.stCycle.iCycleIndex
-//                                  ,pOp->m_stOpStatus.stCycle.iTimeSec
-//                                  ,pOp->m_stOpStatus.stCycle.iOpPage);//旋转轴
-
-    if (pOp->m_stOpStatus.bCheck_C_Over)
-    {
-        pOp->m_stOpStatus.bCheck_C_Over = FALSE;
-    }
-
-    if (bOver != edmOpList->m_bOver)
-    {
-        bOver = edmOpList->m_bOver;
-        if (bOver)
-        {
-            iCmdIndex = -1;
-        }
-    }
-}
-
-void Process::programProcess()
-{
-    enType = OP_HOLE_PROGRAME;
-    gMsg = MSG_OP;
-}
-
-void Process::imitateProcess()
-{
-    enType = OP_HOLE_SIMULATE;
-    gMsg = MSG_OP;
 }
 
 
+//void Process::createMenus()
+//{
+//    QMenuBar* myMenu = menuBar();
+//    myMenu->setStyleSheet("QMenuBar::item{\
+//      background-color:rgb(89,87,87);margin:2px 2px;color:yellow;}\
+//       QMenuBar::item:selected{background-color:rgb(235,110,36);}\
+//        QMenuBar::item:pressed{background-color:rgb(235,110,6);border:1px solid rgb(60,60,60);}");
+//    myMenu->addAction(stopAction);
+//    myMenu->addAction(processAction);
+//    myMenu->addAction(imitateAction);
 
-void Process::timeUpdate()
-{
-}
+//}
 
-unsigned char Process::EDMProcessInit()
-{
-    unsigned char bInit;
-    edm =  EDM::GetEdmInstance();
-    edmOpList = EDM_OP_List::GetEdmOpListPtr();
-    edmOp = edmOpList->m_pEdmOp;
-    edmOpList->SetEdmOpFile(path,strOpName);
-    //从数据库载入
-    //TODO
-    return bInit;
-}
+//void Process::createActions()
+//{
+//    stopAction = new QAction(QString::fromLocal8Bit("总停(ESC)"),this);
+//    stopAction->setShortcut(tr("ESC"));
+//    stopAction->setStatusTip(tr("总停"));
 
-void Process::keyPressEvent(QKeyEvent *e)
-{
-    switch (e->key()) {
-    case Qt::Key_Escape:
-        edmStop();
-        break;
-    case Qt::Key_F4:
-        alarmSignal->edmPurge();
-        break;
-    case Qt::Key_F5:
-        alarmSignal->edmLowerPump();
-        break;
-    case Qt::Key_F6:
-        alarmSignal->edmShake();
-        break;
-    case Qt::Key_F7:
-        alarmSignal->edmProtect();
-        break;
-    case Qt::Key_F10:
-        showFileText();
-        break;
-    case Qt::Key_F12:
-        close();
-        break;
+//    processAction = new QAction(QString::fromLocal8Bit("编程加工(F1)"),this);
+//    processAction->setShortcut(tr("F1"));
+//    processAction->setStatusTip("编程加工");
 
-    default:
-        break;
-    }
-}
+//    imitateAction = new QAction(QString::fromLocal8Bit("模拟加工(F2)"),this);
+//    imitateAction->setShortcut(tr("F2"));
+//    imitateAction->setStatusTip("模拟加工");
 
-void Process::edmStop()
-{
-    alarmSignal->edmStop();
-}
+//}
 
-void Process::showFileText()
-{
-    gFilename = QFileDialog::getOpenFileName(this,"open File",path,"*", nullptr,QFileDialog::DontUseSheet|QFileDialog::DontUseNativeDialog);
-    QFileInfo info(gFilename);
-    m_strElecName = info.fileName();
-    if (!gFilename.isEmpty())
-    {
-        QFile file(gFilename);
-        QTextStream textStream;
-        if (file.open(QIODevice::ReadOnly))
-        {
-            textStream.setDevice(&file);
-            while(!textStream.atEnd())
-            {
-                fileText->setPlainText(textStream.readAll());
-            }
-        }
-        file.close();
-    }
-    //show
-    fileLabel->setText(QString::fromLocal8Bit("加工文件名(F10):")+m_strElecName);
-    //重新渲染表格
-    elecParaTable->showData(elecPageModel,elecOralModel,m_strElecName);
-}
+
+
+
+
+

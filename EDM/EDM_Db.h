@@ -24,6 +24,11 @@ public:
     void GetOpName(QString& str);
     void SaveOpName(QString strName);
 
+    void GetElecMan(MAP_ELEC_MAN* pElecMan);
+    void SaveElecMan(QString str,MAC_ELEC_PARA* pElec);
+    void DelElecMan(QString str);
+    void NewElecElem(QString str);
+
     void GetWorkPosSetIndex(int& iIndex);
     void SaveWorkPosSetIndex(int iIndex);
     void GetAllCoor(int a[][6]);

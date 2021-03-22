@@ -24,6 +24,7 @@ UnionZero::UnionZero(int key, QWidget *parent) : QDialog(parent)
     ww = new QCheckBox(QString::fromLocal8Bit("选择W轴\n(w)"));
     wa = new QCheckBox(QString::fromLocal8Bit("选择A轴\n(a)"));
     wb = new QCheckBox(QString::fromLocal8Bit("选择B轴\n(b)"));
+    wz = new QCheckBox(QString::fromLocal8Bit("选择Z轴\n(z)"));
     wall = new QCheckBox(QString::fromLocal8Bit("选择全部"));
     group->addButton(wx, 0);
     group->addButton(wy, 1);
@@ -31,6 +32,7 @@ UnionZero::UnionZero(int key, QWidget *parent) : QDialog(parent)
     group->addButton(ww, 3);
     group->addButton(wa, 4);
     group->addButton(wb, 5);
+    group->addButton(wz, 6);
     connect(group, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &UnionZero::buttonGroupClicked);
     connect(wall, &QCheckBox::clicked, this, &UnionZero::chooseAll);
     mainLayout = new QGridLayout(this);
@@ -40,6 +42,7 @@ UnionZero::UnionZero(int key, QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(wc, 1, 0);
     mainLayout->addWidget(wa, 1, 1);
     mainLayout->addWidget(wb, 1, 2);
+    mainLayout->addWidget(wz, 2, 0);
     QFrame *line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
@@ -98,13 +101,15 @@ void UnionZero::buttonGroupClicked(int index)
 void UnionZero::accept()
 {
     int i = 0;
+    QChar chas[MAC_LABEL_COUNT]={'X','Y','C','W','A','B','Z'};
     if (workflag == 0){
         //回机械零
         for(i = 0;i < MAC_LABEL_COUNT;i++)
         {
             if(bZero[i])
             {
-                edm->EdmRtZero(i);
+                if(edm->EdmRtZero(i))
+                emit rtZeroSig(i);
             }
         }
     }
@@ -122,11 +127,12 @@ void UnionZero::accept()
     {
         CmdHandle *pCmdHandle;
         static DIGIT_CMD stDigitCmd;
-        QChar chas[MAC_LABEL_COUNT]={'X','Y','C','W','A','B'};
+
         QString sVal = "0";
         DIGIT_CMD cmdDefault;
+        memset(&cmdDefault,0,sizeof(DIGIT_CMD));
         cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
-        QString cmd = "G92 G00";
+        QString cmd = "G92 G00 ";
         if(!lineEdit->text().isEmpty())sVal = lineEdit->text();
         for(i = 0;i<MAC_LABEL_COUNT;i++)
         {
@@ -134,9 +140,12 @@ void UnionZero::accept()
             {
                 cmd += chas[i];
                 cmd += sVal;
+                cmd += " ";
+                emit setAxisSig(i,sVal);
             }
 
         }
+
         pCmdHandle = new CmdHandle(FALSE,cmd,&stDigitCmd,&cmdDefault);
         delete pCmdHandle;
         edm->EdmSendMovePara(&stDigitCmd);

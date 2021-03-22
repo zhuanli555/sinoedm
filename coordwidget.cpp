@@ -1,12 +1,22 @@
 #include "coordwidget.h"
 #include <QDebug>
 #include <QPixmap>
+#include <QSettings>
 
 CoordWidget* CoordWidget::m_coordWid = nullptr;
 CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
 {
     edm = EDM::GetEdmInstance();
     setMaximumWidth(600);
+    setLabels();
+}
+
+CoordWidget::~CoordWidget()
+{
+
+}
+void CoordWidget::setLabels()
+{
     xLabel = new QLabel("X");
     yLabel = new QLabel("Y");
     cLabel = new QLabel("C");
@@ -105,9 +115,108 @@ CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
     bLabel->setMaximumWidth(85);
 }
 
-CoordWidget::~CoordWidget()
-{
+//void CoordWidget::setLabels()
+//{
+//    QSettings* setting = new QSettings("./db/edmsystem.ini",QSettings::IniFormat);
+//    setting->beginGroup("systemSet");
+//    int xLabelFlag,yLabelFlag,aLabelFlag,bLabelFlag=1;
+//    xLabelFlag = setting->value("xLabelFlag").toInt();
+//    yLabelFlag = setting->value("yLabelFlag").toInt();
+//    aLabelFlag = setting->value("aLabelFlag").toInt();
+//    bLabelFlag = setting->value("bLabelFlag").toInt();
+//    qDebug()<<xLabelFlag<<yLabelFlag<<aLabelFlag<<bLabelFlag;
+//    float zero = 0.000;
+//    int count = 0;
+//    QString tmp = float2QString(zero);
+//    QString xstyle = "font-size:40px;";
+//    QString wstyle = "font-size:28px;";
+//    if(xLabelFlag == 1)
+//    {
+//        xLabel = new QLabel("X");
+//        labels.append(xLabel);
+//    }else{labels.append(nullptr);}
+//    if(yLabelFlag == 1)
+//    {
+//        yLabel = new QLabel("Y");
+//        labels.append(yLabel);
+//    }else{labels.append(nullptr);}
+//    cLabel = new QLabel("C");
+//    wLabel = new QLabel("W");
+//    labels.append(cLabel);
+//    labels.append(wLabel);
+//    if(aLabelFlag == 1)
+//    {
+//        aLabel = new QLabel("A");
+//        labels.append(aLabel);
 
+//    }else{labels.append(nullptr);}
+//    if(bLabelFlag == 1)
+//    {
+//        bLabel = new QLabel("B");
+//        labels.append(bLabel);
+
+//    }else{labels.append(nullptr);}
+//    zLabel = new QLabel("Z");
+//    labels.append(zLabel);
+
+//    xValue = new QLabel(tmp);
+//    xMValue = new QLabel(tmp);
+//    xShow = new QLabel();
+//    yValue = new QLabel(tmp);
+//    yMValue = new QLabel(tmp);
+//    yShow = new QLabel();
+//    aValue = new QLabel(tmp);
+//    aMValue = new QLabel(tmp);
+//    aShow = new QLabel();
+//    bValue = new QLabel(tmp);
+//    bMValue = new QLabel(tmp);
+//    bShow = new QLabel();
+
+//    cValue = new QLabel(tmp);
+//    wValue = new QLabel(tmp);
+//    zValue = new QLabel(tmp);
+
+//    cMValue = new QLabel(tmp);
+//    wMValue = new QLabel(tmp);
+//    zMValue = new QLabel(tmp);
+
+//    cShow = new QLabel();
+//    wShow = new QLabel();
+//    zShow = new QLabel();
+//    leftLayout = new QGridLayout(this);
+//    count = 0;
+//    for(int i =0;i<MAC_LABEL_COUNT;i++)
+//    {
+//        if(labels[i])
+//        {
+//            qDebug()<<labels[i];
+//            labels[i]->setAlignment(Qt::AlignVCenter);
+//            Values[i]->setAlignment(Qt::AlignRight);
+//            mValues[i]->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+//            leftLayout->addWidget(labels[i],count,0);
+//            leftLayout->addWidget(Values[i],count,1);
+//            leftLayout->addWidget(mValues[i],count,2);
+//            leftLayout->addWidget(shows[i],count,3);
+//            if(i==3)//w
+//            {
+//                labels[i]->setStyleSheet(wstyle);
+
+//            }else{
+//                labels[i]->setStyleSheet(xstyle);
+//            }
+//            Values[i]->setStyleSheet(xstyle);
+//            mValues[i]->setStyleSheet("color:blue;font-size:24px;");
+//            labels[i]->setMaximumWidth(85);
+//            count++;
+//        }
+//    }
+//}
+
+QString CoordWidget::float2QString(float value)
+{
+    QString str;
+    str = QString("%1").arg(value,8,'f',3);
+    return str;
 }
 
 CoordWidget* CoordWidget::getInstance()
@@ -133,6 +242,7 @@ void CoordWidget::ShowData(const MAC_COMMON& stMaccomm,int iRelLabel[])
     memset(&stMaccomLast,0,sizeof(MAC_COMMON));
     for (int i=0;i<MAC_LABEL_COUNT;i++)
     {
+        if(labels[i] == nullptr)continue;
         if (stMaccomm.stMoveCtrlComm[i].iMachPos != stMaccomLast.stMoveCtrlComm[i].iMachPos
             || stMaccomm.stMoveCtrlComm[i].iRasilPos != stMaccomLast.stMoveCtrlComm[i].iRasilPos)
         {
@@ -140,24 +250,14 @@ void CoordWidget::ShowData(const MAC_COMMON& stMaccomm,int iRelLabel[])
             stMaccomLast.stMoveCtrlComm[i].iMachPos = stMaccomm.stMoveCtrlComm[i].iMachPos;
             stMaccomLast.stMoveCtrlComm[i].iRasilPos = stMaccomm.stMoveCtrlComm[i].iRasilPos;
             iRelLabelLast[i]= iRelLabel[i];
-            if(i == 0)
-            {
-                fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
-                str = QString("%1").arg(fTmp,8,'f',3);
-                xMValue->setText(str);
-                fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
-                str = QString("%1").arg(fTmp,8,'f',3);
-                xValue->setText(str);
-            }else if (i == 1) {
-                fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
-                str = QString("%1").arg(fTmp,8,'f',3);
-                yMValue->setText(str);
-                fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
-                str = QString("%1").arg(fTmp,8,'f',3);
-                yValue->setText(str);
-            }
+            fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
+            if(i == 0&&fTmp<2)qDebug()<<fTmp;
+            str = float2QString(fTmp);
+            mValues[i]->setText(str);
+            fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
+            str = float2QString(fTmp);
+            Values[i]->setText(str);
         }
-
     }
 }
 
@@ -173,6 +273,7 @@ void CoordWidget::SaveData()
         iSaveCnt = 0;
         for (int i=0;i<MAC_LABEL_COUNT;i++)
         {
+            if(labels[i] == nullptr)continue;
             if ( edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iMachPos != stMaccomLast.stMoveCtrlComm[i].iMachPos
                 || edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].bDirMove != stMaccomLast.stMoveCtrlComm[i].bDirMove
                 || edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iWorkPosSet != stMaccomLast.stMoveCtrlComm[i].iWorkPosSet)
@@ -192,14 +293,12 @@ void CoordWidget::SaveData()
 
 void CoordWidget::ShowMacUserStatus()
 {
-    QLabel* labels[MAC_LABEL_COUNT] = {xLabel,yLabel,nullptr,wLabel,aLabel,bLabel,cLabel};
-    QLabel* shows[MAC_LABEL_COUNT] = {xShow,yShow,nullptr,wShow,aShow,bShow,cShow};
     static unsigned long bPosLimit[MAC_LABEL_COUNT] = {0};
     static unsigned long bNegLimit[MAC_LABEL_COUNT] = {0};
     static unsigned long bAlarm[MAC_LABEL_COUNT] = {0};
     for (int i=0;i<MAC_LABEL_COUNT;i++)
     {
-        if(i==2)continue;
+        if(labels[i] == nullptr)continue;
         if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit != bPosLimit[i])
         {
             bPosLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit;
@@ -249,12 +348,17 @@ void CoordWidget::ShowMacUserStatus()
     }
 }
 
+void CoordWidget::setAxisValue(int label,QString str)
+{
+    if(!labels[label])return;
+    Values[label]->setText(str);
+}
+
 void CoordWidget::HandleEdmCycleData()
 {
     edm->GetEdmComm();
     edm->GetEdmStatusData();
     SaveData();              //存储数据
-    //SendComand2Edm();        //发送命令行数据
     ShowAxisData();          //显示数据
     ShowMacUserStatus();	 //状态显示
     edm->EdmAxisAdjust();

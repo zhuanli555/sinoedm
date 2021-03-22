@@ -7,10 +7,13 @@
 #include <QGridLayout>
 #include <QDebug>
 #include <QTextCodec>
+#include <QFile>
+#include <QFileDialog>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QtConcurrent>
 
+extern QString path;
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 {
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
@@ -23,60 +26,46 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     //init edm
     EDMMacInit();
     //状态栏
-    statBar = statusBar();
+    statBar = this->statusBar();
     //left
     coordWidget = CoordWidget::getInstance();
     //right
     alarmSignal = AlarmSignal::getInstance();
-    findCenter = new QPushButton(QString::fromLocal8Bit("找中心(F)"));
-    //添加一个lineedit 记录发送的命令
-    commandText = new QTextEdit();
-    rightLayout = new QGridLayout();
+    fileLabel = new QLabel(QString::fromLocal8Bit("加工文件名(F11)"));
+    fileText = new QPlainTextEdit;
+    fileText->setReadOnly(true);
+    fileText->setMaximumWidth(400);
+    rightLayout = new QGridLayout;
     rightLayout->setSpacing(20);
-    rightLayout->addWidget(findCenter,1,0);
+    rightLayout->addWidget(fileLabel,0,0,1,1);
+    rightLayout->addWidget(fileText,1,0,5,1);
     rightLayout->addWidget(alarmSignal,0,1,6,1);
-    findCenter->setMaximumWidth(85);
     rightLayout->setSizeConstraint(QLayout::SetFixedSize);
-    //bottom
-    commandLabel = new QLabel(QString::fromLocal8Bit("命令"));
-    commandLine = new QLineEdit();
-    connect(commandLine,&QLineEdit::returnPressed,this,&MainWindow::edmSendComand);
-    QLabel *speedLabel = new QLabel(QString::fromLocal8Bit("定位速度:"));
-    speedValue = new QComboBox();
-    speedValue->clear();
-    QStringList speedlist;
-    speedlist<<"1000"<<"2000"<<"5000"<<"10000"<<"20000";
-    speedValue->addItems(speedlist);
-    bottomLayout = new QHBoxLayout();
-    bottomLayout->addWidget(commandLabel);
-    bottomLayout->addWidget(commandLine);
-    bottomLayout->addWidget(speedLabel);
-    bottomLayout->addWidget(speedValue);
+    //tab
+    QTabWidget* tab = new QTabWidget;
+    tab->addTab(createCommandTab(),QString::fromLocal8Bit("发送命令"));
+    tab->addTab(createProcessTab(),QString::fromLocal8Bit("加工页面"));
     //main
-    QGridLayout *mainLayout =new QGridLayout();
-
+    QGridLayout *mainLayout =new QGridLayout;
     mainLayout->setMargin(15);					//设定对话框的边距为15
     mainLayout->setSpacing(10);
     mainLayout->addWidget(coordWidget,0,0);
     mainLayout->addLayout(rightLayout,0,1);
 
     //debug
-    QHBoxLayout* midLayout = new QHBoxLayout();
     tv1 = new QTableWidget;
     tv1->setMaximumWidth(0);
-    midLayout->addWidget(commandText);
-    midLayout->addWidget(tv1);
-    mainLayout->addLayout(midLayout,1,0,1,2);
 
-    mainLayout->addLayout(bottomLayout,2,0,1,2);
-    mainLayout->setColumnStretch(0,1);//设置1:1
+    mainLayout->addWidget(tab,1,0);
+    mainLayout->addWidget(tv1,1,1);
+    mainLayout->setColumnStretch(0,1);
     mainLayout->setColumnStretch(1,1);
     widget->setLayout(mainLayout);
     createActions();
     createMenus();
     //设置多线程信号
     macUserHandle = QtConcurrent::run(this,&MainWindow::MacUserOperate);
-
+    macProcessHandle = QtConcurrent::run(this,&MainWindow::MacProcessOperate);
     //设置定时器
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
@@ -96,6 +85,7 @@ MainWindow::~MainWindow()
     m_quit = true;
     mutex.unlock();
     macUserHandle.waitForFinished();
+    macProcessHandle.waitForFinished();
 }
 
 void MainWindow::MacUserOperate()
@@ -107,11 +97,31 @@ void MainWindow::MacUserOperate()
             mutex.lock();
             coordWidget->HandleEdmCycleData();//机床命令周期性处理
             alarmSignal->EdmStatusSignChange();//机床信号周期性处理
-
+            alarmSignal->edmHandProcess();//处理手盒
             mutex.unlock();
         }
         QThread::msleep(35);
     }
+}
+
+//加工线程
+void MainWindow::MacProcessOperate()
+{
+    while (!m_quit)
+    {
+        if (edm)
+        {
+            mutex.lock();
+            HandleEdmOpStatus();
+            if (edmOpList)
+            {
+                edmOpList->CarryOn();
+            }
+            mutex.unlock();
+        }
+        QThread::msleep(20);
+    }
+    EDM_OP_List::DeleteEdmOpList();
 }
 
 unsigned char MainWindow::EDMMacInit()
@@ -120,6 +130,13 @@ unsigned char MainWindow::EDMMacInit()
     edm =  EDM::GetEdmInstance();
     bInit = edm->EdmInit();
     edm->GetMacPara(&m_stSysSet);
+    edmOpList = EDM_OP_List::GetEdmOpListPtr();
+    edmOp = edmOpList->m_pEdmOp;
+
+    QString strPath = QDir::currentPath()+"/processFile";
+    QString strOpName="DEFAULT";
+    edmOpList->SetEdmOpFile(strPath,strOpName);
+    //从数据库载入
     m_iOpenTime = m_stSysSet.stSetNoneLabel.iTime;
     m_iOpenTimeOp = m_stSysSet.stSetNoneLabel.iTimeOp;
     memset(&mIn,0,sizeof(MAC_INTERFACE_IN));
@@ -145,7 +162,7 @@ void MainWindow::createActions()
 
     processAction = new QAction(QString::fromLocal8Bit("加工(F1)"),this);
     processAction->setShortcut(tr("F1"));
-    processAction->setStatusTip(tr("加工文件"));
+    processAction->setStatusTip(tr("加工"));
     connect(processAction,&QAction::triggered,this,&MainWindow::renderToProcess);
 
     unionZeroAction = new QAction(QString::fromLocal8Bit("回机械零(F2)"),this);
@@ -199,6 +216,39 @@ void MainWindow::createMenus()
 
 }
 
+QWidget* MainWindow::createCommandTab()
+{
+    QWidget* widget = new QWidget();
+    //添加一个lineedit 记录发送的命令
+    commandText = new QTextEdit;
+    commandLabel = new QLabel(QString::fromLocal8Bit("命令"));
+    commandLine = new QLineEdit;
+    connect(commandLine,&QLineEdit::returnPressed,this,&MainWindow::edmSendComand);
+    QLabel *speedLabel = new QLabel(QString::fromLocal8Bit("定位速度:"));
+    speedValue = new QComboBox();
+    speedValue->clear();
+    QStringList speedlist;
+    speedlist<<"60"<<"120"<<"300"<<"600";
+    speedValue->addItems(speedlist);
+    QVBoxLayout* mainLayout = new QVBoxLayout;
+    QHBoxLayout* bottomLayout = new QHBoxLayout;
+    bottomLayout->addWidget(commandLabel);
+    bottomLayout->addWidget(commandLine);
+    bottomLayout->addWidget(speedLabel);
+    bottomLayout->addWidget(speedValue);
+    mainLayout->addWidget(commandText);
+    mainLayout->addLayout(bottomLayout);
+    widget->setLayout(mainLayout);
+    return widget;
+}
+
+QWidget* MainWindow::createProcessTab()
+{
+    QWidget* widget = new QWidget();
+
+    return widget;
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {
@@ -229,11 +279,20 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 }
 
+//模拟加工
 void MainWindow::renderToProcess()
 {
-    process = new Process();
-    process->show();
 
+    edmOpList->DeleteEdmOp();
+    edmOpList->SetEdmOpType(OP_HOLE_SIMULATE);
+    edmOpList->ResetEdmOpFile();
+    edmOpList->SetStart(FALSE);
+    edm->CloseHardWare();
+}
+
+void MainWindow::refresh()
+{
+    this->show();
 }
 
 void MainWindow::renderToProgram()
@@ -244,9 +303,27 @@ void MainWindow::renderToProgram()
 
 void MainWindow::renderToSetting()
 {
-    setting = new Setting();
-    setting->show();
+    setting = new SettingDialog();
+    connect(setting,&SettingDialog::systemSetChanged,this,&MainWindow::systemSetChangeForCoord);
+    int res = setting->exec();
+    if(res != QDialog::Accepted)
+    {
+        disconnect(setting,&SettingDialog::systemSetChanged,this,&MainWindow::systemSetChangeForCoord);
+        return;
+    }
+    delete setting;
 }
+
+void MainWindow::systemSetChangeForCoord()
+{
+    coordWidget->update();
+}
+
+void MainWindow::setAxisValue(int label,QString str)
+{
+    coordWidget->setAxisValue(label,str);
+}
+
 
 void MainWindow::renderToUnionZero()
 {
@@ -267,14 +344,194 @@ void MainWindow::renderToWorkZero()
 void MainWindow::renderToAxisSet()
 {
     unionZero = new UnionZero(2);
+    connect(unionZero,&UnionZero::setAxisSig,this,&MainWindow::setAxisValue);
     int res = unionZero->exec();
-    if(res != QDialog::Accepted)return;
+    if(res != QDialog::Accepted)
+    {
+        disconnect(unionZero,&UnionZero::setAxisSig,this,&MainWindow::setAxisValue);
+        return;
+    }
     delete unionZero;
 }
 
 void MainWindow::edmStop()
 {
     alarmSignal->edmStop();
+}
+
+void MainWindow::showFileText()
+{
+    QString gFilename = QFileDialog::getOpenFileName(this,"open File",path,"*", nullptr,QFileDialog::DontUseNativeDialog);
+    QFileInfo info(gFilename);
+    m_strElecName = info.fileName();
+    if (!gFilename.isEmpty())
+    {
+        QFile file(gFilename);
+        QTextStream textStream;
+        if (file.open(QIODevice::ReadOnly))
+        {
+            textStream.setDevice(&file);
+            while(!textStream.atEnd())
+            {
+                fileText->setPlainText(textStream.readAll());
+            }
+        }
+        file.close();
+    }
+    //show
+    fileLabel->setText(QString::fromLocal8Bit("加工文件名(F10):")+m_strElecName);
+    //重新渲染表格
+    //elecParaTable->showData(elecPageModel,elecOralModel,m_strElecName);
+}
+
+
+//处理各个类型的加工
+//void MainWindow::HandleOpMsg()
+//{
+//    static string  strElec;
+//    static MAC_ELEC_PARA elec;
+//    QString strFileName;
+//    if (!edmOpList)
+//    {
+//        return;
+//    }
+
+//    switch(gMsg)
+//    {
+//    case MSG_OP:
+//        {
+//            edmOpList->DeleteEdmOp();
+//            edmOpList->SetEdmOpType(enType);
+//            edmOpList->ResetEdmOpFile();
+//            edmOpList->SetStart(FALSE);
+//            edm->CloseHardWare();
+//        }
+//        break;
+//    case MSG_PAUSE:
+//        {
+//            if (!edmOpList->m_pEdmOp)
+//                return;
+////            edmOpList->m_pEdmOp->SetPassPara(m_dlgPassChart.m_fElec
+////                                  ,m_fSpeed
+////                                  ,m_iSpeedFilterCnt
+////                                  ,m_iElecFilterCnt);//设置电参数和速度
+//            edmOpList->m_pEdmOp->EdmOpSetStart(FALSE);//设置停止
+
+//        }
+//        break;
+//    case MSG_FILE:
+//        {
+//        //获取filename
+//           edmOpList->SetEdmOpFile(path,m_strElecName);
+//        }
+//        break;
+//    case MSG_TEST:
+//        {
+//            if (!edmOpList->m_pEdmOp || !edm->m_stSysSet.stSetNoneLabel.bCycleMeasure)
+//                return;
+//            edmOpList->m_pEdmOp->EdmOpSetTest(TRUE);
+//            edmOpList->m_pEdmOp->EdmOpSetStart(TRUE);
+//        }
+//        break;
+//    case MSG_ELEC:
+//        {
+//        //获取电参数
+////            strElec = *(string*)(pMsg->wParam);
+////            memcpy(&elec,(MAC_ELEC_PARA*)(pMsg->lParam),sizeof(MAC_ELEC_PARA));
+////            if (!edmOpList->m_pEdmOp)
+////            {
+////                if (((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex >=0 && ((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex < OP_HOLE_PAGE_MAX)
+////                {
+////                    edm->WriteElecPara(&(((MAC_ELEC_PARA*)(pMsg->lParam))->stElecPage[((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex]),"HandleOpMsg");
+////                }
+////            }
+////            else
+////            {
+////                edmOpList->m_pEdmOp->SetEdmOpElec(strElec,elec);
+////            }
+//        }
+//        break;
+//    default:
+//        break;
+//    }
+//}
+//处理加工状态
+void MainWindow::HandleEdmOpStatus()
+{
+    static int iCmdIndex=-1;
+    static unsigned char bOver=FALSE;
+    static OP_ERROR op_error = OP_NO_ERR;
+    static vector<QString> vCmd;
+    static MAP_ELEC_MAN mpElec;
+
+    EDM_OP* pOp;
+
+    if (!edmOpList)
+    {
+        return;
+    }
+
+    pOp = edmOpList->m_pEdmOp;
+    if (pOp != edmOp || edmOpList->m_bChange)
+    {
+        edmOp = pOp;
+        edmOpList->m_bChange = FALSE;
+    }
+
+    if (pOp->m_stOpStatus.stCycle.bPauseCmd)
+    {
+        pOp->m_stOpStatus.stCycle.bPauseCmd = FALSE;
+    }
+
+    if(pOp->m_stOpStatus.iCmdIndex != iCmdIndex && EDM_OP::m_bStartCount)
+    {
+        iCmdIndex = pOp->m_stOpStatus.iCmdIndex;
+    }
+
+    if (pOp->m_stOpStatus.stCycle.stPassChart.bClear)
+    {
+        pOp->m_stOpStatus.stCycle.stPassChart.bClear = FALSE;
+    }
+    else
+    {
+        if (pOp->m_stOpStatus.stCycle.stPassChart.bSet)
+        {
+            pOp->m_stOpStatus.stCycle.stPassChart.bSet = FALSE;
+        }
+        else
+        {
+            if (pOp->m_stOpStatus.stCycle.stPassChart.bRealTimeIn)
+            {
+                pOp->m_stOpStatus.stCycle.stPassChart.bRealTimeIn = FALSE;
+            }
+        }
+    }
+
+
+    if (pOp->m_stOpStatus.enErrAll.errOp != op_error )
+    {
+        op_error = pOp->m_stOpStatus.enErrAll.errOp;
+        edm->EdmYellowLump( !(pOp->m_stOpStatus.enErrAll.errOp==OP_NO_ERR));
+    }
+
+//    m_dlgOpStatus.SetOpStatusPara(pOp->m_stOpStatus.iCmdIndex
+//                                  ,pOp->m_stOpStatus.stCycle.iCycleIndex
+//                                  ,pOp->m_stOpStatus.stCycle.iTimeSec
+//                                  ,pOp->m_stOpStatus.stCycle.iOpPage);//旋转轴
+
+    if (pOp->m_stOpStatus.bCheck_C_Over)
+    {
+        pOp->m_stOpStatus.bCheck_C_Over = FALSE;
+    }
+
+    if (bOver != edmOpList->m_bOver)
+    {
+        bOver = edmOpList->m_bOver;
+        if (bOver)
+        {
+            iCmdIndex = -1;
+        }
+    }
 }
 
 void MainWindow::edmSendComand()
@@ -290,7 +547,7 @@ void MainWindow::edmSendComand()
     cmdDefault.enAim = AIM_G91;
     cmdDefault.enOrbit = ORBIT_G00;
     cmdDefault.enCoor = edm->m_stEdmShowData.enCoorType;
-    cmdDefault.iFreq = speed;
+    cmdDefault.iFreq = speed*100/6;
     pCmdHandle = new CmdHandle(FALSE,cmdstr,&stDigitCmd,&cmdDefault);
     delete pCmdHandle;
     stDigitCmd.stOp.bShortDis = TRUE;

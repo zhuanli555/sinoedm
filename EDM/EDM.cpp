@@ -11,7 +11,7 @@
 #define INTERFACE_HANDWHEEL_IN_SECOND 0x1D2   //手轮所在接口，脉冲,0x312
 
 EDM* EDM::m_pEdm = NULL;
-QString EDM::m_strElecDefault="P0";
+QString EDM::m_strElecDefault="DEFAULT";
 
 EDM::EDM(QObject *parent):QObject(parent)
 {
@@ -311,7 +311,6 @@ void EDM::EdmStopSignClose()
 	m_stStatus.bStop = FALSE;
 }
 
-
 bool EDM::EdmRtZero(int iLabel)
 {
 	short dwStatus;
@@ -362,32 +361,35 @@ int EDM::EdmHandProcess()
 	return  HandBoxProcess();
 }
 
-
-//输入：iLabel：轴标志号 0:X轴；1:Y轴；2:C轴；3:A轴；4:S轴；5:W轴；6:B轴；7:Z轴；
+//TODO
+//输入：iLabel：轴标志号 0:X轴；1:Y轴；2:C轴；3:W轴；4:A轴；5:B轴；
 int EDM::HandBoxProcess()
 {
 	DIGIT_CMD stDigitCmd;
 	static int iSpeedFreq[3]={MAC_INT_FREQ,2000,166};
-	static unsigned char btOut[3] = {0x1B,0x1D,0x1E};
-	static int iLabel_F[4] ={0,1,7,4};
-	static int iLabel_S[3] ={3,5,2};
+    static unsigned char btOut[3] = {0xFB,0xFD,0xFE};
+    static int iLabel_xyz[4] ={0,1,6};
+    static int iLabel_wc[3] ={3,2};
+    static int iLabel_ab[2] = {4,5};
 	static int iIndex = 0;
 	static int iAdd[3] = {2000,387,5};
 	static int iSpeedSum =0;
 	static bool bStop= false;
 	static bool bHas = false;
 	unsigned char btComp = 0x01;
-	short dwStatus=0;
+	int dwStatus=0;
 	unsigned char btTmp;
 	unsigned char btTmp1;
     unsigned char btTmp2;
+    unsigned char btTmp3;
 	bool bDirMove = false;
 
 	stDigitCmd.iAxisCnt=0;
-	btTmp1 = m_stEdmInterfaceIn.btI1C8&0x3F;
-	btTmp2 = m_stEdmInterfaceIn.btI1C4;
+    btTmp1 = m_stEdmInterfaceIn.btI148&0x3C;
+    btTmp2 = m_stEdmInterfaceIn.btI144&0x3F;
+    btTmp3 = m_stEdmInterfaceIn.btI1C4&0x0F;
 
-	if (btTmp2<255 ||  btTmp1<63)
+    if (btTmp2<63 ||  btTmp1<60 || btTmp3<15)
 	{
 		bHas = true;
 		bStop= true;
@@ -397,9 +399,9 @@ int EDM::HandBoxProcess()
 		stDigitCmd.iFreq = iSpeedFreq[iIndex];
 		stDigitCmd.iAxisCnt = 1;
 
-		if (btTmp2<255)
+        if (btTmp2<63)//xyz
 		{			 
-			for (;dwStatus<8;dwStatus++)
+            for (;dwStatus<6;dwStatus++)
 			{
 				btTmp = btTmp2&btComp;
 				if (btTmp == 0)
@@ -410,13 +412,14 @@ int EDM::HandBoxProcess()
 			}
 			if (dwStatus%2==0)
 				bDirMove = true;
-			stDigitCmd.stAxisDigit[0].iLabel = iLabel_F[dwStatus/2];
+            stDigitCmd.stAxisDigit[0].iLabel = iLabel_xyz[dwStatus/2];
 		}
-		else
+        else if(btTmp1<60)//wc
 		{
-			for (;dwStatus<6;dwStatus++)
+            btComp = 0x04;
+            for (dwStatus = 0;dwStatus<4;dwStatus++)
 			{
-				btTmp = m_stEdmInterfaceIn.btI1C8&btComp;
+                btTmp = btTmp1&btComp;
 				if (btTmp == 0)
 				{
 					break;
@@ -425,8 +428,23 @@ int EDM::HandBoxProcess()
 			}
 			if (dwStatus%2==0)
 				bDirMove = true;
-			stDigitCmd.stAxisDigit[0].iLabel = iLabel_S[dwStatus/2];
+            stDigitCmd.stAxisDigit[0].iLabel = iLabel_wc[dwStatus/2];
 		}
+        else {
+            btComp = 0x01;
+            for (dwStatus = 0;dwStatus<4;dwStatus++)
+            {
+                btTmp = btTmp3&btComp;
+                if (btTmp == 0)
+                {
+                    break;
+                }
+                btComp =btComp<<1;
+            }
+            if (dwStatus%2==0)
+                bDirMove = true;
+            stDigitCmd.stAxisDigit[0].iLabel = iLabel_ab[dwStatus/2];
+        }
 	}
 	else
 		bHas = false;
@@ -436,15 +454,15 @@ int EDM::HandBoxProcess()
 		EdmStopMove(FALSE);
 		bStop = FALSE;			
 	}
-
-	btTmp = m_stEdmInterfaceIn.btI1C8&0x40;
+//获取速度
+    btTmp = m_stEdmInterfaceIn.btI148&0x40;
 	if (btTmp==0 && ++iSpeedSum>6)
 	{
 		iSpeedSum = 0;
 		if (++iIndex>=3)
 			iIndex=0;
-		m_stEdmInterfaceOut.btO1C4 |=0x07;
-		m_stEdmInterfaceOut.btO1C4 &=btOut[iIndex];
+        m_stEdmInterfaceOut.btO144 |=0x07;
+        m_stEdmInterfaceOut.btO144 &=btOut[iIndex];
 		::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	}
 
@@ -600,8 +618,9 @@ void EDM::EdmReadMacPara()
 	m_pEdmAdoSys->GetEdmCommPara(&m_stEdmComm,m_iWorkIndex);
 	m_pEdmAdoSys->GetAllCoor(m_iCoor);
 	m_pEdmAdoSys->GetEdmKpIntPara(&m_stEdmKpInt,&m_stSysSet);
-    //m_pEdmAdoSys->GetPrunePara(&m_stMacOther);
+    m_pEdmAdoSys->GetPrunePara(&m_stMacOther);
 	m_pEdmAdoSys->GetOpName(m_strOpName);
+    m_pEdmAdoSys->GetElecMan(&mp_ElecMan);
 	m_pEdmAdoSys->GetMacSystemPara(&m_stEdmKpInt,&m_stSysSet);
 	for (int i=0;i<MAC_LABEL_COUNT;i++)
 	{

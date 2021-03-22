@@ -29,6 +29,7 @@ public:
     void reSort();
     void EdmStatusSignChange();
     static AlarmSignal* getInstance();
+    void edmHandProcess();
 public:
     EDM_SHOW_STATUS m_stEntileStatus;
 private:
@@ -42,6 +43,7 @@ private:
     QLabel* speedValue;
     QLabel* lowPumpValue;
     QLabel* fixElecValue;
+    QLabel* findCenter;
     QLabel* pauseValue;
     QList<QLabel*> alarmList;
     bool bPause;

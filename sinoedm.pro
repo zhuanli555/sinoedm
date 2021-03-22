@@ -29,7 +29,6 @@ SOURCES += \
         mainwindow.cpp \
     process.cpp \
     program.cpp \
-    setting.cpp \
     EDM/common.cpp\
     EDM/EDM.cpp \
     EDM/EDM_Db.cpp \
@@ -43,13 +42,13 @@ SOURCES += \
     EDM/EDM_OP_File.cpp \
     EDM/EDM_OP_HOLE.cpp \
     EDM/EDM_OP_List.cpp \
-    EDM/electool.cpp
+    EDM/electool.cpp \
+    settingdialog.cpp
 
 HEADERS += \
         mainwindow.h \
     process.h \
     program.h \
-    setting.h \
     EDM/common.h \
     EDM/EDM.h \
     EDM/EDM_Db.h \
@@ -64,7 +63,8 @@ HEADERS += \
     EDM/EDM_OP_File.h \
     EDM/EDM_OP_HOLE.h \
     EDM/EDM_OP_List.h \
-    EDM/electool.h
+    EDM/electool.h \
+    settingdialog.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -73,4 +73,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES +=
 
-FORMS +=
+FORMS += \
+    settingdialog.ui
