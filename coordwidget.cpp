@@ -98,7 +98,7 @@ void CoordWidget::setLabels()
     //setStyleSheet("QLabel{background-color:yellow}");
     QString xstyle = "font-size:40px;";
     QString wstyle = "font-size:28px;";
-    //bShow->setStyleSheet("border-image:url(zx.png);")
+    //bShow->setStyleSheet("border-image:url(icon/zx.png);")
     xLabel->setStyleSheet(xstyle);
     yLabel->setStyleSheet(xstyle);
     cLabel->setStyleSheet(xstyle);
@@ -318,7 +318,7 @@ void CoordWidget::ShowMacUserStatus()
             bPosLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit;
             if(bPosLimit[i])
             {
-                shows[i]->setStyleSheet("border-image:url(zx.png);");
+                shows[i]->setStyleSheet("border-image:url(icon/zx.png);");
             }else{
 
                 shows[i]->setStyleSheet("");
@@ -330,7 +330,7 @@ void CoordWidget::ShowMacUserStatus()
             bNegLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bNegLimit;
             if(bNegLimit[i])
             {
-                shows[i]->setStyleSheet("border-image:url(fx.png);");
+                shows[i]->setStyleSheet("border-image:url(icon/fx.png);");
             }else{
 
                 shows[i]->setStyleSheet("");
@@ -345,9 +345,9 @@ void CoordWidget::ShowMacUserStatus()
             {
                 if(i==3)//wÖáÇø±ð¶Ô´ý
                 {
-                    labels[i]->setStyleSheet("font-size:28px;border-image:url(bj.png);");
+                    labels[i]->setStyleSheet("font-size:28px;border-image:url(icon/bj.png);");
                 }else{
-                    labels[i]->setStyleSheet("font-size:40px;border-image:url(bj.png);");
+                    labels[i]->setStyleSheet("font-size:40px;border-image:url(icon/bj.png);");
                 }
 
             }else{
