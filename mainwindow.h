@@ -10,6 +10,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QTabWidget>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QThread>
@@ -20,7 +21,6 @@
 #include "EDM/cmdhandle.h"
 #include "coordwidget.h"
 #include "alarmsignal.h"
-#include "process.h"
 #include "program.h"
 #include "settingdialog.h"
 #include "unionzero.h"
@@ -104,6 +104,7 @@ private:
     //debug
     QTableWidget* tv1;
     bool bPrint;
+    QTabWidget* tab;
     //bottom
     QLabel* commandLabel;
     QLineEdit* commandLine;
@@ -113,6 +114,8 @@ private:
 protected:
     void keyPressEvent(QKeyEvent *e) override;
     void timeUpdate();
+signals:
+    void coordWidgetChanged();
 protected slots:
 
     void renderToProcess();

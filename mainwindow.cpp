@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     rightLayout->addWidget(alarmSignal,0,1,6,1);
     rightLayout->setSizeConstraint(QLayout::SetFixedSize);
     //tab
-    QTabWidget* tab = new QTabWidget;
+    tab = new QTabWidget;
     tab->addTab(createCommandTab(),QString::fromLocal8Bit("发送命令"));
     tab->addTab(createProcessTab(),QString::fromLocal8Bit("加工页面"));
     //main
@@ -63,6 +63,8 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     widget->setLayout(mainLayout);
     createActions();
     createMenus();
+    //多线程中不能操作gui，使用信号槽机制
+    connect(this,&MainWindow::coordWidgetChanged,coordWidget,&CoordWidget::HandleEdmCycleData);
     //设置多线程信号
     macUserHandle = QtConcurrent::run(this,&MainWindow::MacUserOperate);
     macProcessHandle = QtConcurrent::run(this,&MainWindow::MacProcessOperate);
@@ -95,7 +97,12 @@ void MainWindow::MacUserOperate()
         if(edm)
         {
             mutex.lock();
-            coordWidget->HandleEdmCycleData();//机床命令周期性处理
+            edm->GetEdmComm();
+            edm->GetEdmStatusData();
+            emit coordWidgetChanged();//机床命令周期性处理
+            edm->EdmAxisAdjust();
+            edm->EdmAxisAdjustCircle();
+
             alarmSignal->EdmStatusSignChange();//机床信号周期性处理
             alarmSignal->edmHandProcess();//处理手盒
             mutex.unlock();
@@ -282,7 +289,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 //模拟加工
 void MainWindow::renderToProcess()
 {
-
+    tab->setCurrentIndex(1);
     edmOpList->DeleteEdmOp();
     edmOpList->SetEdmOpType(OP_HOLE_SIMULATE);
     edmOpList->ResetEdmOpFile();
