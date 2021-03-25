@@ -86,6 +86,7 @@ unsigned char EDM_OP_List::SetEdmOpFile(QString sPath,QString sFile)
 		}
 		m_sPath = sPath;
 		m_sFile = sFile;
+
 		m_pEdmOp->SetEdmOpFile(sPath,sFile);
 		return TRUE;
 	}
@@ -110,6 +111,14 @@ void EDM_OP_List::SetStart(bool bStart)
 	{
 		m_pEdmOp->EdmOpSetStart(bStart);
 	}
+}
+
+void EDM_OP_List::CarryOnBefore(MAC_OPERATE_TYPE enType)
+{
+	DeleteEdmOp();
+	SetEdmOpType(enType);
+	ResetEdmOpFile();
+	SetStart(FALSE);	
 }
 
 void EDM_OP_List::CarryOn()
@@ -168,23 +177,20 @@ void EDM_OP_List::CarryOn()
 }
 
 
-unsigned char EDM_OP_List::GetOpFileInfo(QString* pStringFile,MAP_ELEC_MAN* pElec,vector<QString>* pCmd,vector<QString>* pCmdAbs)
+unsigned char EDM_OP_List::GetOpFileInfo(QString& stringFile,MAP_ELEC_MAN* pElec,vector<QString>& pCmd,vector<QString>& pCmdAbs)
 {
-	MAP_ELEC_MAN elecMap;
 	map<QString,MAC_ELEC_PARA>::iterator it = pElec->begin();
 	vector<QString>::iterator itVect;
 	QString str;
 	MAC_ELEC_PARA elec;
 	int i=0;
 
-	pCmd->clear();
-	pCmdAbs->clear();
+    pCmd.clear();
+    pCmdAbs.clear();
 
 	it = pElec->begin();
 	while(it!=pElec->end())
 		pElec->erase(it++);
-
-	*pStringFile = "";
 
 	if ( !m_pEdmOp->m_pOpFile || !m_pEdmOp)
 	{
@@ -196,7 +202,7 @@ unsigned char EDM_OP_List::GetOpFileInfo(QString* pStringFile,MAP_ELEC_MAN* pEle
 		return FALSE;
 	}
 
-	*pStringFile = m_pEdmOp->m_pOpFile->m_sFile;
+    stringFile = m_pEdmOp->m_pOpFile->m_sFile;
 
 	it = m_pEdmOp->m_pOpFile->m_mpElecMan.begin();
 	while (it != m_pEdmOp->m_pOpFile->m_mpElecMan.end())
@@ -211,7 +217,7 @@ unsigned char EDM_OP_List::GetOpFileInfo(QString* pStringFile,MAP_ELEC_MAN* pEle
 	i=0;
 	while (itVect != m_pEdmOp->m_pOpFile->m_vCmdStd.end())
 	{
-		pCmd->push_back(m_pEdmOp->m_pOpFile->m_vCmdStd[i]);
+        pCmd.push_back(m_pEdmOp->m_pOpFile->m_vCmdStd[i]);
 		itVect++;
 		i++;
 	}
@@ -220,17 +226,12 @@ unsigned char EDM_OP_List::GetOpFileInfo(QString* pStringFile,MAP_ELEC_MAN* pEle
 	i=0;
 	while (itVect != m_pEdmOp->m_pOpFile->m_vCmd.end())
 	{
-		pCmdAbs->push_back(m_pEdmOp->m_pOpFile->m_vCmd[i]);
+        pCmdAbs.push_back(m_pEdmOp->m_pOpFile->m_vCmd[i]);
 		itVect++;
 		i++;
 	}
 
 	return TRUE;
-}
-
-void EDM_OP_List::GetOpStatus(OP_STATUS* pStatus)
-{
-	return;
 }
 
 void EDM_OP_List::EdmOpListOver()
@@ -242,4 +243,12 @@ void EDM_OP_List::EdmOpListOver()
 	DeleteEdmOp();
 	SetEdmOpType(OP_TYPE_NONE);
 	m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);
+}
+
+void EDM_OP_List::SetEdmOpElec(QString str,MAC_ELEC_PARA elec)
+{
+    if(m_pEdmOp)
+    {
+        m_pEdmOp->SetEdmOpElec(str,elec);
+    }
 }

@@ -70,6 +70,7 @@ unsigned long EDM::EdmInit()
     m_stEdmInterfaceOut.btO1C0 = 0xFF;
     m_stEdmInterfaceOut.btO1C4 = 0xFF;
 
+    EdmReadMacPara();
 	fd = ::open("/dev/short",O_RDWR);
     if(fd < 0)
     {
@@ -78,7 +79,6 @@ unsigned long EDM::EdmInit()
         return 0;
     }
     ::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
-    EdmReadMacPara();
     dwStatus = ioctl(fd,IOC_COMM_INIT,&m_stEdmComm);
 	if (dwStatus ==1)
     {
@@ -797,6 +797,13 @@ void EDM::GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan)
     {
         memcpy(pElecMan,&mp_ElecMan[str],sizeof(MAC_ELEC_PARA));
     }
+}
+
+void EDM::SaveElecElem(QString str,MAC_ELEC_PARA* pElec)
+{
+    MAC_ELEC_PARA stElec;
+    memcpy(&stElec,pElec,sizeof(MAC_ELEC_PARA));
+    m_pEdmAdoSys->SaveElecMan(str,&stElec);
 }
 
 bool EDM::SaveMacPara(MAC_SYSTEM_SET* pSysSet)

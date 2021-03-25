@@ -32,8 +32,8 @@ unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 	m_iCmdNum = 0;
 	m_enOpFileErr = OP_FILE_NO_ERR;
 
-    if (CmdHandle::ReadCmdFromFile(sPath,sFile,&m_vCmdStd,&m_mpElecMan))
-	{
+    if (CmdHandle::ReadCmdFromFile(sPath,sFile,m_vCmdStd,&m_mpElecMan))
+    {
 		it=m_vCmdStd.begin();
 		if (it==m_vCmdStd.end())
 		{
@@ -56,8 +56,7 @@ unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 		SetEdmElecIndex(iHoleIndexBak);
 
 		m_sFile = sFile;
-		m_sPath = sPath;
-
+        m_sPath = sPath;
 		return TRUE;
 	}
 	else

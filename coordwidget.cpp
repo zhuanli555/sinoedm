@@ -136,7 +136,6 @@ void CoordWidget::setLabels()
 {
     QSettings* setting = new QSettings("./db/edmsystem.ini",QSettings::IniFormat);
     setting->beginGroup("systemSet");
-
     int xLabelFlag,yLabelFlag,aLabelFlag,bLabelFlag=1;
     xLabelFlag = setting->value("xLabelFlag").toInt();
     yLabelFlag = setting->value("yLabelFlag").toInt();
@@ -330,7 +329,7 @@ void CoordWidget::ShowMacUserStatus()
     static unsigned long bAlarm[MAC_LABEL_COUNT] = {0};
     for (int i=0;i<MAC_LABEL_COUNT;i++)
     {
-        if(!m_labels[i])continue;
+        if(!m_labels[i] || i == 6)continue;//zÖáÃ»ÓÐ¸æ¾¯
         if (edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit != bPosLimit[i])
         {
             bPosLimit[i] = edm->m_stEdmShowData.stHardCtl.stHardCtlUser[i].bPosLimit;

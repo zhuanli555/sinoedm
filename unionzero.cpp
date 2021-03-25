@@ -66,6 +66,7 @@ UnionZero::UnionZero(int key, QWidget *parent) : QDialog(parent)
     {
         mainLayout->addWidget(button, 3, 0, 1, 3);
     }
+    connect(this,&UnionZero::edmMoveParaSendSig,edm,&EDM::EdmSendMovePara);
 }
 
 UnionZero::~UnionZero()
@@ -84,7 +85,7 @@ void UnionZero::axisWorkZero(int label)
     stDigitCmd.iAxisCnt++;
     stDigitCmd.stAxisDigit[0].iDistance = 0;
     stDigitCmd.stAxisDigit[0].iLabel = label;
-    edm->EdmSendMovePara(&stDigitCmd);
+    emit edmMoveParaSendSig(&stDigitCmd);
 }
 
 void UnionZero::chooseAll()
@@ -148,7 +149,7 @@ void UnionZero::accept()
 
         pCmdHandle = new CmdHandle(FALSE,cmd,&stDigitCmd,&cmdDefault);
         delete pCmdHandle;
-        edm->EdmSendMovePara(&stDigitCmd);
+        emit edmMoveParaSendSig(&stDigitCmd);
     }
     return QDialog::accept();
 }

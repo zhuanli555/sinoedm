@@ -16,13 +16,12 @@ public:
 	void SetEdmOpType(MAC_OPERATE_TYPE enType);
 	unsigned char SetEdmOpFile(QString sPath,QString sFile);
 	void SetStart(bool bStart);
+	void CarryOnBefore(MAC_OPERATE_TYPE enType);
 	void CarryOn();
 	void StageRestart();
 	void EdmOpListOver();
 
-	unsigned char GetOpFileInfo(QString* sFile,MAP_ELEC_MAN* pElec,vector<QString>* pCmd,vector<QString>* pCmdAbs);
-	void GetOpStatus(OP_STATUS* pStatus);
-
+    unsigned char GetOpFileInfo(QString& sFile,MAP_ELEC_MAN* pElec,vector<QString>& pCmd,vector<QString>& pCmdAbs);
 	void DeleteEdmOp();
 public:
 	unsigned char m_bChange;
@@ -34,6 +33,8 @@ private:
 	
 	QString m_sPath;
 	QString m_sFile;
+public slots:
+    void SetEdmOpElec(QString str,MAC_ELEC_PARA elec);
 };
 
 

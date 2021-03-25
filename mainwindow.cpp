@@ -72,7 +72,12 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
     t->start(1000);
-
+    connect(this,&MainWindow::edmOPSig,edmOpList,&EDM_OP_List::CarryOnBefore);
+    connect(this,&MainWindow::edmCloseSig,edm,&EDM::CloseHardWare);
+    connect(this,&MainWindow::edmMoveParaSendSig,edm,&EDM::EdmSendMovePara);
+    connect(this,&MainWindow::edmWriteElecSig,edm,&EDM::WriteElecPara);
+    connect(this,&MainWindow::edmOpFileSig,edmOpList,&EDM_OP_List::SetEdmOpFile);
+    connect(this,&MainWindow::edmOpElecSig,edmOpList,&EDM_OP_List::SetEdmOpElec);
 }
 
 MainWindow::~MainWindow()
@@ -140,9 +145,8 @@ unsigned char MainWindow::EDMMacInit()
     edmOpList = EDM_OP_List::GetEdmOpListPtr();
     edmOp = edmOpList->m_pEdmOp;
 
-    QString strPath = QDir::currentPath()+"/processFile";
-    QString strOpName="DEFAULT";
-    edmOpList->SetEdmOpFile(strPath,strOpName);
+    m_strElecName="DEFAULT";
+    edmOpList->SetEdmOpFile(path,m_strElecName);
     //从数据库载入
     m_iOpenTime = m_stSysSet.stSetNoneLabel.iTime;
     m_iOpenTimeOp = m_stSysSet.stSetNoneLabel.iTimeOp;
@@ -252,9 +256,294 @@ QWidget* MainWindow::createCommandTab()
 QWidget* MainWindow::createProcessTab()
 {
     QWidget* widget = new QWidget();
-
+    elecPageTable = new QTableWidget;
+    elecPageTable->setColumnCount(10);elecPageTable->setRowCount(6);
+    elecOralTable = new QTableWidget;
+    elecOralTable->setColumnCount(14);elecOralTable->setRowCount(1);
+    int row,col=0;
+    elecPageTable->setHorizontalHeaderItem(0,new QTableWidgetItem(QString::fromLocal8Bit("加工深度")));
+    elecPageTable->setHorizontalHeaderItem(1,new QTableWidgetItem(QString::fromLocal8Bit("脉冲宽度")));
+    elecPageTable->setHorizontalHeaderItem(2,new QTableWidgetItem(QString::fromLocal8Bit("脉冲停息")));
+    elecPageTable->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("加工电流")));
+    elecPageTable->setHorizontalHeaderItem(4,new QTableWidgetItem(QString::fromLocal8Bit("高压电流")));
+    elecPageTable->setHorizontalHeaderItem(5,new QTableWidgetItem(QString::fromLocal8Bit("加工电容")));
+    elecPageTable->setHorizontalHeaderItem(6,new QTableWidgetItem(QString::fromLocal8Bit("伺服给定")));
+    elecPageTable->setHorizontalHeaderItem(7,new QTableWidgetItem(QString::fromLocal8Bit("进给灵敏")));
+    elecPageTable->setHorizontalHeaderItem(8,new QTableWidgetItem(QString::fromLocal8Bit("回退灵敏")));
+    elecPageTable->setHorizontalHeaderItem(9,new QTableWidgetItem(QString::fromLocal8Bit("R轴速度")));
+    QStringList list;
+    list<<QString::fromLocal8Bit("修电极")<<QString::fromLocal8Bit("加工页1")\
+       <<QString::fromLocal8Bit("加工页2")<<QString::fromLocal8Bit("加工页3")\
+      <<QString::fromLocal8Bit("加工页4")<<QString::fromLocal8Bit("加工页5");
+    elecPageTable->setVerticalHeaderLabels(list);
+    for(row =0;row<OP_HOLE_PAGE_MAX;row++)
+    {
+        for(col=0;col<10;col++)
+        {
+            elecPageTable->setItem(row,col,new QTableWidgetItem("0"));
+        }
+    }
+    list.clear();
+    list<<QString::fromLocal8Bit("加工行号")<<QString::fromLocal8Bit("总行数")\
+       <<QString::fromLocal8Bit("回升位置")<<QString::fromLocal8Bit("安全位置")\
+      <<QString::fromLocal8Bit("旋转有效")<<QString::fromLocal8Bit("连续加工")\
+     <<QString::fromLocal8Bit("总深度")<<QString::fromLocal8Bit("起判位置")\
+    <<QString::fromLocal8Bit("底部停歇")<<QString::fromLocal8Bit("重复次数")\
+    <<QString::fromLocal8Bit("重复长度")<<QString::fromLocal8Bit("铣削伺服")\
+    <<QString::fromLocal8Bit("最小时限")<<QString::fromLocal8Bit("最大时限");
+    elecOralTable->setHorizontalHeaderLabels(list);
+    for(col = 0;col<14;col++)
+    {
+        elecOralTable->setItem(0,col,new QTableWidgetItem("0"));
+    }
+    OpFileCopyAndSend();
+    QVBoxLayout* mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(elecPageTable);
+    mainLayout->addWidget(elecOralTable);
+    mainLayout->setStretchFactor(elecPageTable,3);
+    mainLayout->setStretchFactor(elecOralTable,1);
+    widget->setLayout(mainLayout);
+    connect(elecPageTable,&QTableWidget::itemChanged,this,&MainWindow::elecTableChanged);
+    connect(elecOralTable,&QTableWidget::itemChanged,this,&MainWindow::elecTableChanged);
     return widget;
 }
+
+void MainWindow::elecTableChanged()
+{
+    MAC_ELEC_PARA elec;
+    elecOralTable->blockSignals(true);
+    ReadParaFromTable(&elec);
+    if (!edmOpList->m_pEdmOp)
+    {
+        if (elec.iParaIndex >=0 && elec.iParaIndex < OP_HOLE_PAGE_MAX)
+        {
+            emit edmWriteElecSig(&elec.stElecPage[elec.iParaIndex],"");
+        }
+    }
+    emit edmOpElecSig(m_strElecName,elec);
+
+    elecOralTable->blockSignals(false);
+}
+
+void MainWindow::fillTableWidget(MAC_ELEC_PARA* pPara)
+{
+    int col,row;
+    QString str;
+    for (row=0;row<OP_HOLE_PAGE_MAX;row++)
+    {
+        col = 0;
+        str = QString("%1").arg(pPara->stElecPage[row].iOpLen);
+        elecPageTable->item(row,col)->setText(str);
+        str = QString("%1").arg(pPara->stElecPage[row].iTon);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1").arg(pPara->stElecPage[row].iToff);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1").arg(pPara->stElecPage[row].iElecLow);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1").arg(pPara->stElecPage[row].iElecHigh);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1").arg(((float)pPara->stElecPage[row].iCap)/100.0,8,'f',2);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1").arg(pPara->stElecPage[row].iServo);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1").arg(pPara->stElecPage[row].iFeedSense);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1").arg(pPara->stElecPage[row].iBackSense);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1").arg(pPara->stElecPage[row].iRotSpeed);
+        elecPageTable->item(row,++col)->setText(str);
+    }
+
+    row =0;
+    col = -1;
+    str = QString("%1").arg(pPara->stElecOral.iOpHoleIndex);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iOpHoleAll);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iRisePos);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iSafePos);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.bRotateValidate);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.bContinueOp);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iOpLenAll);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iJudgePos);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iBottomSleep);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iRepeatCount);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iRepeatLen);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iMillServo);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iTimeMin);
+    elecOralTable->item(row,++col)->setText(str);
+    str = QString("%1").arg(pPara->stElecOral.iTimeMax);
+    elecOralTable->item(row,++col)->setText(str);
+}
+
+void MainWindow::ReadParaFromTable(MAC_ELEC_PARA* pPara)
+{
+    int row=1;
+    int col=1;
+    QString str;
+    int iIndex;
+    pPara->iParaIndex = -100;
+    for (row=0;row<OP_HOLE_PAGE_MAX;row++)
+    {
+        col =0;
+        str = elecPageTable->item(row,col)->text();
+        if (str.contains('.'))
+            pPara->stElecPage[row].iOpLen = (int)(str.toFloat()*1000.0);
+        else
+            pPara->stElecPage[row].iOpLen = str.toInt();
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iTon = str.toInt();
+        pPara->stElecPage[row].iTon = GetElecTon(pPara->stElecPage[row].iTon,&iIndex);
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iToff = str.toInt();
+        pPara->stElecPage[row].iToff = GetElecToff(pPara->stElecPage[row].iToff,&iIndex);
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iElecLow = str.toInt();
+        pPara->stElecPage[row].iElecLow = GetElecCurLow(pPara->stElecPage[row].iElecLow,&iIndex);
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iElecHigh = str.toInt();
+        pPara->stElecPage[row].iElecHigh = GetElecCurHigh(pPara->stElecPage[row].iElecHigh,&iIndex);
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iCap = str.toFloat()*100.0;
+        pPara->stElecPage[row].iCap = GetElecCap(pPara->stElecPage[row].iCap,&iIndex);
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iServo = PercentStr2int(str);
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iFeedSense = PercentStr2int(str);
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iBackSense = PercentStr2int(str);
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iRotSpeed = str.toInt();
+    }
+
+
+    row =0;
+    col =-1;
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.iOpHoleIndex = str.toInt();
+    col++;
+    str = elecOralTable->item(row,++col)->text();
+    if (str.contains('.'))
+        pPara->stElecOral.iRisePos = (int)(str.toFloat()*1000.0);
+    else
+        pPara->stElecOral.iRisePos = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    if (str.contains('.'))
+        pPara->stElecOral.iSafePos = (int)(str.toFloat()*1000.0);
+    else
+        pPara->stElecOral.iSafePos = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.bRotateValidate = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.bContinueOp = str.toInt();
+    col++;
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.iJudgePos = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.iBottomSleep = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.iRepeatCount = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.iRepeatLen = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.iMillServo = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.iTimeMin = str.toInt();
+
+    str = elecOralTable->item(row,++col)->text();
+    pPara->stElecOral.iTimeMax = str.toInt();
+
+    LawOfPara(pPara);
+
+}
+
+float MainWindow::PercentStr2int(QString str)
+{
+    QString strTmp=str;
+    if(strTmp.contains('.'))
+    {
+        return strTmp.toFloat()*100;
+    }
+    int index = str.indexOf('%');
+    if(index>=0)
+    {
+        strTmp = str.left(index);
+
+    }
+    return strTmp.toFloat();
+}
+
+void MainWindow::LawOfPara(MAC_ELEC_PARA* pPara)
+{
+    for (int i=0;i<OP_HOLE_PAGE_MAX;i++)
+    {
+        LawInt(pPara->stElecPage[i].iOpLen,0,1000000);
+        LawInt(pPara->stElecPage[i].iServo,0,100);
+        LawInt(pPara->stElecPage[i].iFeedSense,0,100);
+        LawInt(pPara->stElecPage[i].iBackSense,0,1000000);
+        LawInt(pPara->stElecPage[i].iRotSpeed,1,8);
+    }
+
+    LawInt(pPara->stElecOral.iOpHoleIndex,1,pPara->stElecOral.iOpHoleAll);
+    if (pPara->stElecOral.iTimeMin<0)
+        pPara->stElecOral.iTimeMin = 0;
+    if (pPara->stElecOral.iTimeMax<0)
+        pPara->stElecOral.iTimeMax = 0;
+    if (pPara->stElecOral.iBottomSleep<0)
+        pPara->stElecOral.iBottomSleep = 0;
+    if (pPara->stElecOral.iRepeatCount<0)
+        pPara->stElecOral.iRepeatCount = 0;
+    if (pPara->stElecOral.iRepeatLen<0)
+        pPara->stElecOral.iRepeatLen = 0;
+    LawInt(pPara->stElecOral.iMillServo,1,1000);
+
+    pPara->stElecOral.iOpLenAll = 0;
+    for (int i=0;i<OP_HOLE_PAGE_MAX;i++)
+    {
+        pPara->stElecOral.iOpLenAll += pPara->stElecPage[i].iOpLen;
+    }
+}
+
+void MainWindow::LawInt(int& t,int low,int high)
+{
+    if (low >=high)
+        return;
+
+    if (t<low)
+        t=low;
+    else if (t>high)
+        t=high;
+}
+
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
@@ -271,6 +560,8 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         alarmSignal->edmProtect();break;
     case Qt::Key_F8:
         alarmSignal->edmPause();break;
+    case Qt::Key_F11:
+        showFileText();break;
     case Qt::Key_F12:
     {
         bPrint = !bPrint;
@@ -290,16 +581,8 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 void MainWindow::renderToProcess()
 {
     tab->setCurrentIndex(1);
-    edmOpList->DeleteEdmOp();
-    edmOpList->SetEdmOpType(OP_HOLE_SIMULATE);
-    edmOpList->ResetEdmOpFile();
-    edmOpList->SetStart(FALSE);
-    edm->CloseHardWare();
-}
-
-void MainWindow::refresh()
-{
-    this->show();
+    emit edmOPSig(OP_HOLE_SIMULATE);
+    emit edmCloseSig();
 }
 
 void MainWindow::renderToProgram()
@@ -313,11 +596,7 @@ void MainWindow::renderToSetting()
     setting = new SettingDialog();
     connect(setting,&SettingDialog::systemSetChanged,this,&MainWindow::systemSetChangeForCoord);
     int res = setting->exec();
-    if(res != QDialog::Accepted)
-    {
-        disconnect(setting,&SettingDialog::systemSetChanged,this,&MainWindow::systemSetChangeForCoord);
-        return;
-    }
+    if(res != QDialog::Accepted)return;
     delete setting;
 }
 
@@ -353,11 +632,7 @@ void MainWindow::renderToAxisSet()
     unionZero = new UnionZero(2);
     connect(unionZero,&UnionZero::setAxisSig,this,&MainWindow::setAxisValue);
     int res = unionZero->exec();
-    if(res != QDialog::Accepted)
-    {
-        disconnect(unionZero,&UnionZero::setAxisSig,this,&MainWindow::setAxisValue);
-        return;
-    }
+    if(res != QDialog::Accepted)return;
     delete unionZero;
 }
 
@@ -386,82 +661,12 @@ void MainWindow::showFileText()
         file.close();
     }
     //show
-    fileLabel->setText(QString::fromLocal8Bit("加工文件名(F10):")+m_strElecName);
+    fileLabel->setText(QString::fromLocal8Bit("加工文件名(F11):")+m_strElecName);
+    emit edmOpFileSig(path,m_strElecName);
     //重新渲染表格
-    //elecParaTable->showData(elecPageModel,elecOralModel,m_strElecName);
+    OpFileCopyAndSend();
 }
 
-
-//处理各个类型的加工
-//void MainWindow::HandleOpMsg()
-//{
-//    static string  strElec;
-//    static MAC_ELEC_PARA elec;
-//    QString strFileName;
-//    if (!edmOpList)
-//    {
-//        return;
-//    }
-
-//    switch(gMsg)
-//    {
-//    case MSG_OP:
-//        {
-//            edmOpList->DeleteEdmOp();
-//            edmOpList->SetEdmOpType(enType);
-//            edmOpList->ResetEdmOpFile();
-//            edmOpList->SetStart(FALSE);
-//            edm->CloseHardWare();
-//        }
-//        break;
-//    case MSG_PAUSE:
-//        {
-//            if (!edmOpList->m_pEdmOp)
-//                return;
-////            edmOpList->m_pEdmOp->SetPassPara(m_dlgPassChart.m_fElec
-////                                  ,m_fSpeed
-////                                  ,m_iSpeedFilterCnt
-////                                  ,m_iElecFilterCnt);//设置电参数和速度
-//            edmOpList->m_pEdmOp->EdmOpSetStart(FALSE);//设置停止
-
-//        }
-//        break;
-//    case MSG_FILE:
-//        {
-//        //获取filename
-//           edmOpList->SetEdmOpFile(path,m_strElecName);
-//        }
-//        break;
-//    case MSG_TEST:
-//        {
-//            if (!edmOpList->m_pEdmOp || !edm->m_stSysSet.stSetNoneLabel.bCycleMeasure)
-//                return;
-//            edmOpList->m_pEdmOp->EdmOpSetTest(TRUE);
-//            edmOpList->m_pEdmOp->EdmOpSetStart(TRUE);
-//        }
-//        break;
-//    case MSG_ELEC:
-//        {
-//        //获取电参数
-////            strElec = *(string*)(pMsg->wParam);
-////            memcpy(&elec,(MAC_ELEC_PARA*)(pMsg->lParam),sizeof(MAC_ELEC_PARA));
-////            if (!edmOpList->m_pEdmOp)
-////            {
-////                if (((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex >=0 && ((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex < OP_HOLE_PAGE_MAX)
-////                {
-////                    edm->WriteElecPara(&(((MAC_ELEC_PARA*)(pMsg->lParam))->stElecPage[((MAC_ELEC_PARA*)(pMsg->lParam))->iParaIndex]),"HandleOpMsg");
-////                }
-////            }
-////            else
-////            {
-////                edmOpList->m_pEdmOp->SetEdmOpElec(strElec,elec);
-////            }
-//        }
-//        break;
-//    default:
-//        break;
-//    }
-//}
 //处理加工状态
 void MainWindow::HandleEdmOpStatus()
 {
@@ -483,6 +688,7 @@ void MainWindow::HandleEdmOpStatus()
     {
         edmOp = pOp;
         edmOpList->m_bChange = FALSE;
+        OpFileCopyAndSend();
     }
 
     if (pOp->m_stOpStatus.stCycle.bPauseCmd)
@@ -541,6 +747,20 @@ void MainWindow::HandleEdmOpStatus()
     }
 }
 
+void MainWindow::OpFileCopyAndSend()
+{
+    static vector<QString> vCmd;
+    static vector<QString> vCmdAbs;
+    static QString strFileName;
+    static MAP_ELEC_MAN mpElec;
+
+    if (edmOpList && edmOpList->m_pEdmOp)
+    {
+        edmOpList->GetOpFileInfo(strFileName,&mpElec,vCmd,vCmdAbs);
+        fillTableWidget(&mpElec[strFileName]);
+    }
+}
+
 void MainWindow::edmSendComand()
 {
     static DIGIT_CMD stDigitCmd;
@@ -559,7 +779,7 @@ void MainWindow::edmSendComand()
     delete pCmdHandle;
     stDigitCmd.stOp.bShortDis = TRUE;
     stDigitCmd.bNoCheck = TRUE;
-    edm->EdmSendMovePara(&stDigitCmd);
+    emit edmMoveParaSendSig(&stDigitCmd);
 }
 
 void MainWindow::Char2QStringInBinary(unsigned char btVal,QString &str)

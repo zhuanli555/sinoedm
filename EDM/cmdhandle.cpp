@@ -867,6 +867,7 @@ QString CmdHandle::GetElecPageParaFromQString(QString strCmd,Elec_Page* pElecPag
 
     QString strTmp = strCmd.trimmed();
     QStringList list = strTmp.split(' ');
+
     foreach (const QString &str, list) {
         iPara[i++] = str.trimmed().toInt();
     }
@@ -890,59 +891,43 @@ QString CmdHandle::GetElecOralParaFromQString(QString strCmd,Elec_Oral* pElecOra
 }
 
 
-unsigned char CmdHandle::ReadCmdFromFile(QString strPath,QString strFile,vector<QString>* pVector,MAP_ELEC_MAN* pMap)
+unsigned char CmdHandle::ReadCmdFromFile(QString strPath,QString strFile,vector<QString>& pVector,MAP_ELEC_MAN* pMap)
 {
     QString	  strFullName =  strPath + "/" + strFile;
     QFile inFile(strFullName);
-    unsigned char bHeadRv = FALSE;
-    unsigned char bHeadStart = FALSE;
     QString str;
-    QString strName;
-    MAC_ELEC_PARA stElec;
+    MAC_ELEC_PARA stElec = {0};
     map<QString,MAC_ELEC_PARA>::iterator it=pMap->begin();
 
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
               return FALSE;
 
-    pVector->clear();
+    pVector.clear();
     while(it!=pMap->end())
         pMap->erase(it++);
     QTextStream in(&inFile);
     while(!in.atEnd())
     {
         str = in.readLine();
-        str = str.trimmed().toUpper();
-        if (str=="HEADSTART")
-		{
-			bHeadStart = TRUE;
-			continue;
-		}		
-		if (str=="HEADOVER")
-		{
-			bHeadRv = TRUE;
-			continue;
-		}
-
-		if (bHeadRv)
-		{
-			if (str!="")
-			{
-				pVector->push_back(str);
-			}			
-		}	
+        if (!str.isEmpty())
+        {
+            str = str.trimmed().toUpper();
+            pVector.push_back(str);
+        }
     }
-    if (!bHeadStart && !bHeadRv)
+    EDM* pEdm = EDM::GetEdmInstance();
+    str=EDM::m_strElecDefault;
+    if(!pEdm->FindElecManElem(strFile))
     {
-        EDM* pEdm = EDM::GetEdmInstance();
-        str=EDM::m_strElecDefault;
         pEdm->GetElecManElem(str,&stElec);
-        pMap->insert(make_pair(str,stElec));
+    }else{
+        pEdm->GetElecManElem(strFile,&stElec);
     }
 
-
+    pMap->insert(make_pair(strFile,stElec));
     inFile.close();
 
-    return TRUE;
+    return 1;
 }
 
 void CmdHandle::LawInt(int& t,int low,int high)

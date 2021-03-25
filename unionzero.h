@@ -42,6 +42,7 @@ private:
 signals:
     void rtZeroSig(int label);
     void setAxisSig(int label,QString str);
+    void edmMoveParaSendSig(DIGIT_CMD*);
 protected slots:
 
     void chooseAll();

@@ -206,6 +206,7 @@ void EDM_Db::GetElecMan(MAP_ELEC_MAN* pElecMan)
         CmdHandle::GetElecPageParaFromQString(q.value(6).toString(),&(stMacElecPara.stElecPage[4]));
         CmdHandle::GetElecPageParaFromQString(q.value(7).toString(),&(stMacElecPara.stElecPage[5]));
         CmdHandle::GetElecOralParaFromQString(q.value(8).toString(),&(stMacElecPara.stElecOral));
+
         pElecMan->insert(pair<QString,MAC_ELEC_PARA>(strTmp,stMacElecPara));
     }
 }

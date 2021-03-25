@@ -30,15 +30,13 @@ EDM_OP::EDM_OP()
 
 EDM_OP::~EDM_OP()
 {
-	m_pEdm = NULL;
 	if (m_pOpFile)
 	{
 		if (m_enOpType!=OP_TYPE_NONE)
 		{
-			m_pOpFile->SaveElec2Db();
+            m_pEdm->SaveElecElem(m_pOpFile->m_sFile,&m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile]);
 		}
-		delete m_pOpFile;
-		m_pOpFile = NULL;
+        delete m_pOpFile;
 	}
 }
 

@@ -24,16 +24,7 @@
 #include "program.h"
 #include "settingdialog.h"
 #include "unionzero.h"
-struct testName
-{
-    int a;
-    int b;
-    int c;
-};
-union FILE_READBUFFER{
-    struct testName m_param;
-    char header_pt[sizeof(m_param)];
-};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -57,6 +48,13 @@ private:
     void Char2QStringInBinary(unsigned char btVal,QString &str);
     void setAxisValue(int label,QString str);
     void systemSetChangeForCoord();
+    void OpFileCopyAndSend();
+    void fillTableWidget(MAC_ELEC_PARA* pPara);
+    void ReadParaFromTable(MAC_ELEC_PARA* pPara);
+    float PercentStr2int(QString str);
+    void LawOfPara(MAC_ELEC_PARA* pPara);
+    void LawInt(int& t,int low,int high);
+
 private:
     EDM* edm;
     MAC_SYSTEM_SET mSysSet;
@@ -64,7 +62,7 @@ private:
     EDM_OP_List* edmOpList;
     EDM_OP* edmOp;
     MAC_SYSTEM_SET m_stSysSet;
-    QString m_strOpName;
+    MAP_ELEC_MAN m_mpElecMan;       //电参数管理;
     int  m_iOpenTime;
     int m_iOpenTimeOp;
     MAC_INTERFACE_IN mIn;
@@ -109,13 +107,20 @@ private:
     QLabel* commandLabel;
     QLineEdit* commandLine;
     QComboBox* speedValue;
-
+    QTableWidget* elecPageTable;
+    QTableWidget* elecOralTable;
     bool m_quit = false;
 protected:
     void keyPressEvent(QKeyEvent *e) override;
     void timeUpdate();
 signals:
     void coordWidgetChanged();
+    void edmOPSig(MAC_OPERATE_TYPE);
+    void edmCloseSig();
+    void edmMoveParaSendSig(DIGIT_CMD*);
+    void edmOpFileSig(QString,QString);
+    void edmOpElecSig(QString,MAC_ELEC_PARA);
+    void edmWriteElecSig(Elec_Page*,QString);
 protected slots:
 
     void renderToProcess();
@@ -126,8 +131,8 @@ protected slots:
     void renderToAxisSet();
     void edmStop();
     void edmSendComand();
+    void elecTableChanged();
     void printInterface();
-    void refresh();
 };
 
 #endif // MAINWINDOW_H

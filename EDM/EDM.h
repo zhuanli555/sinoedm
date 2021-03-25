@@ -205,6 +205,7 @@ public:
     int WriteElecPara(Elec_Page *pElecPara,QString strFunc);
 	bool GetWorkPosSetByIndex(int iIndex,int iWork[]);
 	void ReSetWorkPosSetByIndex(int iIndex,int iWork[]);
+    void SaveElecElem(QString str,MAC_ELEC_PARA* pElec);
 public:
     bool SaveMacPara(MAC_SYSTEM_SET* pSysSet);
 public slots:
