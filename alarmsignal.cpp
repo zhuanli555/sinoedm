@@ -104,85 +104,6 @@ void AlarmSignal::EdmStatusSignChange()
     }
 }
 
-//´¦Àí¼Ó¹¤×´Ì¬
-//void AlarmSignal::HandleEdmOpStatus()
-//{
-//    static int iCmdIndex=-1;
-//    static unsigned char bOver=FALSE;
-//    static OP_ERROR op_error = OP_NO_ERR;
-//    static vector<QString> vCmd;
-//    static MAP_ELEC_MAN mpElec;
-
-//    EDM_OP* pOp;
-
-//    if (!edmOpList)
-//    {
-//        return;
-//    }
-
-//    pOp = edmOpList->m_pEdmOp;
-//    if (pOp != edmOp || edmOpList->m_bChange)
-//    {
-//        edmOp = pOp;
-//        edmOpList->m_bChange = FALSE;
-//    }
-
-//    if (pOp->m_stOpStatus.stCycle.bPauseCmd)
-//    {
-//        pOp->m_stOpStatus.stCycle.bPauseCmd = FALSE;
-//    }
-
-//    if(pOp->m_stOpStatus.iCmdIndex != iCmdIndex && EDM_OP::m_bStartCount)
-//    {
-//        iCmdIndex = pOp->m_stOpStatus.iCmdIndex;
-//    }
-
-//    if (pOp->m_stOpStatus.stCycle.stPassChart.bClear)
-//    {
-//        pOp->m_stOpStatus.stCycle.stPassChart.bClear = FALSE;
-//    }
-//    else
-//    {
-//        if (pOp->m_stOpStatus.stCycle.stPassChart.bSet)
-//        {
-//            pOp->m_stOpStatus.stCycle.stPassChart.bSet = FALSE;
-//        }
-//        else
-//        {
-//            if (pOp->m_stOpStatus.stCycle.stPassChart.bRealTimeIn)
-//            {
-//                pOp->m_stOpStatus.stCycle.stPassChart.bRealTimeIn = FALSE;
-//            }
-//        }
-//    }
-
-
-//    if (pOp->m_stOpStatus.enErrAll.errOp != op_error )
-//    {
-//        op_error = pOp->m_stOpStatus.enErrAll.errOp;
-//        edm->EdmYellowLump( !(pOp->m_stOpStatus.enErrAll.errOp==OP_NO_ERR));
-//    }
-
-////    m_dlgOpStatus.SetOpStatusPara(pOp->m_stOpStatus.iCmdIndex
-////                                  ,pOp->m_stOpStatus.stCycle.iCycleIndex
-////                                  ,pOp->m_stOpStatus.stCycle.iTimeSec
-////                                  ,pOp->m_stOpStatus.stCycle.iOpPage);//Ðý×ªÖá
-
-//    if (pOp->m_stOpStatus.bCheck_C_Over)
-//    {
-//        pOp->m_stOpStatus.bCheck_C_Over = FALSE;
-//    }
-
-//    if (bOver != edmOpList->m_bOver)
-//    {
-//        bOver = edmOpList->m_bOver;
-//        if (bOver)
-//        {
-//            iCmdIndex = -1;
-//        }
-//    }
-//}
-
 void AlarmSignal::edmPurge()
 {
     edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);//µÍÑ¹ ³åÒº£¿
@@ -239,10 +160,9 @@ void AlarmSignal::edmProtect()
 
 void AlarmSignal::edmPause()
 {
-    if (!m_stEntileStatus.bOpIn || m_stEntileStatus.bRTzero)
-    {
+    if (!edmOpList->m_pEdmOp)
         return;
-    }
+    edmOpList->m_pEdmOp->EdmOpSetStart(bPause);
     bPause = !bPause;
     if(bPause)
     {
@@ -251,10 +171,7 @@ void AlarmSignal::edmPause()
     }else{
         pauseValue->setStyleSheet("background-color:green;");
         pauseValue->setText(QString::fromLocal8Bit("ÔÝÍ£(F8)"));
-    }
-    if (!edmOpList->m_pEdmOp)
-        return;
-    edmOpList->m_pEdmOp->EdmOpSetStart(bPause);
+    }  
 }
 
 void AlarmSignal::edmStop()

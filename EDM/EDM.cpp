@@ -60,13 +60,13 @@ unsigned long EDM::EdmInit()
 	short dwStatus;
 
     m_stEdmInterfaceOut.btO140 = 0xFF;
-    m_stEdmInterfaceOut.btO144 = 0xFD;
+    m_stEdmInterfaceOut.btO144 = 0xFF;
 	m_stEdmInterfaceOut.btO184 = 0xFF;
 	m_stEdmInterfaceOut.btO188 = 0xFF;
 	m_stEdmInterfaceOut.btO18C = 0x07;//中断号设置
-	m_stEdmInterfaceOut.btO190 = 0xFB;
-    m_stEdmInterfaceOut.btO198 = 0x7F;//控制电流档位
-	m_stEdmInterfaceOut.btO199 = 0xBF;
+    m_stEdmInterfaceOut.btO190 = 0xFF;
+    m_stEdmInterfaceOut.btO198 = 0xFF;//控制电流档位
+    m_stEdmInterfaceOut.btO199 = 0xFF;
     m_stEdmInterfaceOut.btO1C0 = 0xFF;
     m_stEdmInterfaceOut.btO1C4 = 0xFF;
 
@@ -480,7 +480,11 @@ int EDM::HandBoxProcess()
 void EDM::CloseHardWare()
 {
 	//硬件的关闭
-    m_stEdmInterfaceOut.btO188 |=0x3F;
+    m_stStatus.bPumpLow = 0;
+    m_stStatus.bShake = 0;
+    m_stStatus.bPrune= 0;
+    m_stStatus.bPower = 0;
+    m_stEdmInterfaceOut.btO188 |=0xFF;
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 }
 
@@ -642,10 +646,7 @@ void EDM::EdmSaveMacComm()
 int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
 {
 	unsigned char btTmp;
-	unsigned char btCal;
-    QString str;
-    QString strTmp = "write elec:";
-	unsigned char bDebug = TRUE;
+    unsigned char btCal;
 	int iForbit;
 
 	//防止乱码
@@ -656,57 +657,41 @@ int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
 	}
 
 	//设置脉宽
-	btTmp = GetElecTonVal(pElecPara->iTon);
-	btCal = 0x0F&btTmp;
-	m_stEdmInterfaceOut.btO184 &= 0xF0;
-	m_stEdmInterfaceOut.btO184 |= btCal;
-	m_stEdmInterfaceOut.btO188 &=0xF7;
-	btCal = 0x10&btTmp;
-	if (btCal)
-		m_stEdmInterfaceOut.btO188 |= 0x08;
+//	btTmp = GetElecTonVal(pElecPara->iTon);
+//	btCal = 0x0F&btTmp;
+//	m_stEdmInterfaceOut.btO184 &= 0xF0;
+//	m_stEdmInterfaceOut.btO184 |= btCal;
+//	m_stEdmInterfaceOut.btO188 &=0xF7;
+//	btCal = 0x10&btTmp;
+//	if (btCal)
+//		m_stEdmInterfaceOut.btO188 |= 0x08;
 	
 	//设置脉停
-	btTmp = GetElecToffVal(pElecPara->iToff);
-	m_stEdmInterfaceOut.btO184 &= 0x0F;
-	btTmp = btTmp<<4;
-	btTmp &= 0xF0;
-	m_stEdmInterfaceOut.btO184 |= btTmp;
+//	btTmp = GetElecToffVal(pElecPara->iToff);
+//	m_stEdmInterfaceOut.btO184 &= 0x0F;
+//	btTmp = btTmp<<4;
+//	btTmp &= 0xF0;
+//	m_stEdmInterfaceOut.btO184 |= btTmp;
 
 	//低压电流
-	btTmp = GetElecCurLowVal(pElecPara->iElecLow);
-	m_stEdmInterfaceOut.btO190 &= 0xE0;
-	m_stEdmInterfaceOut.btO190 =m_stEdmInterfaceOut.btO190 |btTmp;
+//	btTmp = GetElecCurLowVal(pElecPara->iElecLow);
+//	m_stEdmInterfaceOut.btO190 &= 0xE0;
+//	m_stEdmInterfaceOut.btO190 =m_stEdmInterfaceOut.btO190 |btTmp;
 	
 	//高压电流
-	btTmp = GetElecCurHighVal(pElecPara->iElecHigh);
-	m_stEdmInterfaceOut.btO18C &= 0xE7;
-	btTmp = btTmp<<3;	
-	m_stEdmInterfaceOut.btO18C |= btTmp;
+//	btTmp = GetElecCurHighVal(pElecPara->iElecHigh);
+//	m_stEdmInterfaceOut.btO18C &= 0xE7;
+//	btTmp = btTmp<<3;
+//	m_stEdmInterfaceOut.btO18C |= btTmp;
 	
 	//电容
-	btTmp = GetElecCapVal(pElecPara->iCap);
-	m_stEdmInterfaceOut.btO144 = btTmp;
+//	btTmp = GetElecCapVal(pElecPara->iCap);
+//	m_stEdmInterfaceOut.btO144 = btTmp;
 
-	//旋转
-	btTmp = pElecPara->iRotSpeed;
-	btTmp &=0x07;
-	btTmp = ~btTmp;
-	btTmp = btTmp<<5;
-	m_stEdmInterfaceOut.btO144 &= 0x1F;
-	m_stEdmInterfaceOut.btO144 |= btTmp;
+    //伺服给定
+//    SetServoToGive(pElecPara->iServo);
+//	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 
-	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
-	//伺服给定
-	SetServoToGive(pElecPara->iServo);
-
-    str =  CmdHandle::GetElecPagePara2QString(pElecPara);
-	strTmp += str;
-	if (bDebug)
-	{
-		strTmp +=": ";
-		strTmp += strFunc;
-	}	
-	//WriteRecord(strTmp);
 	return 0;
 }
 
