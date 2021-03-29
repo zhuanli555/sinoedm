@@ -34,6 +34,7 @@ unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 
     if (CmdHandle::ReadCmdFromFile(sPath,sFile,m_vCmdStd,&m_mpElecMan))
     {
+        INFO_PRINT();
 		it=m_vCmdStd.begin();
 		if (it==m_vCmdStd.end())
 		{
@@ -79,6 +80,7 @@ void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bSta
 
 	if (bStart)
 	{
+        INFO_PRINT();
 		m_mpElecMan[strName].stElecOral.iOpHoleIndex = iHoleIndexBak;
         if (m_strElec==str && iPageIndex==elec.iParaIndex)
 		{
@@ -87,6 +89,7 @@ void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bSta
 	}
 	else
 	{
+        INFO_PRINT();
 		if (bCycleStart)
 		{
 			elec.stElecOral.iOpHoleIndex = iHoleIndexBak;
@@ -113,7 +116,7 @@ void EDM_OP_File::SetEdmElecIndex(int iCmdIndex)
 
 	iCmdIndex = max(iCmdIndex,1);
 	iCmdIndex = min(iCmdIndex,m_iCmdNum);
-	it=m_mpElecMan.begin();
+    it=m_mpElecMan.begin();
 	while(it!=m_mpElecMan.end())
 	{
 		it->second.stElecOral.iOpHoleIndex = iCmdIndex;

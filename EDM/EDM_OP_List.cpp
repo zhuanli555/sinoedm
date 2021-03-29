@@ -118,7 +118,7 @@ void EDM_OP_List::CarryOnBefore(MAC_OPERATE_TYPE enType)
 	DeleteEdmOp();
 	SetEdmOpType(enType);
 	ResetEdmOpFile();
-	SetStart(FALSE);	
+    SetStart(FALSE);
 }
 
 void EDM_OP_List::CarryOn()

@@ -126,6 +126,7 @@ void UnionZero::accept()
         }
     }else
     {
+        //ÖáÖÃÊý
         CmdHandle *pCmdHandle;
         static DIGIT_CMD stDigitCmd;
 

@@ -33,15 +33,6 @@ Process::Process(QWidget *parent): QMainWindow(parent)
     rightLayout->addWidget(fileText,1,0,5,1);
     rightLayout->setSizeConstraint(QLayout::SetFixedSize);
     //bottom
-    elecPageModel = new QSqlRelationalTableModel(this);
-    elecPageModel->setTable("elec_page");
-    elecPageModel->setRelation(2, QSqlRelation("elec_oral", "id", "manufactory"));
-    elecPageModel->select();
-
-    elecOralModel = new QSqlTableModel(this);
-    elecOralModel->setTable("elec_oral");
-    elecOralModel->select();
-    elecParaTable = new ElecParaTable(elecPageModel,elecOralModel,"");
     QGridLayout *bgLayout = new QGridLayout();
     QLabel *jxProcess = new QLabel(QString::fromLocal8Bit("精铣加工"));
     QLabel *ProcessNum = new QLabel(QString::fromLocal8Bit("加工段号"));

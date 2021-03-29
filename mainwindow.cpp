@@ -28,9 +28,9 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     //状态栏
     statBar = this->statusBar();
     //left
-    coordWidget = CoordWidget::getInstance();
+    coordWidget = new CoordWidget;
     //right
-    alarmSignal = AlarmSignal::getInstance();
+    alarmSignal = new AlarmSignal;
     fileLabel = new QLabel(QString::fromLocal8Bit("加工文件名(F11)"));
     fileText = new QPlainTextEdit;
     fileText->setReadOnly(true);
@@ -63,8 +63,6 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     widget->setLayout(mainLayout);
     createActions();
     createMenus();
-    //多线程中不能操作gui，使用信号槽机制
-    connect(this,&MainWindow::coordWidgetChanged,coordWidget,&CoordWidget::HandleEdmCycleData);
     //设置多线程信号
     macUserHandle = QtConcurrent::run(this,&MainWindow::MacUserOperate);
     macProcessHandle = QtConcurrent::run(this,&MainWindow::MacProcessOperate);
@@ -72,10 +70,18 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
     t->start(1000);
-    connect(this,&MainWindow::edmOPSig,edmOpList,&EDM_OP_List::CarryOnBefore);
+    //多线程中不能操作gui，使用信号槽机制
+    connect(this,&MainWindow::coordWidgetChanged,coordWidget,&CoordWidget::HandleEdmCycleData);
+    //connect(this,&MainWindow::systemSetChangeSig,coordWidget,&CoordWidget::setLabels);
+    connect(this,&MainWindow::setAxisValueSig,coordWidget,&CoordWidget::setAxisValue);
+    connect(this,&MainWindow::edmPauseSig,alarmSignal,&AlarmSignal::edmPause);
+    connect(this,&MainWindow::edmShakeSig,alarmSignal,&AlarmSignal::edmShake);
+    connect(this,&MainWindow::edmPurgeSig,alarmSignal,&AlarmSignal::edmPurge);
+    connect(this,&MainWindow::edmStopSig,alarmSignal,&AlarmSignal::edmStop);
     connect(this,&MainWindow::edmCloseSig,edm,&EDM::CloseHardWare);
     connect(this,&MainWindow::edmMoveParaSendSig,edm,&EDM::EdmSendMovePara);
     connect(this,&MainWindow::edmWriteElecSig,edm,&EDM::WriteElecPara);
+    connect(this,&MainWindow::edmOPSig,edmOpList,&EDM_OP_List::CarryOnBefore);
     connect(this,&MainWindow::edmOpFileSig,edmOpList,&EDM_OP_List::SetEdmOpFile);
     connect(this,&MainWindow::edmOpElecSig,edmOpList,&EDM_OP_List::SetEdmOpElec);
 }
@@ -262,8 +268,8 @@ QWidget* MainWindow::createProcessTab()
     elecOralTable->setColumnCount(14);elecOralTable->setRowCount(1);
     int row,col=0;
     elecPageTable->setHorizontalHeaderItem(0,new QTableWidgetItem(QString::fromLocal8Bit("加工深度")));
-    elecPageTable->setHorizontalHeaderItem(1,new QTableWidgetItem(QString::fromLocal8Bit("脉冲宽度")));
-    elecPageTable->setHorizontalHeaderItem(2,new QTableWidgetItem(QString::fromLocal8Bit("脉冲停息")));
+    elecPageTable->setHorizontalHeaderItem(1,new QTableWidgetItem(QString::fromLocal8Bit("脉冲宽度us")));
+    elecPageTable->setHorizontalHeaderItem(2,new QTableWidgetItem(QString::fromLocal8Bit("脉冲停息us")));
     elecPageTable->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("加工电流")));
     elecPageTable->setHorizontalHeaderItem(4,new QTableWidgetItem(QString::fromLocal8Bit("高压电流")));
     elecPageTable->setHorizontalHeaderItem(5,new QTableWidgetItem(QString::fromLocal8Bit("加工电容")));
@@ -319,9 +325,9 @@ void MainWindow::elecTableChanged()
         {
             emit edmWriteElecSig(&elec.stElecPage[elec.iParaIndex],"");
         }
+    }else{
+        emit edmOpElecSig(m_strElecName,elec);
     }
-    emit edmOpElecSig(m_strElecName,elec);
-
     elecOralTable->blockSignals(false);
 }
 
@@ -342,7 +348,7 @@ void MainWindow::fillTableWidget(MAC_ELEC_PARA* pPara)
         elecPageTable->item(row,++col)->setText(str);
         str = QString("%1").arg(pPara->stElecPage[row].iElecHigh);
         elecPageTable->item(row,++col)->setText(str);
-        str = QString("%1").arg(((float)pPara->stElecPage[row].iCap)/100.0,8,'f',2);
+        str = QString("%1").arg(pPara->stElecPage[row].iCap);
         elecPageTable->item(row,++col)->setText(str);
         str = QString("%1").arg(pPara->stElecPage[row].iServo);
         elecPageTable->item(row,++col)->setText(str);
@@ -403,24 +409,19 @@ void MainWindow::ReadParaFromTable(MAC_ELEC_PARA* pPara)
             pPara->stElecPage[row].iOpLen = str.toInt();
 
         str = elecPageTable->item(row,++col)->text();
-        pPara->stElecPage[row].iTon = str.toInt();
-        pPara->stElecPage[row].iTon = GetElecTon(pPara->stElecPage[row].iTon,&iIndex);
+        pPara->stElecPage[row].iTon = str.toFloat();
 
         str = elecPageTable->item(row,++col)->text();
-        pPara->stElecPage[row].iToff = str.toInt();
-        pPara->stElecPage[row].iToff = GetElecToff(pPara->stElecPage[row].iToff,&iIndex);
+        pPara->stElecPage[row].iToff = str.toFloat();
 
         str = elecPageTable->item(row,++col)->text();
         pPara->stElecPage[row].iElecLow = str.toInt();
-        pPara->stElecPage[row].iElecLow = GetElecCurLow(pPara->stElecPage[row].iElecLow,&iIndex);
 
         str = elecPageTable->item(row,++col)->text();
         pPara->stElecPage[row].iElecHigh = str.toInt();
-        pPara->stElecPage[row].iElecHigh = GetElecCurHigh(pPara->stElecPage[row].iElecHigh,&iIndex);
 
         str = elecPageTable->item(row,++col)->text();
-        pPara->stElecPage[row].iCap = str.toFloat()*100.0;
-        pPara->stElecPage[row].iCap = GetElecCap(pPara->stElecPage[row].iCap,&iIndex);
+        pPara->stElecPage[row].iCap = str.toInt();
 
         str = elecPageTable->item(row,++col)->text();
         pPara->stElecPage[row].iServo = PercentStr2int(str);
@@ -551,15 +552,15 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     case Qt::Key_Escape:
         edmStop();break;
     case Qt::Key_F4:
-        alarmSignal->edmPurge();break;
+        emit edmPurgeSig();break;
     case Qt::Key_F5:
         alarmSignal->edmLowerPump();break;
     case Qt::Key_F6:
-        alarmSignal->edmShake();break;
+        emit edmShakeSig();break;
     case Qt::Key_F7:
         alarmSignal->edmProtect();break;
     case Qt::Key_F8:
-        alarmSignal->edmPause();break;
+        emit edmPauseSig();break;
     case Qt::Key_F11:
         showFileText();break;
     case Qt::Key_F12:
@@ -602,12 +603,12 @@ void MainWindow::renderToSetting()
 
 void MainWindow::systemSetChangeForCoord()
 {
-    coordWidget->update();
+    //emit systemSetChangeSig();
 }
 
 void MainWindow::setAxisValue(int label,QString str)
 {
-    coordWidget->setAxisValue(label,str);
+    emit setAxisValueSig(label,str);
 }
 
 
@@ -638,7 +639,7 @@ void MainWindow::renderToAxisSet()
 
 void MainWindow::edmStop()
 {
-    alarmSignal->edmStop();
+    emit edmStopSig();
 }
 
 void MainWindow::showFileText()
@@ -688,7 +689,6 @@ void MainWindow::HandleEdmOpStatus()
     {
         edmOp = pOp;
         edmOpList->m_bChange = FALSE;
-        OpFileCopyAndSend();
     }
 
     if (pOp->m_stOpStatus.stCycle.bPauseCmd)
@@ -727,10 +727,6 @@ void MainWindow::HandleEdmOpStatus()
         edm->EdmYellowLump( !(pOp->m_stOpStatus.enErrAll.errOp==OP_NO_ERR));
     }
 
-//    m_dlgOpStatus.SetOpStatusPara(pOp->m_stOpStatus.iCmdIndex
-//                                  ,pOp->m_stOpStatus.stCycle.iCycleIndex
-//                                  ,pOp->m_stOpStatus.stCycle.iTimeSec
-//                                  ,pOp->m_stOpStatus.stCycle.iOpPage);//旋转轴
 
     if (pOp->m_stOpStatus.bCheck_C_Over)
     {

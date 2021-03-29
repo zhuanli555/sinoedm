@@ -292,7 +292,7 @@ bool EDM::EdmStopMove(unsigned long bStatus)
 {
 	short dwStatus;
     QString str = "stop move";
-
+    INFO_PRINT();
     m_stEdmOpEntile.bStop = TRUE;
     dwStatus = ioctl(fd,IOC_MAC_OPERATE,&m_stEdmOpEntile);
 	m_stEdmOpEntile.bStop = FALSE;
@@ -343,7 +343,7 @@ bool EDM::EdmSetProtect(unsigned long bProtect)
 
 	if (m_stEdmComm.enMvStatus==RULE_RTZERO)
 		return false;
-
+    INFO_PRINT();
     m_stEdmOpEntile.bNoProtect = !bProtect;
     dwStatus = ioctl(fd,IOC_MAC_OPERATE,&m_stEdmOpEntile);
 	if (dwStatus == 1)
@@ -645,53 +645,63 @@ void EDM::EdmSaveMacComm()
 //设置电参数
 int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
 {
-	unsigned char btTmp;
-    unsigned char btCal;
-	int iForbit;
-
-	//防止乱码
-	iForbit = pElecPara->iTon + pElecPara->iElecLow;
-	if ( iForbit>170 || iForbit <0)
-	{
-		return -1;
-	}
-
+    unsigned char btTmp;
 	//设置脉宽
-//	btTmp = GetElecTonVal(pElecPara->iTon);
-//	btCal = 0x0F&btTmp;
-//	m_stEdmInterfaceOut.btO184 &= 0xF0;
-//	m_stEdmInterfaceOut.btO184 |= btCal;
-//	m_stEdmInterfaceOut.btO188 &=0xF7;
-//	btCal = 0x10&btTmp;
-//	if (btCal)
-//		m_stEdmInterfaceOut.btO188 |= 0x08;
-	
+    btTmp = GetElecTonVal(pElecPara->iTon);
+    btTmp = btTmp<<4;
+    m_stEdmInterfaceOut.btO184 |= 0xF0;
+    m_stEdmInterfaceOut.btO184 &= btTmp;
+
 	//设置脉停
-//	btTmp = GetElecToffVal(pElecPara->iToff);
-//	m_stEdmInterfaceOut.btO184 &= 0x0F;
-//	btTmp = btTmp<<4;
-//	btTmp &= 0xF0;
-//	m_stEdmInterfaceOut.btO184 |= btTmp;
+    btTmp = GetElecToffVal(pElecPara->iToff);
+    m_stEdmInterfaceOut.btO184 |= 0x0F;
+    m_stEdmInterfaceOut.btO184 &= btTmp;
 
 	//低压电流
-//	btTmp = GetElecCurLowVal(pElecPara->iElecLow);
-//	m_stEdmInterfaceOut.btO190 &= 0xE0;
-//	m_stEdmInterfaceOut.btO190 =m_stEdmInterfaceOut.btO190 |btTmp;
+    btTmp = GetElecCurLowVal(pElecPara->iElecLow);
+    m_stEdmInterfaceOut.btO198 |= 0xFF;
+    m_stEdmInterfaceOut.btO198 &= btTmp;
+    if(pElecPara->iElecHigh == 9)
+    {
+        m_stEdmInterfaceOut.btO188 |= 0x02;
+        m_stEdmInterfaceOut.btO188 &= 0xFE;
+    }else if(pElecPara->iElecHigh == 10)
+    {
+        m_stEdmInterfaceOut.btO188 |= 0x01;
+        m_stEdmInterfaceOut.btO188 &= 0xFD;
+    }else if(pElecPara->iElecHigh == 11)
+    {
+        m_stEdmInterfaceOut.btO188 &= 0xFC;
+    }else{
+        m_stEdmInterfaceOut.btO188 |= 0x03;
+    }
 	
-	//高压电流
-//	btTmp = GetElecCurHighVal(pElecPara->iElecHigh);
-//	m_stEdmInterfaceOut.btO18C &= 0xE7;
-//	btTmp = btTmp<<3;
-//	m_stEdmInterfaceOut.btO18C |= btTmp;
+    //高压电流(加工电流)
+    btTmp = GetElecCurHighVal(pElecPara->iElecHigh);
+    m_stEdmInterfaceOut.btO199 |= 0xFF;
+    m_stEdmInterfaceOut.btO199 &= btTmp;
 	
 	//电容
-//	btTmp = GetElecCapVal(pElecPara->iCap);
-//	m_stEdmInterfaceOut.btO144 = btTmp;
+    btTmp = (64-pElecPara->iCap)&0xFF;
+    m_stEdmInterfaceOut.btO190 |= 0x08;
+    if(btTmp&0x20)
+    {
+        m_stEdmInterfaceOut.btO190 &= 0xFF;
+    }else{
+        m_stEdmInterfaceOut.btO190 &= 0xF7;
+    }
+    m_stEdmInterfaceOut.btO144 |= 0xF8;
+    m_stEdmInterfaceOut.btO144 &= ((btTmp&0x1F)<<3|0x07);
 
     //伺服给定
-//    SetServoToGive(pElecPara->iServo);
-//	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
-
+    if(pElecPara->iServo == 0)
+    {
+        m_stEdmInterfaceOut.btO18C &= 0xEF;
+    }
+    else {
+        m_stEdmInterfaceOut.btO18C |= 0x10;
+    }
+    ::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	return 0;
 }
 
@@ -699,18 +709,11 @@ int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
 //设定伺服
 void EDM::SetServoToGive(int iPercent)
 {
-	int iConverge =  (iPercent - 30) * 4;
-	unsigned char btServo;
-
-	if (iConverge>=10 && iConverge<=240)
-		btServo = iConverge;
-	else
-	{
-		if (iConverge < 10)
-			btServo = 10;
-		if (iConverge > 240)
-			btServo = 240;
-	}
+    if(iPercent == 0)
+        m_stEdmInterfaceOut.btO18C &= 0xEF;
+    else {
+        m_stEdmInterfaceOut.btO18C |= 0x10;
+    }
 }
 
 bool EDM::GetAxisOffset()

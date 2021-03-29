@@ -24,8 +24,6 @@ CmdHandle::~CmdHandle()
 void CmdHandle::AnalyseCommand(QString strCommand,DIGIT_CMD *pDigitCmd,DIGIT_CMD* pCmdDefault)
 {
     int iIndex(-1);
-    QString strCmdWay("");
-    QString strCmdTemp("");
 
     memset(pDigitCmd,0,sizeof(DIGIT_CMD));
     pDigitCmd->iFreq = pCmdDefault->iFreq;
@@ -154,7 +152,7 @@ void CmdHandle::WriteCmd2Para(QString strCmd ,DIGIT_CMD *pDigitCmd)
 
     while(strCmd != "")
     {
-        strCmd.trimmed();
+        strCmd = strCmd.trimmed();
         iLength = strCmd.length();
 
         ch= strCmd.at(0).unicode();
@@ -195,7 +193,7 @@ void CmdHandle::WriteCmd2Para(QString strCmd ,DIGIT_CMD *pDigitCmd)
                 strCmd =strCmd.right(iLength-iIndex-1);
         }
 
-        strTemp.trimmed();
+        strTemp = strTemp.trimmed();
         QStringtoFloat(strTemp,fDistaceVal);
         if (bDot)
             stMoveUser.iDistance = (long)(fDistaceVal*1000.0);
@@ -318,9 +316,7 @@ int CmdHandle::CheckCmdFig(QString strCmd,bool* pLaw)
 
 void CmdHandle::AnalyseVectCommand(QString strCommand,DIGIT_CMD *pDigitCmd,DIGIT_CMD* pCmdDefault)
 {
-    int iIndex(-1);
-    QString strCmdWay("");
-    QString strCmdTemp("");
+    int iIndex=-1;
     DIGIT_CMD_VECT stVectCmd;
 
     memset(pDigitCmd,0,sizeof(DIGIT_CMD));
@@ -382,7 +378,7 @@ void CmdHandle::Vect2DigitCmd(DIGIT_CMD_VECT* pVectCmd,DIGIT_CMD* pDigitCmd)
     EDM* pEdm = EDM::GetEdmInstance();
     int iWorkSet[MAC_LABEL_COUNT]={0};
     QString strLogWrite;
-    strLogWrite = pEdm->m_strSysPath + "\\rec.txt";
+    strLogWrite = pEdm->m_strSysPath + "/rec.txt";
 
 
     int iLabel_C_xMach = pEdm->m_stSysSet.stSetNoneLabel.iLabel_C_xMachine;
@@ -896,7 +892,7 @@ unsigned char CmdHandle::ReadCmdFromFile(QString strPath,QString strFile,vector<
     QString	  strFullName =  strPath + "/" + strFile;
     QFile inFile(strFullName);
     QString str;
-    MAC_ELEC_PARA stElec = {0};
+    MAC_ELEC_PARA stElec;
     map<QString,MAC_ELEC_PARA>::iterator it=pMap->begin();
 
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))

@@ -13,7 +13,6 @@
 #include <QTabWidget>
 #include <QLineEdit>
 #include <QTextEdit>
-#include <QThread>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QGridLayout>
@@ -121,6 +120,13 @@ signals:
     void edmOpFileSig(QString,QString);
     void edmOpElecSig(QString,MAC_ELEC_PARA);
     void edmWriteElecSig(Elec_Page*,QString);
+    void edmPauseSig();
+    void edmShakeSig();
+    void edmPurgeSig();
+    void edmStopSig();
+    void setAxisValueSig(int label,QString str);
+    void systemSetChangeSig();
+
 protected slots:
 
     void renderToProcess();

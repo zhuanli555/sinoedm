@@ -37,7 +37,6 @@ SOURCES += \
     codeeditor.cpp \
     EDM/cmdhandle.cpp \
     alarmsignal.cpp \
-    elecparatable.cpp \
     EDM/EDM_OP.cpp \
     EDM/EDM_OP_File.cpp \
     EDM/EDM_OP_HOLE.cpp \
@@ -58,7 +57,6 @@ HEADERS += \
     codeeditor.h \
     EDM/cmdhandle.h \
     alarmsignal.h \
-    elecparatable.h \
     EDM/EDM_OP.h \
     EDM/EDM_OP_File.h \
     EDM/EDM_OP_HOLE.h \

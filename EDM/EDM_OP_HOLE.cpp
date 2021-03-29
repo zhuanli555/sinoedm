@@ -851,8 +851,8 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 		{
 			m_stOpCtrl.stZeroCtrl.bWait = TRUE;
 			memset(&stElec,0,sizeof(Elec_Page));
-			stElec.iTon  = 2;
-			stElec.iToff = 80;
+            stElec.iTon  = 0.2;
+            stElec.iToff = 0.2;
 			stElec.iElecLow = 1;
 			stElec.iElecHigh = 0;
 			stElec.iCap = 0;
@@ -1089,10 +1089,7 @@ unsigned char EDM_OP_HOLE::EdmHoleOpPage()
 				(!m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver|| (m_stOpCtrl.stZeroCtrl.stPassCtl.bPole &&m_pEdm->m_stSysSet.stSetNoneLabel.iPoleMode)))
 			{
 				memset(&elec,0,sizeof(Elec_Page));
-				memcpy(&elec,&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage]),sizeof(Elec_Page));
-                GetElecToff(elec.iToff,&iToffIndex);
-				iToffIndex += m_pEdm->m_stSysSet.stSetNoneLabel.iToff;
-                elec.iToff = GetElecToffByIndex(iToffIndex);
+                memcpy(&elec,&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage]),sizeof(Elec_Page));
 				elec.iServo = 55;
 				if(m_pEdm->WriteElecPara(&elec,"EdmHoleOpPage_1")==-1)
 				{
@@ -1154,13 +1151,7 @@ unsigned char EDM_OP_HOLE::EdmHoleOpPage()
 				}
 				cmd.iAxisCnt++;
 
-				memcpy(&elec,&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[m_stOpStatus.stCycle.iOpPage]),sizeof(Elec_Page));
-                GetElecToff(elec.iToff,&iToffIndex);
-				iToffIndex += m_pEdm->m_stSysSet.stSetNoneLabel.iToff;
-                elec.iToff = GetElecToffByIndex(iToffIndex);
-                GetElecCap(elec.iCap,&iToffIndex);
-				iToffIndex += m_pEdm->m_stSysSet.stSetNoneLabel.iCap;
-                elec.iCap = GetElecCapByIndex(iToffIndex);
+                memcpy(&elec,&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[m_stOpStatus.stCycle.iOpPage]),sizeof(Elec_Page));
 				elec.iRotSpeed += m_pEdm->m_stSysSet.stSetNoneLabel.iRotate;
 				elec.iServo += m_pEdm->m_stSysSet.stSetNoneLabel.iSifu;
 				if(m_pEdm->WriteElecPara(&elec,"EdmHoleOpPage_3")==-1)
@@ -1455,11 +1446,8 @@ void EDM_OP_HOLE::EdmHolePassCtl()
 {
 	float fStable;
 	int iCnt=0;
-	int iCalc =0;
-	int iPulseSleep;
-	int iStartStable;
-	float fToff;
-	int iToffIndex;
+    int iCalc =0;
+    int iStartStable;
 	int iOpLabelWorkPos;	
 
 	m_pEdm->GetEdmMacPassPara(&m_stMacPassPara);
@@ -1539,18 +1527,11 @@ void EDM_OP_HOLE::EdmHolePassCtl()
 	m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageStable[m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex] = m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltage;
 
 	if (iOpLabelWorkPos>=m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iJudgePos)
-	{
-		/////////////////////
-		iPulseSleep = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[m_stOpStatus.stCycle.iOpPage].iToff;
+    {
 		if (!m_stOpCtrl.stZeroCtrl.stPassCtl.bStop && m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver && m_stOpCtrl.stZeroCtrl.stPassCtl.iStageCnt>1) 
 		{
-			m_stOpCtrl.stZeroCtrl.stPassCtl.bStop = TRUE;
-            GetElecToff(iPulseSleep,&iToffIndex);
-			iToffIndex += m_pEdm->m_stSysSet.stSetNoneLabel.iToff;
-            fToff = GetElecToffByIndex(iToffIndex);
-			iCalc = m_stOpCtrl.stZeroCtrl.stPassCtl.iSum/m_stOpCtrl.stZeroCtrl.stPassCtl.iStageCnt*0.7;
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageStd = (m_stPassSet.fElec* (((float)iPulseSleep)/fToff)+0.17)
-				*((float)m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageSum/(float)m_stOpCtrl.stZeroCtrl.stPassCtl.iStageCnt);
+            m_stOpCtrl.stZeroCtrl.stPassCtl.bStop = TRUE;
+            iCalc = m_stOpCtrl.stZeroCtrl.stPassCtl.iSum/m_stOpCtrl.stZeroCtrl.stPassCtl.iStageCnt*0.7;
 			m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd = iCalc;
 			if (m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd>35)
 				m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd=35;

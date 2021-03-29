@@ -12,6 +12,12 @@
 #include <map>
 #include <vector>
 
+//¥Ú”°
+#define INFO_PRINT(info,...)  \
+do{ \
+    qDebug()<<__FILE__<<":"<<__FUNCTION__<<":"<<__LINE__;\
+}while(0)
+
 using namespace std;
 
 typedef enum

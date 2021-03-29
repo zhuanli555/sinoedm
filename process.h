@@ -24,7 +24,6 @@
 #include "alarmsignal.h"
 #include "EDM/cmdhandle.h"
 #include "EDM/EDM_OP_List.h"
-#include "elecparatable.h"
 
 class Process : public QMainWindow
 {
@@ -60,7 +59,6 @@ private:
     QHBoxLayout* bottomLayout;
     QPushButton* addButton;
     QPushButton* delButton;
-    ElecParaTable *elecParaTable;
     QLineEdit *jxProcessVal;
     QLineEdit *ProcessNumVal;
     QLineEdit *singleProcessVal;

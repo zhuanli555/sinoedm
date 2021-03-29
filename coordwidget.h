@@ -28,7 +28,7 @@ public :
 	EDM_COOR_TYPE m_enCoorType;
 
 private:
-    void setLabels();
+
     void ShowData(const MAC_COMMON& stMaccomm,int iRelLabel[]);
     void SaveData();
     void ShowAxisData();
@@ -38,11 +38,11 @@ private:
     static CoordWidget* m_coordWid;
     QVector<QLabel*> m_labels;
 
-protected:
 signals:
 public slots:
     void setAxisValue(int label,QString str);
     void HandleEdmCycleData();
+    void setLabels();
 };
 
 #endif // COORDWIDGET_H
