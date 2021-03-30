@@ -62,9 +62,9 @@ unsigned long EDM::EdmInit()
     m_stEdmInterfaceOut.btO140 = 0xFF;
     m_stEdmInterfaceOut.btO144 = 0xFF;
 	m_stEdmInterfaceOut.btO184 = 0xFF;
-	m_stEdmInterfaceOut.btO188 = 0xFF;
+    m_stEdmInterfaceOut.btO188 = 0xFB;
 	m_stEdmInterfaceOut.btO18C = 0x07;//中断号设置
-    m_stEdmInterfaceOut.btO190 = 0xFF;
+    m_stEdmInterfaceOut.btO190 = 0xFB;
     m_stEdmInterfaceOut.btO198 = 0xFF;//控制电流档位
     m_stEdmInterfaceOut.btO199 = 0xFF;
     m_stEdmInterfaceOut.btO1C0 = 0xFF;

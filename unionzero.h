@@ -46,7 +46,7 @@ signals:
 protected slots:
 
     void chooseAll();
-    void buttonGroupClicked(int index);
+    void buttonGroupClicked();
     void accept() override;
 
 };

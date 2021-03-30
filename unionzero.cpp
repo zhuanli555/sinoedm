@@ -33,7 +33,13 @@ UnionZero::UnionZero(int key, QWidget *parent) : QDialog(parent)
     group->addButton(wa, 4);
     group->addButton(wb, 5);
     group->addButton(wz, 6);
-    connect(group, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &UnionZero::buttonGroupClicked);
+    connect(wx, &QCheckBox::clicked, this, &UnionZero::buttonGroupClicked);
+    connect(wy, &QCheckBox::clicked, this, &UnionZero::buttonGroupClicked);
+    connect(wc, &QCheckBox::clicked, this, &UnionZero::buttonGroupClicked);
+    connect(ww, &QCheckBox::clicked, this, &UnionZero::buttonGroupClicked);
+    connect(wa, &QCheckBox::clicked, this, &UnionZero::buttonGroupClicked);
+    connect(wb, &QCheckBox::clicked, this, &UnionZero::buttonGroupClicked);
+    connect(wz, &QCheckBox::clicked, this, &UnionZero::buttonGroupClicked);
     connect(wall, &QCheckBox::clicked, this, &UnionZero::chooseAll);
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(wx, 0, 0);
@@ -93,9 +99,16 @@ void UnionZero::chooseAll()
     for(int i= 0;i<MAC_LABEL_COUNT;i++)bZero[i] = true;
 }
 
-void UnionZero::buttonGroupClicked(int index)
+void UnionZero::buttonGroupClicked()
 {
-    if(index == -1)return;
+    int index = -1;
+    if(wx->isChecked())index = 0;
+    if(wy->isChecked())index = 1;
+    if(wc->isChecked())index = 2;
+    if(ww->isChecked())index = 3;
+    if(wa->isChecked())index = 4;
+    if(wb->isChecked())index = 5;
+    if(wz->isChecked())index = 6;
     bZero[index] = true;
 }
 
