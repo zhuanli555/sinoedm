@@ -34,7 +34,6 @@ unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 
     if (CmdHandle::ReadCmdFromFile(sPath,sFile,m_vCmdStd,&m_mpElecMan))
     {
-        INFO_PRINT();
 		it=m_vCmdStd.begin();
 		if (it==m_vCmdStd.end())
 		{
@@ -93,11 +92,11 @@ void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bSta
 		SetEdmElecIndex(elec.stElecOral.iOpHoleIndex);
 	}
 
-	if (bWrite)
-	{
-		if(m_pEdm->WriteElecPara(&elec.stElecPage[elec.iParaIndex],"EDM_OP_File::SetEdmOpElec") ==-1)
-			m_enOpFileErr=OP_FILE_ERR_ELEC;
-	}
+    if (bWrite)
+    {
+        if(m_pEdm->WriteElecPara(&elec.stElecPage[elec.iParaIndex],"EDM_OP_File::SetEdmOpElec") ==-1)
+            m_enOpFileErr=OP_FILE_ERR_ELEC;
+    }
 }
 
 

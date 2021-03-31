@@ -278,6 +278,7 @@ void EDM_OP_HOLE::EdmHoleCarry()
 	{
 		if (EdmHoleSynchro())
 		{
+			INFO_PRINT();
 			m_stOpCtrl.stZeroCtrl.bCycleStart = TRUE;
 			m_it = m_ListStage.begin();
             if (m_stOpStatus.enOpType!=OP_HOLE_SING)
@@ -345,7 +346,7 @@ void EDM_OP_HOLE::EdmHoleMvCmdProcess()
 	QString str;
 	DIGIT_CMD cmdDefault;
     CmdHandle* pCmdHandle;
-
+	INFO_PRINT();
 	memset(&cmdDefault,0,sizeof(DIGIT_CMD));
 	memset(&m_stMvCmd,0,sizeof(DIGIT_CMD));
 	str = m_pOpFile->m_vCmd[m_stOpStatus.iCmdIndex];
@@ -359,9 +360,8 @@ void EDM_OP_HOLE::EdmHoleMvCmdProcess()
 unsigned char EDM_OP_HOLE::EdmHoleRise()
 {
 	unsigned char bRise = FALSE;
-	DIGIT_CMD cmd;
-	QString strRec;
-	QString strTmpRec = " ";
+    DIGIT_CMD cmd;
+    INFO_PRINT();
 	int iPos = m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iMachPos 
 		- m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iWorkPosSet;
 
@@ -412,9 +412,8 @@ unsigned char EDM_OP_HOLE::EdmHoleRise()
 
 unsigned char EDM_OP_HOLE::EdmHoleUp2Safe()
 {
-	DIGIT_CMD cmd;
-	QString strRec;
-	QString strTmpRec;
+    DIGIT_CMD cmd;
+    INFO_PRINT();
 
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
@@ -458,8 +457,7 @@ unsigned char EDM_OP_HOLE::EdmHoleUp2Safe()
 unsigned char EDM_OP_HOLE::EdmHoleDownFromSafe()
 {
 	DIGIT_CMD cmd;
-	QString strRec;
-	QString strTmpRec;
+    INFO_PRINT();
 
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
@@ -515,7 +513,7 @@ unsigned char EDM_OP_HOLE::EdmHoleLocation()
 	unsigned char bAddCycleMeasVal = FALSE;
     DIGIT_CMD cmd2Send;
 	unsigned char bEmptyMove=FALSE;
-
+    INFO_PRINT();
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
 
@@ -612,7 +610,7 @@ unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 	int iLabel;
 	int iCmdIndex;
     QString str;
-
+    INFO_PRINT();
 	if (m_stOpStatus.enOpType == OP_HOLE_SING)
 	{
 		return TRUE;
@@ -704,8 +702,6 @@ unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust_Sing()
 {
 	DIGIT_CMD cmd;
-	QString strRec;
-	QString strTmpRec;
 
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
@@ -760,13 +756,11 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust_Sing()
 	return FALSE;
 }
 
-
+//µç¼«¶ÔÁã
 unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 {
 	Elec_Page stElec;
 	DIGIT_CMD cmd;
-	QString strRec;
-	QString strTmpRec;
 
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
@@ -843,8 +837,7 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 unsigned char EDM_OP_HOLE::EdmHolePrune()
 {
 	DIGIT_CMD cmd;
-	QString strRec;
-	QString strTmpRec;
+    INFO_PRINT();
 	
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 	   return FALSE;	
@@ -1702,6 +1695,7 @@ void EDM_OP_HOLE::EdmHoleRecover()
 	DIGIT_CMD cmd;
     EDM_OP::m_bSetPower = FALSE;
     m_pEdm->CloseHardWare();
+    INFO_PRINT();
 	if (m_enOpType == OP_TYPE_NONE || EDM_OP::m_bInOp==FALSE)
 	{
 		return;
@@ -1894,7 +1888,7 @@ unsigned char EDM_OP_HOLE::EdmOpMvAheadChkLabel()
 {
 	DIGIT_CMD cmd;
 	CHECK_MODE enMode =CHECK_ELASTIC;
-
+    INFO_PRINT();
 	if (m_stOpCtrl.stZeroCtrl.bStageLast)
 	{
 		m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
@@ -1974,7 +1968,7 @@ unsigned char EDM_OP_HOLE::EdmOpMvBackChkLabel()
 {
 	DIGIT_CMD cmd;
 	CHECK_MODE enMode =CHECK_ELASTIC;
-
+    INFO_PRINT();
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 	{
 		return FALSE;

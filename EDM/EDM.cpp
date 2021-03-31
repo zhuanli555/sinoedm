@@ -292,7 +292,6 @@ bool EDM::EdmStopMove(unsigned long bStatus)
 {
 	short dwStatus;
     QString str = "stop move";
-    INFO_PRINT();
     m_stEdmOpEntile.bStop = TRUE;
     dwStatus = ioctl(fd,IOC_MAC_OPERATE,&m_stEdmOpEntile);
     m_stEdmOpEntile.bStop = FALSE;
@@ -341,8 +340,7 @@ bool EDM::EdmSetProtect(unsigned long bProtect)
 {
     short dwStatus;
 	if (m_stEdmComm.enMvStatus==RULE_RTZERO)
-		return false;
-    INFO_PRINT();
+        return false;
     m_stEdmOpEntile.bNoProtect = !bProtect;
     dwStatus = ioctl(fd,IOC_MAC_OPERATE,&m_stEdmOpEntile);
 	if (dwStatus == 1)
@@ -645,62 +643,89 @@ void EDM::EdmSaveMacComm()
 int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
 {
     unsigned char btTmp;
-	//设置脉宽
-    btTmp = GetElecTonVal(pElecPara->iTon);
-    btTmp = btTmp<<4;
-    m_stEdmInterfaceOut.btO184 |= 0xF0;
-    m_stEdmInterfaceOut.btO184 &= btTmp;
-
-	//设置脉停
-    btTmp = GetElecToffVal(pElecPara->iToff);
-    m_stEdmInterfaceOut.btO184 |= 0x0F;
-    m_stEdmInterfaceOut.btO184 &= btTmp;
-
-	//低压电流
-    btTmp = GetElecCurLowVal(pElecPara->iElecLow);
-    m_stEdmInterfaceOut.btO198 |= 0xFF;
-    m_stEdmInterfaceOut.btO198 &= btTmp;
-    if(pElecPara->iElecHigh == 9)
+    static Elec_Page elec;
+    bool bWrite = false;
+    //设置脉宽
+    if(elec.iTon != pElecPara->iTon)
     {
-        m_stEdmInterfaceOut.btO188 |= 0x02;
-        m_stEdmInterfaceOut.btO188 &= 0xFE;
-    }else if(pElecPara->iElecHigh == 10)
-    {
-        m_stEdmInterfaceOut.btO188 |= 0x01;
-        m_stEdmInterfaceOut.btO188 &= 0xFD;
-    }else if(pElecPara->iElecHigh == 11)
-    {
-        m_stEdmInterfaceOut.btO188 &= 0xFC;
-    }else{
-        m_stEdmInterfaceOut.btO188 |= 0x03;
+        elec.iTon = pElecPara->iTon;
+        btTmp = GetElecTonVal(pElecPara->iTon);
+        btTmp = btTmp<<4;
+        m_stEdmInterfaceOut.btO184 |= 0xF0;
+        m_stEdmInterfaceOut.btO184 &= btTmp;
+        bWrite = true;
     }
-	
+    //设置脉停
+    if(elec.iToff != pElecPara->iToff)
+    {
+        elec.iToff = pElecPara->iToff;
+        btTmp = GetElecToffVal(pElecPara->iToff);
+        m_stEdmInterfaceOut.btO184 |= 0x0F;
+        m_stEdmInterfaceOut.btO184 &= btTmp;
+        bWrite = true;
+    }
+    //低压电流
+    if(elec.iElecLow != pElecPara->iElecLow)
+    {
+        elec.iElecLow = pElecPara->iElecLow;
+        btTmp = GetElecCurLowVal(pElecPara->iElecLow);
+        m_stEdmInterfaceOut.btO198 |= 0xFF;
+        m_stEdmInterfaceOut.btO198 &= btTmp;
+        if(pElecPara->iElecLow == 9)
+        {
+            m_stEdmInterfaceOut.btO188 |= 0x02;
+            m_stEdmInterfaceOut.btO188 &= 0xFE;
+        }else if(pElecPara->iElecLow == 10)
+        {
+            m_stEdmInterfaceOut.btO188 |= 0x01;
+            m_stEdmInterfaceOut.btO188 &= 0xFD;
+        }else if(pElecPara->iElecLow == 11)
+        {
+            m_stEdmInterfaceOut.btO188 &= 0xFC;
+        }else{
+            m_stEdmInterfaceOut.btO188 |= 0x03;
+        }
+        bWrite = true;
+    }
+
     //高压电流(加工电流)
-    btTmp = GetElecCurHighVal(pElecPara->iElecHigh);
-    m_stEdmInterfaceOut.btO199 |= 0xFF;
-    m_stEdmInterfaceOut.btO199 &= btTmp;
-	
-	//电容
-    btTmp = (64-pElecPara->iCap)&0xFF;
-    m_stEdmInterfaceOut.btO190 |= 0x08;
-    if(btTmp&0x20)
+    if(elec.iElecHigh != pElecPara->iElecHigh)
     {
-        m_stEdmInterfaceOut.btO190 &= 0xFF;
-    }else{
-        m_stEdmInterfaceOut.btO190 &= 0xF7;
+        elec.iElecHigh = pElecPara->iElecHigh;
+        btTmp = GetElecCurHighVal(pElecPara->iElecHigh);
+        m_stEdmInterfaceOut.btO199 |= 0xFF;
+        m_stEdmInterfaceOut.btO199 &= btTmp;
+        bWrite = true;
     }
-    m_stEdmInterfaceOut.btO144 |= 0xF8;
-    m_stEdmInterfaceOut.btO144 &= ((btTmp&0x1F)<<3|0x07);
-
+    //电容
+    if(elec.iCap != pElecPara->iCap)
+    {
+        elec.iCap = pElecPara->iCap;
+        btTmp = (64-pElecPara->iCap)&0xFF;
+        m_stEdmInterfaceOut.btO190 |= 0x08;
+        if(btTmp&0x20)
+        {
+            m_stEdmInterfaceOut.btO190 &= 0xFF;
+        }else{
+            m_stEdmInterfaceOut.btO190 &= 0xF7;
+        }
+        m_stEdmInterfaceOut.btO144 |= 0xF8;
+        m_stEdmInterfaceOut.btO144 &= ((btTmp&0x1F)<<3|0x07);
+        bWrite = true;
+    }
     //伺服给定
-    if(pElecPara->iServo == 0)
+    if(elec.iServo != pElecPara->iServo)
     {
-        m_stEdmInterfaceOut.btO18C &= 0xEF;
+        if(pElecPara->iServo == 0)
+        {
+            m_stEdmInterfaceOut.btO18C &= 0xEF;
+        }
+        else {
+            m_stEdmInterfaceOut.btO18C |= 0x10;
+        }
+        bWrite = true;
     }
-    else {
-        m_stEdmInterfaceOut.btO18C |= 0x10;
-    }
-    ::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
+    if(bWrite)::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	return 0;
 }
 
@@ -906,6 +931,7 @@ void EDM::SetAxisAdjustCircleType(ADJUST_CIRCLE* pAdjustCircle)
 	m_stAdjustCircle.iIndexCnt = 0;
 }
 
+//对刀
 void EDM::EdmAxisAdjust()
 {
 	int iAim = 500000;
@@ -1066,6 +1092,7 @@ void EDM::EdmAxisAdjust()
 	}
 }
 
+//找内外圆中心
 void EDM::EdmAxisAdjustCircle()
 {
 	if (m_stAdjustCircle.bAdjust)

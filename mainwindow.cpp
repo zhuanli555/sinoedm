@@ -111,8 +111,8 @@ void MainWindow::MacUserOperate()
             edm->GetEdmComm();
             edm->GetEdmStatusData();
             emit coordWidgetChanged();//机床命令周期性处理
-            edm->EdmAxisAdjust();
-            edm->EdmAxisAdjustCircle();
+            //edm->EdmAxisAdjust();
+            //edm->EdmAxisAdjustCircle();
 
             alarmSignal->EdmStatusSignChange();//机床信号周期性处理
             alarmSignal->edmHandProcess();//处理手盒

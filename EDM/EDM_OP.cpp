@@ -93,8 +93,7 @@ void EDM_OP::CalcDigitCmd()
 void EDM_OP::SetEdmOpElec(QString str,MAC_ELEC_PARA elec)
 {
 	if (m_pOpFile)
-	{
-        INFO_PRINT();
+    {
 		m_pOpFile->SetEdmOpElec(str,elec,m_stOpStatus.bStart,m_stOpStatus.stCycle.bCycleStart,m_stOpStatus.stCycle.iOpPage);
 		if (m_stOpStatus.bStart)
 		{
