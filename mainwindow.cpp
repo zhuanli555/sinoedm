@@ -152,7 +152,7 @@ unsigned char MainWindow::EDMMacInit()
     edmOp = edmOpList->m_pEdmOp;
 
     m_strElecName="DEFAULT";
-    edmOpList->SetEdmOpFile(path,m_strElecName);
+    emit edmOpFileSig(path,m_strElecName);
     //从数据库载入
     m_iOpenTime = m_stSysSet.stSetNoneLabel.iTime;
     m_iOpenTimeOp = m_stSysSet.stSetNoneLabel.iTimeOp;
@@ -268,10 +268,10 @@ QWidget* MainWindow::createProcessTab()
     elecOralTable->setColumnCount(14);elecOralTable->setRowCount(1);
     int row,col=0;
     elecPageTable->setHorizontalHeaderItem(0,new QTableWidgetItem(QString::fromLocal8Bit("加工深度")));
-    elecPageTable->setHorizontalHeaderItem(1,new QTableWidgetItem(QString::fromLocal8Bit("脉冲宽度us")));
-    elecPageTable->setHorizontalHeaderItem(2,new QTableWidgetItem(QString::fromLocal8Bit("脉冲停息us")));
+    elecPageTable->setHorizontalHeaderItem(1,new QTableWidgetItem(QString::fromLocal8Bit("脉冲宽度ns")));
+    elecPageTable->setHorizontalHeaderItem(2,new QTableWidgetItem(QString::fromLocal8Bit("脉冲停息ns")));
     elecPageTable->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("加工电流")));
-    elecPageTable->setHorizontalHeaderItem(4,new QTableWidgetItem(QString::fromLocal8Bit("高压电流")));
+    elecPageTable->setHorizontalHeaderItem(4,new QTableWidgetItem(QString::fromLocal8Bit("低压电流")));
     elecPageTable->setHorizontalHeaderItem(5,new QTableWidgetItem(QString::fromLocal8Bit("加工电容")));
     elecPageTable->setHorizontalHeaderItem(6,new QTableWidgetItem(QString::fromLocal8Bit("伺服给定")));
     elecPageTable->setHorizontalHeaderItem(7,new QTableWidgetItem(QString::fromLocal8Bit("进给灵敏")));
@@ -327,6 +327,7 @@ void MainWindow::elecTableChanged()
         }
     }else{
         emit edmOpElecSig(m_strElecName,elec);
+
     }
     elecOralTable->blockSignals(false);
 }
@@ -397,8 +398,7 @@ void MainWindow::ReadParaFromTable(MAC_ELEC_PARA* pPara)
     int row=1;
     int col=1;
     QString str;
-    int iIndex;
-    pPara->iParaIndex = -100;
+    pPara->iParaIndex = elecPageTable->currentRow()==-1?0:elecPageTable->currentRow();
     for (row=0;row<OP_HOLE_PAGE_MAX;row++)
     {
         col =0;
@@ -409,10 +409,10 @@ void MainWindow::ReadParaFromTable(MAC_ELEC_PARA* pPara)
             pPara->stElecPage[row].iOpLen = str.toInt();
 
         str = elecPageTable->item(row,++col)->text();
-        pPara->stElecPage[row].iTon = str.toFloat();
+        pPara->stElecPage[row].iTon = str.toInt();
 
         str = elecPageTable->item(row,++col)->text();
-        pPara->stElecPage[row].iToff = str.toFloat();
+        pPara->stElecPage[row].iToff = str.toInt();
 
         str = elecPageTable->item(row,++col)->text();
         pPara->stElecPage[row].iElecLow = str.toInt();
@@ -581,8 +581,13 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 //模拟加工
 void MainWindow::renderToProcess()
 {
+    showFileText();
     tab->setCurrentIndex(1);
     emit edmOPSig(OP_HOLE_SIMULATE);
+    if(!alarmSignal->bPause)
+    {
+        emit edmPauseSig();
+    }
     emit edmCloseSig();
 }
 
@@ -674,8 +679,6 @@ void MainWindow::HandleEdmOpStatus()
     static int iCmdIndex=-1;
     static unsigned char bOver=FALSE;
     static OP_ERROR op_error = OP_NO_ERR;
-    static vector<QString> vCmd;
-    static MAP_ELEC_MAN mpElec;
 
     EDM_OP* pOp;
 
@@ -694,6 +697,10 @@ void MainWindow::HandleEdmOpStatus()
     if (pOp->m_stOpStatus.stCycle.bPauseCmd)
     {
         pOp->m_stOpStatus.stCycle.bPauseCmd = FALSE;
+        if(!alarmSignal->bPause)
+        {
+            emit edmPauseSig();
+        }
     }
 
     if(pOp->m_stOpStatus.iCmdIndex != iCmdIndex && EDM_OP::m_bStartCount)

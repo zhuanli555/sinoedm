@@ -51,11 +51,6 @@ void EDM_OP_List::DeleteEdmOpList()
 	m_pEdmOpList = NULL;
 }
 
-void EDM_OP_List::ResetEdmOpFile()
-{
-	SetEdmOpFile(m_sPath,m_sFile);
-}
-
 void EDM_OP_List::DeleteEdmOp()
 {
 	EDM_OP* pOpPre;
@@ -99,10 +94,10 @@ void EDM_OP_List::SetStart(bool bStart)
 	if (bStart)
 	{
 		if (m_bOver)
-		{
-			DeleteEdmOp();
-			SetEdmOpType(m_enOpType);
-			m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);	
+        {
+            DeleteEdmOp();
+            SetEdmOpType(m_enOpType);
+            m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);
 			m_bOver = FALSE;
 		}
 	}
@@ -117,8 +112,7 @@ void EDM_OP_List::CarryOnBefore(MAC_OPERATE_TYPE enType)
 {
 	DeleteEdmOp();
 	SetEdmOpType(enType);
-	ResetEdmOpFile();
-    SetStart(FALSE);
+    m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);
 }
 
 void EDM_OP_List::CarryOn()
@@ -153,11 +147,11 @@ void EDM_OP_List::CarryOn()
 			delete pOp;
 		}
 		else
-		{				
-			delete pOp;
-			m_pEdmOp = NULL;
-			SetEdmOpType(OP_TYPE_NONE);
-			m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);
+        {
+            delete pOp;
+            m_pEdmOp = NULL;
+            SetEdmOpType(OP_TYPE_NONE);
+            m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);
 			m_bOver = TRUE;		
 			return;
 		}		
@@ -240,9 +234,9 @@ void EDM_OP_List::EdmOpListOver()
 	{
 		m_pEdmOp->EdmOpOver();
 	}
-	DeleteEdmOp();
-	SetEdmOpType(OP_TYPE_NONE);
-	m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);
+    DeleteEdmOp();
+    SetEdmOpType(OP_TYPE_NONE);
+    m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);
 }
 
 void EDM_OP_List::SetEdmOpElec(QString str,MAC_ELEC_PARA elec)

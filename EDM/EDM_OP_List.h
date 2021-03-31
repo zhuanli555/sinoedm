@@ -11,8 +11,7 @@ private:
 	virtual  ~EDM_OP_List();
 public:
 	static EDM_OP_List* GetEdmOpListPtr();
-	static void DeleteEdmOpList();
-	void ResetEdmOpFile();
+    static void DeleteEdmOpList();
 	void SetEdmOpType(MAC_OPERATE_TYPE enType);
 	unsigned char SetEdmOpFile(QString sPath,QString sFile);
 	void SetStart(bool bStart);

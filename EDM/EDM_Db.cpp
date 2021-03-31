@@ -214,18 +214,31 @@ void EDM_Db::GetElecMan(MAP_ELEC_MAN* pElecMan)
 
 void EDM_Db::SaveElecMan(QString str,MAC_ELEC_PARA* pElec)
 {
-    QString sql;
-    QString str0,str1,str2,str3,str4,str5,strOral;
-    str0 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[0]);
-    str1 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[1]);
-    str2 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[2]);
-    str3 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[3]);
-    str4 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[4]);
-    str5 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[5]);
-    strOral = CmdHandle::GetElecOralPara2QString(&pElec->stElecOral);
-    sql = QString("update elec set elec_page_0='%1',elec_page_1='%2',elec_page_2='%3',elec_page_3='%4',\
-elec_page_4='%5',elec_page_5='%6',elec_oral='%7' where eName='%8'").arg(str0).arg(str1).arg(str2).arg(str3).arg(str4).arg(str5).arg(strOral).arg(str);
-    q.exec(sql);
+   QString sql;
+   QString str0,str1,str2,str3,str4,str5,strOral;
+   str0 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[0]);
+   str1 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[1]);
+   str2 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[2]);
+   str3 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[3]);
+   str4 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[4]);
+   str5 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[5]);
+   strOral = CmdHandle::GetElecOralPara2QString(&pElec->stElecOral);
+
+   sql = QString("select eName from elec where eName='%1'").arg(str);
+   q.exec(sql);
+   if(!q.next())
+   {
+       sql = QString("insert into elec(eName,elec_page_0,elec_page_1,elec_page_2,elec_page_3,\
+elec_page_4,elec_page_5,elec_oral) values('%1','%2','%3','%4','%5','%6','%7','%8')").arg(str)\
+               .arg(str0).arg(str1).arg(str2).arg(str3).arg(str4).arg(str5).arg(strOral);
+       q.exec(sql);
+       return;
+   }
+
+   sql = QString("update elec set elec_page_0='%1',elec_page_1='%2',elec_page_2='%3',elec_page_3='%4',\
+elec_page_4='%5',elec_page_5='%6',elec_oral='%7' where eName='%8'").arg(str0).arg(str1)\
+           .arg(str2).arg(str3).arg(str4).arg(str5).arg(strOral).arg(str);
+   q.exec(sql);
 }
 
 

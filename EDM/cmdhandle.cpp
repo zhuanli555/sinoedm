@@ -896,7 +896,7 @@ unsigned char CmdHandle::ReadCmdFromFile(QString strPath,QString strFile,vector<
     map<QString,MAC_ELEC_PARA>::iterator it=pMap->begin();
 
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
-              return FALSE;
+              return 0;
 
     pVector.clear();
     while(it!=pMap->end())

@@ -32,6 +32,7 @@ public:
     void edmHandProcess();
 public:
     EDM_SHOW_STATUS m_stEntileStatus;
+    bool bPause;
 private:
     QGridLayout* mainLayout;
     EDM *edm;
@@ -46,7 +47,7 @@ private:
     QLabel* findCenter;
     QLabel* pauseValue;
     QList<QLabel*> alarmList;
-    bool bPause;
+
 private:
 
 signals:

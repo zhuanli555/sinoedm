@@ -52,8 +52,8 @@ typedef struct edmMacOther
 
 typedef struct isaElec_Page 
 {
-    float iTon;           //脉冲宽度
-    float iToff;          //脉宽间歇
+    int iTon;           //脉冲宽度
+    int iToff;          //脉宽间歇
 	int iElecLow;       //加工电流
 	int iElecHigh;      //高压电流
 	int iServo;         //伺服给定

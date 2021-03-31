@@ -33,6 +33,7 @@ unsigned long CalcLimitBool(MAC_INTERFACE_IN *pIn,int iLabel,unsigned long bDir,
 		bLimit=pIn->btI1C4 & btLimit[iLabel][bDir];
 		break;
 	default:
+        bLimit = 0;
 		break;
 	}
 	return bLimit;
@@ -59,6 +60,7 @@ unsigned long CalcAlarmBool(MAC_INTERFACE_IN *pIn,int iLabel)
 		bAlarm = pIn->btI1C8 & btAlarm[iLabel];
 		break;
 	default:
+        bAlarm = 0;
 		break;
 	}
 	return bAlarm;

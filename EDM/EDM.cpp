@@ -295,7 +295,7 @@ bool EDM::EdmStopMove(unsigned long bStatus)
     INFO_PRINT();
     m_stEdmOpEntile.bStop = TRUE;
     dwStatus = ioctl(fd,IOC_MAC_OPERATE,&m_stEdmOpEntile);
-	m_stEdmOpEntile.bStop = FALSE;
+    m_stEdmOpEntile.bStop = FALSE;
 	if (dwStatus ==1)
 	{
 		 m_stStatus.bStop = bStatus;
@@ -339,8 +339,7 @@ void EDM::EdmZeroSignClose()
 
 bool EDM::EdmSetProtect(unsigned long bProtect)
 {
-	short dwStatus;
-
+    short dwStatus;
 	if (m_stEdmComm.enMvStatus==RULE_RTZERO)
 		return false;
     INFO_PRINT();

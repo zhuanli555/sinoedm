@@ -117,9 +117,7 @@ protected:
 	void EdmHoleCmdProcess();
 
 	void EdmHolePauseProcess();
-	void EdmHoleOverProcess();
-	void EdmHoleElecProcess();
-	void EdmHoleMillFileProcess();
+    void EdmHoleOverProcess();
 	void EdmHoleMvCmdProcess();
 private:
 	void SetAllErr();

@@ -21,7 +21,10 @@ EDM_OP_HOLE::~EDM_OP_HOLE()
 {
 	if (!m_ListStage.empty())
 		m_ListStage.clear();
-
+    if (m_enOpType!=OP_TYPE_NONE)
+    {
+        m_pEdm->SaveElecElem(m_pOpFile->m_sFile,&m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile]);
+    }
 	EdmHoleRecover();
 	m_pEdm = NULL;
 }
@@ -131,7 +134,7 @@ void EDM_OP_HOLE::EdmOpSetStart(unsigned char bStart)
 
 		if (!m_stOpStatus.stCycle.bCycleStart)
 		{
-			m_stOpStatus.iCmdIndex = m_pOpFile->m_mpElecMan[EDM::m_strElecDefault].stElecOral.iOpHoleIndex-1;
+            m_stOpStatus.iCmdIndex = m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile].stElecOral.iOpHoleIndex-1;
 			m_stOpStatus.iCmdIndex = max(m_stOpStatus.iCmdIndex,0);
 			m_stOpStatus.iCmdIndex = min(m_stOpStatus.iCmdIndex,m_pOpFile->m_iCmdNum);
 			memset(&m_stOpStatus.stCycle,0,sizeof(STATUS_NEW_CYCYLE));			
@@ -151,8 +154,7 @@ void EDM_OP_HOLE::EdmOpSetStart(unsigned char bStart)
 				m_stOpStatus.iCmdIndex = 0;
 			}	
 			m_stOpCtrl.bSynchro = FALSE;
-		}
-		m_pOpFile->GetLastElecName(m_stOpStatus.iCmdIndex);
+        }
         m_stOpStatus.bCheck_C_Over = TRUE;
 	}
 	else
@@ -176,7 +178,7 @@ void EDM_OP_HOLE::EdmOpCarry()
 {
 	if (m_stOpStatus.bStart && !m_stOpStatus.bOpOver)
 	{
-		if (m_stOpStatus.iCmdIndex != m_pOpFile->m_mpElecMan[EDM::m_strElecDefault].stElecOral.iOpHoleIndex-1)
+        if (m_stOpStatus.iCmdIndex != m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile].stElecOral.iOpHoleIndex-1)
 		{
 			m_pOpFile->SetEdmElecIndex(m_stOpStatus.iCmdIndex+1);
 		}
@@ -250,8 +252,7 @@ void EDM_OP_HOLE::EdmOpStageRestart()
 */
 void EDM_OP_HOLE::EdmHoleCarry()
 {
-	fEdmOpStage pStageCarry;
-	QString strRec;
+    fEdmOpStage pStageCarry;
 
     CalcDigitCmd();
 	if(!m_pEdm->GetEdmComm())
@@ -305,11 +306,7 @@ void EDM_OP_HOLE::EdmHoleCmdProcess()
 	if (m_pOpFile->IsPauseCmd(str))
 		EdmHolePauseProcess();
 	else if (m_pOpFile->IsOverCmd(str))
-		EdmHoleOverProcess();
-	else if (m_pOpFile->IsStrElecCmd(str))
-		EdmHoleElecProcess();
-	else if (m_pOpFile->IsMillFile(str))
-		EdmHoleMillFileProcess();
+        EdmHoleOverProcess();
 	else	  
 		EdmHoleMvCmdProcess();	
 }
@@ -342,56 +339,6 @@ void EDM_OP_HOLE::EdmHoleOverProcess()
 	m_pOpFile->SetEdmElecIndex(1);
 	EdmHoleRecover();
 }
-
-void EDM_OP_HOLE::EdmHoleElecProcess()
-{
-	//m_strElec = m_vCmd[m_stOpStatus.iCmdIndex];
-	m_pOpFile->GetLastElecName(m_stOpStatus.iCmdIndex);
-	CycleOver();
-}
-
-void EDM_OP_HOLE::EdmHoleMillFileProcess()
-{
-	DIGIT_CMD cmd;
-	QString strRec;
-	QString str=m_pOpFile->m_vCmd[m_stOpStatus.iCmdIndex];
-	m_stOpStatus.bNewOp = TRUE;
-	m_stOpStatus.pNewHoleOp = new EDM_OP_HOLE(OP_HOLE_MILL);
-    ((EDM_OP*)m_stOpStatus.pNewHoleOp)->SetEdmOpFile(m_sPath,str);
-	((EDM_OP*)m_stOpStatus.pNewHoleOp)->m_pOpFile->PlusDigit2Cmd();
-
-	memset(&cmd,0,sizeof(DIGIT_CMD));
-	cmd.enAim = AIM_G92;
-	cmd.enCoor =  ((EDM_OP*)m_stOpStatus.pNewHoleOp)->m_pOpFile->m_enCoor;
-	cmd.enOrbit = ORBIT_G01;
-	for (int i=0;i<MAC_LABEL_COUNT;i++)
-	{
-		if (i==m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel)
-		{
-			continue;
-		}
-		cmd.stAxisDigit[cmd.iAxisCnt].iLabel = i;
-		cmd.iAxisCnt++;
-	}
-
-	while (!m_pEdm->EdmSendMovePara(&cmd))
-	{
-		for (int j=0;j<10000;j++)
-		{
-		}
-	}
-
-	for (int j=0;j<10000;j++)
-	{
-	}
-
-	((EDM_OP*)m_stOpStatus.pNewHoleOp)->m_stOpStatus.iCmdIndex = 0;
-	((EDM_OP*)m_stOpStatus.pNewHoleOp)->m_pOpFile->SetEdmElecIndex(1);
-	((EDM_OP*)m_stOpStatus.pNewHoleOp)->m_pOpFile->GetLastElecName(0);
-	m_it=m_ListStage.end();
-	m_stOpCtrl.bSynchro = TRUE;
-}
-
 
 void EDM_OP_HOLE::EdmHoleMvCmdProcess()
 {
@@ -664,9 +611,7 @@ unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 	int iWorkPos[MAC_LABEL_COUNT];
 	int iLabel;
 	int iCmdIndex;
-	QString str;
-	QString strRec;
-	QString strTmpRec;
+    QString str;
 
 	if (m_stOpStatus.enOpType == OP_HOLE_SING)
 	{
@@ -696,9 +641,7 @@ unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 		while (iCmdIndex<m_pOpFile->m_iCmdNum)
 		{
 			str = m_pOpFile->m_vCmd[iCmdIndex];
-			if (!m_pOpFile->IsPauseCmd(str) 
-				&& !m_pOpFile->IsStrElecCmd(str) 
-				&& !m_pOpFile->IsMillFile(str))
+            if (!m_pOpFile->IsPauseCmd(str))
 			{
 				break;
 			}
@@ -851,8 +794,8 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 		{
 			m_stOpCtrl.stZeroCtrl.bWait = TRUE;
 			memset(&stElec,0,sizeof(Elec_Page));
-            stElec.iTon  = 0.2;
-            stElec.iToff = 0.2;
+            stElec.iTon  = 200;
+            stElec.iToff = 200;
 			stElec.iElecLow = 1;
 			stElec.iElecHigh = 0;
 			stElec.iCap = 0;
@@ -924,8 +867,7 @@ unsigned char EDM_OP_HOLE::EdmHolePrune()
 	{
 		if (!m_stOpCtrl.stZeroCtrl.bWait)
         {
-			SetEdmHolePower(TRUE,TRUE,FALSE);
-			m_pOpFile->GetLastElecName(m_stOpStatus.iCmdIndex);
+            SetEdmHolePower(TRUE,TRUE,FALSE);
 			if(m_pEdm->WriteElecPara(&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[m_stOpStatus.stCycle.iOpPage]),"EdmHolePrune")==-1)
 			{
 				m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
@@ -1236,15 +1178,9 @@ unsigned char EDM_OP_HOLE::EdmHoleMillPage()
 			return FALSE;
 		}
 
-		m_pOpFile->GetLastElecName(m_stOpStatus.iCmdIndex);
 		str = m_pOpFile->m_vCmd[m_stOpStatus.iCmdIndex];
         str = str.trimmed().toUpper();
-		if (m_pOpFile->IsStrElecCmd(str))
-		{
-			m_stOpCtrl.stZeroCtrl.bMillLast = TRUE;
-			return FALSE;
-		}
-		else if (m_pOpFile->IsPauseCmd(str))
+        if (m_pOpFile->IsPauseCmd(str))
 		{
 			m_stOpStatus.bStart = FALSE;
 			m_stOpStatus.stCycle.bPauseCmd = TRUE;
@@ -1411,8 +1347,6 @@ unsigned char EDM_OP_HOLE::EdmHoleRepeat()
 //µ×²¿Í£Áô
 unsigned char EDM_OP_HOLE::EdmHoleRootSleep()
 {
-	QString strRec;
-	QString strTmpRec;
 
 	if (m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iBottomSleep>0)
 	{
@@ -1749,8 +1683,7 @@ void EDM_OP_HOLE::CycleOver()
 			m_stOpStatus.iCmdIndex = 0;
 			m_stOpStatus.bOpOver = TRUE;
 		}
-		m_pOpFile->SetEdmElecIndex(m_stOpStatus.iCmdIndex+1);
-		m_pOpFile->GetLastElecName(m_stOpStatus.iCmdIndex);
+        m_pOpFile->SetEdmElecIndex(m_stOpStatus.iCmdIndex+1);
 	}
 
 	if (m_stOpStatus.enOpType==OP_HOLE_SING || 
@@ -1909,10 +1842,7 @@ int EDM_OP_HOLE::GetFirstCmdValOfCLabel()
 	for (int i=0;i<m_pOpFile->m_iCmdNum;i++)
 	{
 		str = m_pOpFile->m_vCmd[i];
-		if (!m_pOpFile->IsPauseCmd(str) 
-			&& !m_pOpFile->IsStrElecCmd(str) 
-			&& !m_pOpFile->IsMillFile(str) 
-			&& !m_pOpFile->IsOverCmd(str))
+        if (!m_pOpFile->IsPauseCmd(str)&& !m_pOpFile->IsOverCmd(str))
 		{
 			memset(&cmd,0,sizeof(DIGIT_CMD));
             pCmdHandle = new CmdHandle(FALSE,str,&cmd,&cmd);

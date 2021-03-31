@@ -32,12 +32,9 @@ EDM_OP::~EDM_OP()
 {
 	if (m_pOpFile)
 	{
-		if (m_enOpType!=OP_TYPE_NONE)
-		{
-            m_pEdm->SaveElecElem(m_pOpFile->m_sFile,&m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile]);
-		}
+
         delete m_pOpFile;
-	}
+    }
 }
 
 unsigned char EDM_OP::EdmOpErr()
@@ -97,6 +94,7 @@ void EDM_OP::SetEdmOpElec(QString str,MAC_ELEC_PARA elec)
 {
 	if (m_pOpFile)
 	{
+        INFO_PRINT();
 		m_pOpFile->SetEdmOpElec(str,elec,m_stOpStatus.bStart,m_stOpStatus.stCycle.bCycleStart,m_stOpStatus.stCycle.iOpPage);
 		if (m_stOpStatus.bStart)
 		{

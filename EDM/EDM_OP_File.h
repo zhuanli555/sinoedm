@@ -44,16 +44,12 @@ protected:
 public:
 	unsigned char SetEdmOpFile(QString sPath,QString sFile);
 	void SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bStart,unsigned char bCycleStart,int iPageIndex);
-    unsigned char IsStrElecCmd(QString str);
     unsigned char IsPauseCmd(QString str);
     unsigned char IsOverCmd(QString str);
     unsigned char IsMillStart(QString str);
     unsigned char IsMillOver(QString str);
 	void SetEdmElecIndex(int iCmdIndex);
-	void PlusDigit2Cmd();
-    unsigned char IsMillFile(QString str);
-	void SaveElec2Db();
-    QString GetLastElecName(int iCmdIndex);
+    void PlusDigit2Cmd();
 	void SetOpType(MAC_OPERATE_TYPE enOpType);
 private:
 	void CalcStartPt(DIGIT_CMD* pCmd,int iSum[]);
