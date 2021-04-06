@@ -44,9 +44,7 @@ unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 		{
 			m_iCmdNum++;
 			it++;
-		}
-        iHoleIndexBak = m_mpElecMan[sFile].stElecOral.iOpHoleIndex;
-		SetEdmElecIndex(iHoleIndexBak);
+        }
 
 		m_sFile = sFile;
         m_sPath = sPath;
@@ -78,18 +76,16 @@ void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bSta
 		}
 	}
 	else
-	{
-        INFO_PRINT();
+    {
 		if (bCycleStart)
 		{
+            INFO_PRINT();
 			elec.stElecOral.iOpHoleIndex = iHoleIndexBak;
             if (m_strElec==str && iPageIndex==elec.iParaIndex)
 			{
 				bWrite = TRUE;
 			}
 		}
-
-		SetEdmElecIndex(elec.stElecOral.iOpHoleIndex);
 	}
 
     if (bWrite)
@@ -264,11 +260,6 @@ void EDM_OP_File::PlusDigit2Cmd()
             CmdHandle::DigitCmd2QString(&cmd_Loc,str_Loc);
         }
         m_vCmd.push_back(str);
-        if (IsOverCmd(str))
-        {
-            CalcStartPt(&cmd_Loc,iSumLastMac);
-            CmdHandle::DigitCmd2QString(&cmd_Loc,str_Loc);
-        }
         m_vCmdLoc.push_back(str_Loc);
     }
 

@@ -13,7 +13,6 @@ public:
     static void DigitCmd2QString(DIGIT_CMD *pCmd,QString& strCmd);
     static int  GetSpeedFreq(int iSpeed);
     static int GetSpeed(int iFreq);
-    static int GetRAxisFreq(int iSpeed);
     //from ccmdhandle
 
     static QString GetElecPagePara2QString(Elec_Page* pElecPage);
@@ -35,12 +34,6 @@ private:
     int FindFirstLabel(QString strCmd);
     int  GetLableIndex(char cComLabel);
 
-    void AnalyseVectCommand(QString strCommand,DIGIT_CMD *pDigitCmd,DIGIT_CMD* cmdDefault);
-    void WriteVectCmd2Para(QString strCmd,DIGIT_CMD_VECT *pDigitCmd);
-    int FindFirstLabelVect(QString strCmd);
-    int  GetLableIndexVect(char cComLabel);
-    void Vect2DigitCmd(DIGIT_CMD_VECT* pVectCmd,DIGIT_CMD* pDigitCmd);
-
     int FindAndCalSpeed(QString strCmd);
     int FindAndCalDepth(QString strCmd,short& dwDepth);
     void QStringtoFloat(QString str,float &fFloat);
@@ -49,8 +42,6 @@ private:
     unsigned char HasDot(QString strCmd);
 
     int GetAntanAngle(unsigned char bFourQuant,float fSon,float fMon);
-
-    void VectSort(DIGIT_CMD_VECT* pVectCmd);
 
     int GetALabel_xDis(int iLabel_A,int iRadius,unsigned char bAntiClockWise);
     int GetALabel_zDis(int iLabel_A,int iRadius,unsigned char bAntiClockWise);

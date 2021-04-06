@@ -246,7 +246,7 @@ void EDM_OP_HOLE::EdmHoleCarry()
 			CycleOver();
 		}
 		else
-		{
+        {
 			pStageCarry = *m_it;
 			if((this->*pStageCarry)())
 			{
@@ -582,13 +582,9 @@ unsigned char EDM_OP_HOLE::EdmHoleLocation()
 //加工同步
 unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 {
-	DIGIT_CMD cmd;
-	DIGIT_CMD cmd2Send;
-    CmdHandle* pCmdHandle;
-	int iLabel;
 	int iCmdIndex;
     QString str;
-    INFO_PRINT();
+
 	if (m_stOpStatus.enOpType == OP_HOLE_SING)
 	{
 		return TRUE;
@@ -601,18 +597,16 @@ unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 	{
 		return TRUE;
 	}
-
+    m_stOpStatus.stCycle.iCycleIndex = 2;
 	if (m_stOpCtrl.stZeroCtrl.bStageLast)
 	{
+        INFO_PRINT();
         m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
 		return TRUE;
 	}
-
-	
-	m_stOpStatus.stCycle.iCycleIndex = 2;
-
 	if (!m_stOpCtrl.stZeroCtrl.bStageLast)
     {
+        INFO_PRINT();
 		iCmdIndex = m_stOpStatus.iCmdIndex+1;
 		while (iCmdIndex<m_pOpFile->m_iCmdNum)
 		{
@@ -626,49 +620,13 @@ unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 		if (iCmdIndex >= m_pOpFile->m_iCmdNum)
 		{
 			return TRUE;
-		}
-
-		str = m_pOpFile->m_vCmdLoc[iCmdIndex];
-		memset(&cmd,0,sizeof(DIGIT_CMD));
-        pCmdHandle = new CmdHandle(FALSE,str,&cmd,&cmd);
-		delete pCmdHandle;
+        }
 
 		while (!m_pEdm->EdmSetProtect(true))
 		{
-		}	
-		for (int k=0;k<cmd.iAxisCnt;k++)
-		{
-			iLabel = cmd.stAxisDigit[k].iLabel;
-			if (iLabel==m_pEdm->m_stSysSet.iAxistLabel)
-			{
-				m_iSafeLabelMacPos = cmd.stAxisDigit[k].iDistance;
-			}
-			cmd.stAxisDigit[k].iDistance = cmd.stAxisDigit[k].iDistance 
-				- m_pEdm->m_stEdmComm.stMoveCtrlComm[iLabel].iMachPos;			
-		}
-		cmd.enAim = AIM_G91;
-
-		memcpy(&cmd2Send,&cmd,sizeof(DIGIT_CMD));
-		cmd2Send.stOp.bShortDis = TRUE;
-
-		//过滤没有使用的轴
-		cmd2Send.iAxisCnt = 0;
-		for (int k=0;k<cmd.iAxisCnt;k++)
-		{
-			iLabel = cmd.stAxisDigit[k].iLabel;
-			if (m_pEdm->m_stSysSet.bSetUse[iLabel])
-			{
-				cmd2Send.stAxisDigit[cmd2Send.iAxisCnt].iLabel = cmd.stAxisDigit[k].iLabel;
-				cmd2Send.stAxisDigit[cmd2Send.iAxisCnt].iDistance = cmd.stAxisDigit[k].iDistance;
-				cmd2Send.iAxisCnt++;
-			}
-		}
-		
-		if(m_pEdm->EdmSendMovePara(&cmd2Send))
-		{
-			m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-			return FALSE;
-		}	
+        }
+        m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
+        return FALSE;
 	}	
 
 	return FALSE;
@@ -1311,7 +1269,7 @@ unsigned char EDM_OP_HOLE::EdmHoleRepeat()
 //底部停留
 unsigned char EDM_OP_HOLE::EdmHoleRootSleep()
 {
-
+    INFO_PRINT();
 	if (m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iBottomSleep>0)
 	{
 		if (!EDM_OP::m_bSetPower && m_stOpStatus.enOpType!= OP_HOLE_SIMULATE)
@@ -1628,6 +1586,7 @@ unsigned char EDM_OP_HOLE::EdmHoleResetStartPos()
 
 void EDM_OP_HOLE::CycleOver()
 {
+    INFO_PRINT();
 	memset(&m_stOpCtrl.stZeroCtrl,0,sizeof(HOLE_ZERO_CTRL));
 	m_stOpStatus.stCycle.iTimeCnt = 0;
     m_stOpStatus.stCycle.iTimeSec = 0;

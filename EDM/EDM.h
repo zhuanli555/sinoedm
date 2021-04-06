@@ -60,28 +60,6 @@ typedef struct  edmAxis_Adjust
 	int iPos;
 }Axis_Adjust;
 
-//内外圆基准控制
-typedef enum
-{
-	EN_ADJUST_NONE          = 0,     //没有内外圆基准
-	EN_ADJUST_INSIDE        = 1,     //内圆基准
-	EN_ADJUST_OUTSIDE       = 2,     //外圆基准
-}ADJUST_TYPE;
-
-typedef struct edmAdjustCircle 
-{
-	ADJUST_TYPE enAdjustType;
-	int iIndex;
-	int iIndexCnt;
-	int iHeight;
-	int iSemiDiameter;
-	int iVal_X[5];
-	int iVal_Y[5];
-	unsigned char bAdjust;
-	unsigned char bOver;
-}ADJUST_CIRCLE;
-
-
 //轴运动使用的控制参数硬件参数
 typedef struct  edmAxis_Hard_Ctl
 {	
@@ -157,8 +135,7 @@ private:
 	MAC_OTHER m_stMacOther;
     EDM_Db * m_pEdmAdoSys;
     MAP_ELEC_MAN  mp_ElecMan;
-	Axis_Adjust m_stAxisAdjust;
-	ADJUST_CIRCLE m_stAdjustCircle;
+    Axis_Adjust m_stAxisAdjust;
 
     QString m_strMakeUpFile;
 public:
@@ -170,10 +147,7 @@ public:
 	int  GetEdmAxisWorkPos(int iLabel);
 	bool GetEdmStatusData();
 
-	int  EdmHandProcess();
-
-	int GetRAxisFreq(int iSpeed);
-	
+    int  EdmHandProcess();
 	void CloseHardWare();
 
 	bool EdmStopMove(unsigned long bStatus);
@@ -181,10 +155,8 @@ public:
 	void EdmZeroSignClose();
 	void EdmSaveMacComm();
 
-	void SetAxisAdjust(int iLabel, unsigned char bDir);
-	void SetAxisAdjustCircleType(ADJUST_CIRCLE* pAdjustCircle);
-	void EdmAxisAdjust();
-    void EdmAxisAdjustCircle();
+    void SetAxisAdjust(int iLabel, unsigned char bDir);
+    void EdmAxisAdjust();
 
 	void SetValMakeUp(int iVal_C,int iVal_X);
     void SetMakeUpFile(QString strFile);
@@ -201,9 +173,7 @@ private:
 	int GetSpeed(int iFreq);
 	int HandBoxProcess();	
 	bool SwitchWorkIndex(int iIndex);
-	void RetCenter_C_G59();
-	void EdmAxisAdjustCircleInside();
-	void EdmAxisAdjustCircleOutSide();
+    void RetCenter_C_G59();
 public:
     unsigned char FindElecManElem(QString str);
     void GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan);

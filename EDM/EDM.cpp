@@ -20,8 +20,7 @@ EDM::EDM(QObject *parent):QObject(parent)
 	memset(&m_stEdmInterfaceOut,0,sizeof(MAC_INTERFACE_OUT));
 	memset(&m_stEdmInterfaceIn,0,sizeof(MAC_INTERFACE_IN));
 	memset(&m_stStatus,0,sizeof(Mac_Status));
-	memset(&m_stEdmOpEntile,0,sizeof(MAC_HANDLE_ENTILE));
-	memset(&m_stAdjustCircle,0,sizeof(ADJUST_CIRCLE));
+    memset(&m_stEdmOpEntile,0,sizeof(MAC_HANDLE_ENTILE));
     memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
     m_pEdmAdoSys = new EDM_Db();
 	m_bMachFault = FALSE;
@@ -239,8 +238,7 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
 void EDM::EdmStop()
 {
 	CloseHardWare();
-	memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
-	memset(&m_stAdjustCircle,0,sizeof(ADJUST_CIRCLE));
+    memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
 	EdmStopMove(TRUE);
 }
 
@@ -480,18 +478,6 @@ bool EDM::EdmSetShake(unsigned long bShake)
     m_stStatus.bShake = bShake;
 
     return true;
-}
-
-int EDM::GetRAxisFreq(int iSpeed)
-{
-	int iFreq = 5000;
-	if (iSpeed>100)
-		iSpeed = 100;
-	if (iSpeed>=0 && iSpeed<=100)
-	{
-		iFreq = iSpeed*100;
-	}
-	return iFreq;
 }
 
 //电源
@@ -889,17 +875,6 @@ void EDM::SetAxisAdjust(int iLabel, unsigned char bDir)
 	m_stAxisAdjust.iLabel = iLabel;
 	m_stAxisAdjust.bDir = bDir;
 }
-
-void EDM::SetAxisAdjustCircleType(ADJUST_CIRCLE* pAdjustCircle)
-{
-	memcpy(&m_stAdjustCircle,pAdjustCircle,sizeof(ADJUST_CIRCLE));
-	m_stAdjustCircle.iVal_X[4] =  m_stEdmComm.stMoveCtrlComm[0].iMachPos;
-	m_stAdjustCircle.iVal_Y[4] = m_stEdmComm.stMoveCtrlComm[1].iMachPos;
-	m_stAdjustCircle.iIndex = 0;
-	m_stAdjustCircle.bAdjust = TRUE;
-	m_stAdjustCircle.iIndexCnt = 0;
-}
-
 //对刀
 void EDM::EdmAxisAdjust()
 {
@@ -1058,300 +1033,6 @@ void EDM::EdmAxisAdjust()
 					m_stAxisAdjust.iStage = 2;
 			}
 		}		
-	}
-}
-
-//找内外圆中心
-void EDM::EdmAxisAdjustCircle()
-{
-	if (m_stAdjustCircle.bAdjust)
-	{
-		if (m_stAdjustCircle.enAdjustType == EN_ADJUST_INSIDE)
-		{
-			EdmAxisAdjustCircleInside();
-		}
-		else if (m_stAdjustCircle.enAdjustType == EN_ADJUST_OUTSIDE)
-		{
-			EdmAxisAdjustCircleOutSide();
-		}
-	}
-}
-
-void EDM::EdmAxisAdjustCircleInside()
-{
-	DIGIT_CMD stDigitCmd;
-	int iLabel[4] = {0,0,1,1};
-	unsigned char bDir[4] = {TRUE,FALSE,TRUE,FALSE};
-	int iVal_Center[2];
-
-	if (!m_stAxisAdjust.bAdjust)
-	{
-		if (m_stEdmComm.enMvStatus == RULE_MOVE_OVER)
-		{
-			memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
-
-			if (m_stAdjustCircle.bOver)
-			{
-				memset(&m_stAdjustCircle,0,sizeof(ADJUST_CIRCLE));
-				EdmSetProtect(TRUE);
-			}
-
-			if (m_stAdjustCircle.iIndex>3)
-			{
-				m_stAdjustCircle.iIndex =0;
-				m_stAdjustCircle.iIndexCnt++;
-			}
-
-			if (m_stAdjustCircle.iIndexCnt==4)
-			{
-				while (!EdmSetProtect(FALSE))
-				{					
-				}
-				iVal_Center[0] = (m_stAdjustCircle.iVal_X[0] + m_stAdjustCircle.iVal_X[1])/2;
-				iVal_Center[1] = (m_stAdjustCircle.iVal_Y[2] + m_stAdjustCircle.iVal_Y[3])/2;
-				iVal_Center[0] = iVal_Center[0] - m_stEdmComm.stMoveCtrlComm[0].iWorkPosSet;
-				iVal_Center[1] = iVal_Center[1] - m_stEdmComm.stMoveCtrlComm[1].iWorkPosSet;
-
-				stDigitCmd.iFreq = 10000;
-				stDigitCmd.enAim = AIM_G90;						
-				stDigitCmd.enOrbit = ORBIT_G00;
-				stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-				stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iDistance = iVal_Center[0];
-				stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iLabel = 0;
-				stDigitCmd.iAxisCnt++;
-
-				stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iDistance = iVal_Center[1];
-				stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iLabel = 1;
-				stDigitCmd.iAxisCnt++;
-
-				if (EdmSendMovePara(&stDigitCmd))
-				{
-					m_stAdjustCircle.bOver = TRUE;
-					return;
-				}
-			}
-
-			switch(m_stAdjustCircle.iIndex)
-			{
-			case 0:
-				{
-					stDigitCmd.iFreq = 10000;
-					stDigitCmd.enAim = AIM_G91;						
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					stDigitCmd.stAxisDigit[0].iDistance = m_stAdjustCircle.iHeight;
-					stDigitCmd.stAxisDigit[0].iLabel = m_stSysSet.stSetNoneLabel.iOpLabel;
-					stDigitCmd.iAxisCnt = 1;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAdjustCircle.iIndex++;
-					}
-				}
-				break;
-			case 1:
-				{
-					SetAxisAdjust(iLabel[m_stAdjustCircle.iIndexCnt], bDir[m_stAdjustCircle.iIndexCnt]);
-					m_stAdjustCircle.iIndex++;
-				}
-				break;			
-			case 2:
-				{
-					m_stAdjustCircle.iVal_X[m_stAdjustCircle.iIndexCnt] = m_stEdmComm.stMoveCtrlComm[0].iMachPos;
-					m_stAdjustCircle.iVal_Y[m_stAdjustCircle.iIndexCnt] = m_stEdmComm.stMoveCtrlComm[1].iMachPos;
-					while (!EdmSetProtect(FALSE))
-					{						
-					}
-					stDigitCmd.iFreq = 10000;
-					stDigitCmd.enAim = AIM_G90;						
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iDistance = m_stAdjustCircle.iVal_X[4]
-					- m_stEdmComm.stMoveCtrlComm[0].iWorkPosSet;
-					stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iLabel = 0;
-					stDigitCmd.iAxisCnt++;
-
-					stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iDistance = m_stAdjustCircle.iVal_Y[4]
-					- m_stEdmComm.stMoveCtrlComm[1].iWorkPosSet;
-					stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iLabel = 1;
-					stDigitCmd.iAxisCnt++;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAdjustCircle.iIndex++;
-					}
-				}
-				break;
-			case 3:
-				{
-					stDigitCmd.iFreq = 10000;
-					stDigitCmd.enAim = AIM_G91;						
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					stDigitCmd.stAxisDigit[0].iDistance = 0-m_stAdjustCircle.iHeight;
-					stDigitCmd.stAxisDigit[0].iLabel = m_stSysSet.stSetNoneLabel.iOpLabel;
-					stDigitCmd.iAxisCnt = 1;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAdjustCircle.iIndex++;
-					}
-				}
-				break;
-			default:
-				break;
-			}
-		}
-	}
-}
-
-void EDM::EdmAxisAdjustCircleOutSide()
-{
-	DIGIT_CMD stDigitCmd;
-	int iLabel[4] = {0,0,1,1};
-	unsigned char bDir[4] = {TRUE,FALSE,TRUE,FALSE};
-	int iProtect = ((float)m_stAdjustCircle.iSemiDiameter)*0.1;
-	int iVal_Center[2];
-
-	iProtect = max(iProtect,2000);	
-	if (!m_stAxisAdjust.bAdjust)
-	{
-		if (m_stEdmComm.enMvStatus == RULE_MOVE_OVER)
-		{
-			memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
-
-			if (m_stAdjustCircle.bOver)
-			{
-				memset(&m_stAdjustCircle,0,sizeof(ADJUST_CIRCLE));
-				EdmSetProtect(TRUE);
-			}
-
-			if (m_stAdjustCircle.iIndex>4)
-			{
-				m_stAdjustCircle.iIndex =0;
-				m_stAdjustCircle.iIndexCnt++;
-			}
-
-			if (m_stAdjustCircle.iIndexCnt==4)
-			{
-				while (!EdmSetProtect(FALSE))
-				{					
-				}
-				iVal_Center[0] = (m_stAdjustCircle.iVal_X[0] + m_stAdjustCircle.iVal_X[1])/2;
-				iVal_Center[1] = (m_stAdjustCircle.iVal_Y[2] + m_stAdjustCircle.iVal_Y[3])/2;
-				iVal_Center[0] = iVal_Center[0] - m_stEdmComm.stMoveCtrlComm[0].iWorkPosSet;
-				iVal_Center[1] = iVal_Center[1] - m_stEdmComm.stMoveCtrlComm[1].iWorkPosSet;
-
-				stDigitCmd.iFreq = 10000;
-				stDigitCmd.enAim = AIM_G90;						
-				stDigitCmd.enOrbit = ORBIT_G00;
-				stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-				stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iDistance = iVal_Center[0];
-				stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iLabel = 0;
-				stDigitCmd.iAxisCnt++;
-
-				stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iDistance = iVal_Center[1];
-				stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iLabel = 1;
-				stDigitCmd.iAxisCnt++;
-
-				if (EdmSendMovePara(&stDigitCmd))
-				{
-					m_stAdjustCircle.bOver = TRUE;
-					return;
-				}
-			}
-
-			switch(m_stAdjustCircle.iIndex)
-			{
-			case 0:
-				{
-					stDigitCmd.iFreq = 10000;
-					stDigitCmd.enAim = AIM_G91;						
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					if (bDir[m_stAdjustCircle.iIndexCnt])
-						stDigitCmd.stAxisDigit[0].iDistance = 0-m_stAdjustCircle.iSemiDiameter-iProtect;
-					else
-						stDigitCmd.stAxisDigit[0].iDistance = m_stAdjustCircle.iSemiDiameter+iProtect;
-
-					stDigitCmd.stAxisDigit[0].iLabel = iLabel[m_stAdjustCircle.iIndexCnt];
-					stDigitCmd.iAxisCnt = 1;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAdjustCircle.iIndex++;
-					}
-				}
-				break;
-			case 1:
-				{
-					stDigitCmd.iFreq = 10000;
-					stDigitCmd.enAim = AIM_G91;						
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					stDigitCmd.stAxisDigit[0].iDistance = m_stAdjustCircle.iHeight;
-					stDigitCmd.stAxisDigit[0].iLabel = m_stSysSet.stSetNoneLabel.iOpLabel;
-					stDigitCmd.iAxisCnt = 1;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAdjustCircle.iIndex++;
-					}
-				}
-				break;
-			case 2:
-				{
-					SetAxisAdjust(iLabel[m_stAdjustCircle.iIndexCnt], bDir[m_stAdjustCircle.iIndexCnt]);
-					m_stAdjustCircle.iIndex++;
-				}
-				break;
-			case 3:
-				{
-					stDigitCmd.iFreq = 10000;
-					stDigitCmd.enAim = AIM_G91;						
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					stDigitCmd.stAxisDigit[0].iDistance = 0-m_stAdjustCircle.iHeight;
-					stDigitCmd.stAxisDigit[0].iLabel = m_stSysSet.stSetNoneLabel.iOpLabel;
-					stDigitCmd.iAxisCnt = 1;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAdjustCircle.iIndex++;
-					}
-				}
-				break;
-			case 4:
-				{
-					m_stAdjustCircle.iVal_X[m_stAdjustCircle.iIndexCnt] = m_stEdmComm.stMoveCtrlComm[0].iMachPos;
-					m_stAdjustCircle.iVal_Y[m_stAdjustCircle.iIndexCnt] = m_stEdmComm.stMoveCtrlComm[1].iMachPos;
-					while (!EdmSetProtect(FALSE))
-					{						
-					}
-					stDigitCmd.iFreq = 10000;
-					stDigitCmd.enAim = AIM_G90;						
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iDistance = m_stAdjustCircle.iVal_X[4]
-					- m_stEdmComm.stMoveCtrlComm[0].iWorkPosSet;
-					stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iLabel = 0;
-					stDigitCmd.iAxisCnt++;
-
-					stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iDistance = m_stAdjustCircle.iVal_Y[4]
-					- m_stEdmComm.stMoveCtrlComm[1].iWorkPosSet;
-					stDigitCmd.stAxisDigit[stDigitCmd.iAxisCnt].iLabel = 1;
-					stDigitCmd.iAxisCnt++;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAdjustCircle.iIndex++;
-					}
-				}
-				break;
-			default:
-				break;
-			}
-		}
 	}
 }
 
