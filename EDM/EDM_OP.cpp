@@ -18,13 +18,14 @@ EDM_OP::EDM_OP()
 	if (m_pEdm->m_stSysSet.iAxistLabel>=0 && m_pEdm->m_stSysSet.iAxistLabel<MAC_LABEL_COUNT)
 	{
 		m_iSafeLabelMacPos = m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.iAxistLabel].iMachPos;
-	}
-
-	for (int i=0;i<6;i++)
-	{
-		m_pEdm->GetWorkPosSetByIndex(i,&(m_iWorkPos_All[i][0]));
-	}
-
+    }
+    for(int i = 0;i<MAC_LABEL_COUNT;i++)
+    {
+        for(int j = 0;j<6;j++)
+        {
+            m_iWorkPos_All[i][j] = m_pEdm->m_iCoor[i][j];
+        }
+    }
     m_iWholeFreq = CmdHandle::GetSpeedFreq(m_pEdm->m_stSysSet.stSetNoneLabel.iWholeSpeed);
 }
 
@@ -32,7 +33,6 @@ EDM_OP::~EDM_OP()
 {
 	if (m_pOpFile)
 	{
-
         delete m_pOpFile;
     }
 }
@@ -40,12 +40,11 @@ EDM_OP::~EDM_OP()
 unsigned char EDM_OP::EdmOpErr()
 {
 	if (m_pEdm->m_stEdmComm.enMvTrouble != MOVE_NO_TROUBLE 
-		|| m_stOpStatus.enErrAll.errOp != OP_NO_ERR
-		|| m_stOpStatus.enErrAll.errFile != OP_FILE_NO_ERR
-		//|| m_pEdm->m_stEdmShowData.stStatus.bRalarm
+        || m_stOpStatus.errOp != OP_NO_ERR
+        || m_stOpStatus.errFile != OP_FILE_NO_ERR
 		|| m_pEdm->m_stEdmShowData.stStatus.bAxisOffset)
 	{
-		m_stOpStatus.enErrAll.errOp = OP_HARD_ERR;
+        m_stOpStatus.errOp = OP_HARD_ERR;
 		m_stOpStatus.stCycle.bPauseCmd = TRUE;
 		m_stOpStatus.bStart = FALSE;		
 		return TRUE;
@@ -79,11 +78,13 @@ void EDM_OP::CalcDigitCmd()
 	}
 
 	m_bCalc = TRUE;
-	for (int i=0;i<6;i++)
-	{
-		m_pEdm->GetWorkPosSetByIndex(i,&(m_iWorkPos_All[i][0]));
-	}
-
+    for(int i = 0;i<MAC_LABEL_COUNT;i++)
+    {
+        for(int j = 0;j<6;j++)
+        {
+            m_iWorkPos_All[i][j] = m_pEdm->m_iCoor[i][j];
+        }
+    }
 	if (m_pOpFile)
 	{
 		m_pOpFile->PlusDigit2Cmd();
@@ -100,12 +101,4 @@ void EDM_OP::SetEdmOpElec(QString str,MAC_ELEC_PARA elec)
 			EdmOpStageRestart();
 		}
 	}
-}
-
-void EDM_OP::SetPassPara(float fElec,float fSpeed,int iSpeedFilterCnt,int iElecFilterCnt)
-{
-	m_stPassSet.fElec = fElec;
-	m_stPassSet.fSpeed = fSpeed;
-	m_stPassSet.iSpeedFilterCnt = iSpeedFilterCnt;
-	m_stPassSet.iElecFilterCnt = iElecFilterCnt;
 }

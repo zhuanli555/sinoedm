@@ -108,7 +108,6 @@ void MainWindow::MacUserOperate()
         if(edm)
         {
             mutex.lock();
-            edm->GetEdmComm();
             edm->GetEdmStatusData();
             emit coordWidgetChanged();//机床命令周期性处理
             //edm->EdmAxisAdjust();
@@ -202,6 +201,11 @@ void MainWindow::createActions()
     axisSetAction->setStatusTip(tr("轴置数"));
     connect(axisSetAction,&QAction::triggered,this,&MainWindow::renderToAxisSet);
 
+    simulateAction = new QAction(QString::fromLocal8Bit("模拟加工(F9)"),this);
+    simulateAction->setShortcut(tr("F9"));
+    simulateAction->setStatusTip(tr("模拟加工"));
+    connect(simulateAction,&QAction::triggered,this,&MainWindow::renderToSimulate);
+
     settingAction = new QAction(QString::fromLocal8Bit("设置(F10)"),this);
     settingAction->setShortcut(tr("F10"));
     settingAction->setStatusTip("设置");
@@ -228,6 +232,7 @@ void MainWindow::createMenus()
     myMenu->addAction(programAction);
     myMenu->addAction(workZeroAction);
     myMenu->addAction(axisSetAction);
+    myMenu->addAction(simulateAction);
     myMenu->addAction(settingAction);
     myMenu->addAction(exitAction);
 
@@ -263,7 +268,7 @@ QWidget* MainWindow::createProcessTab()
 {
     QWidget* widget = new QWidget();
     elecPageTable = new QTableWidget;
-    elecPageTable->setColumnCount(10);elecPageTable->setRowCount(6);
+    elecPageTable->setColumnCount(11);elecPageTable->setRowCount(6);
     elecOralTable = new QTableWidget;
     elecOralTable->setColumnCount(14);elecOralTable->setRowCount(1);
     int row,col=0;
@@ -276,7 +281,8 @@ QWidget* MainWindow::createProcessTab()
     elecPageTable->setHorizontalHeaderItem(6,new QTableWidgetItem(QString::fromLocal8Bit("伺服给定")));
     elecPageTable->setHorizontalHeaderItem(7,new QTableWidgetItem(QString::fromLocal8Bit("进给灵敏")));
     elecPageTable->setHorizontalHeaderItem(8,new QTableWidgetItem(QString::fromLocal8Bit("回退灵敏")));
-    elecPageTable->setHorizontalHeaderItem(9,new QTableWidgetItem(QString::fromLocal8Bit("R轴速度")));
+    elecPageTable->setHorizontalHeaderItem(9,new QTableWidgetItem(QString::fromLocal8Bit("振动强度")));
+    elecPageTable->setHorizontalHeaderItem(10,new QTableWidgetItem(QString::fromLocal8Bit("振动灵敏")));
     QStringList list;
     list<<QString::fromLocal8Bit("修电极")<<QString::fromLocal8Bit("加工页1")\
        <<QString::fromLocal8Bit("加工页2")<<QString::fromLocal8Bit("加工页3")\
@@ -284,7 +290,7 @@ QWidget* MainWindow::createProcessTab()
     elecPageTable->setVerticalHeaderLabels(list);
     for(row =0;row<OP_HOLE_PAGE_MAX;row++)
     {
-        for(col=0;col<10;col++)
+        for(col=0;col<11;col++)
         {
             elecPageTable->setItem(row,col,new QTableWidgetItem("0"));
         }
@@ -351,13 +357,15 @@ void MainWindow::fillTableWidget(MAC_ELEC_PARA* pPara)
         elecPageTable->item(row,++col)->setText(str);
         str = QString("%1").arg(pPara->stElecPage[row].iCap);
         elecPageTable->item(row,++col)->setText(str);
-        str = QString("%1").arg(pPara->stElecPage[row].iServo);
+        str = QString("%1%").arg(pPara->stElecPage[row].iServo);
         elecPageTable->item(row,++col)->setText(str);
-        str = QString("%1").arg(pPara->stElecPage[row].iFeedSense);
+        str = QString("%1%").arg(pPara->stElecPage[row].iFeedSense);
         elecPageTable->item(row,++col)->setText(str);
-        str = QString("%1").arg(pPara->stElecPage[row].iBackSense);
+        str = QString("%1%").arg(pPara->stElecPage[row].iBackSense);
         elecPageTable->item(row,++col)->setText(str);
-        str = QString("%1").arg(pPara->stElecPage[row].iRotSpeed);
+        str = QString("%1").arg(pPara->stElecPage[row].iShake);
+        elecPageTable->item(row,++col)->setText(str);
+        str = QString("%1%").arg(pPara->stElecPage[row].iShakeSense);
         elecPageTable->item(row,++col)->setText(str);
     }
 
@@ -433,7 +441,10 @@ void MainWindow::ReadParaFromTable(MAC_ELEC_PARA* pPara)
         pPara->stElecPage[row].iBackSense = PercentStr2int(str);
 
         str = elecPageTable->item(row,++col)->text();
-        pPara->stElecPage[row].iRotSpeed = str.toInt();
+        pPara->stElecPage[row].iShake = str.toInt();
+
+        str = elecPageTable->item(row,++col)->text();
+        pPara->stElecPage[row].iShakeSense = PercentStr2int(str);
     }
 
 
@@ -487,7 +498,7 @@ void MainWindow::ReadParaFromTable(MAC_ELEC_PARA* pPara)
 
 }
 
-float MainWindow::PercentStr2int(QString str)
+int MainWindow::PercentStr2int(QString str)
 {
     QString strTmp=str;
     if(strTmp.contains('.'))
@@ -500,7 +511,7 @@ float MainWindow::PercentStr2int(QString str)
         strTmp = str.left(index);
 
     }
-    return strTmp.toFloat();
+    return strTmp.toInt();
 }
 
 void MainWindow::LawOfPara(MAC_ELEC_PARA* pPara)
@@ -511,7 +522,8 @@ void MainWindow::LawOfPara(MAC_ELEC_PARA* pPara)
         LawInt(pPara->stElecPage[i].iServo,0,100);
         LawInt(pPara->stElecPage[i].iFeedSense,0,100);
         LawInt(pPara->stElecPage[i].iBackSense,0,1000000);
-        LawInt(pPara->stElecPage[i].iRotSpeed,1,8);
+        LawInt(pPara->stElecPage[i].iShake,300,800);
+        LawInt(pPara->stElecPage[i].iShakeSense,0,100);
     }
 
     LawInt(pPara->stElecOral.iOpHoleIndex,1,pPara->stElecOral.iOpHoleAll);
@@ -579,11 +591,24 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 }
 
 //模拟加工
-void MainWindow::renderToProcess()
+void MainWindow::renderToSimulate()
 {
     showFileText();
     tab->setCurrentIndex(1);
     emit edmOPSig(OP_HOLE_SIMULATE);
+    if(!alarmSignal->bPause)
+    {
+        emit edmPauseSig();
+    }
+    emit edmCloseSig();
+}
+
+//放电加工
+void MainWindow::renderToProcess()
+{
+    showFileText();
+    tab->setCurrentIndex(1);
+    emit edmOPSig(OP_HOLE_PROGRAME);
     if(!alarmSignal->bPause)
     {
         emit edmPauseSig();
@@ -707,39 +732,11 @@ void MainWindow::HandleEdmOpStatus()
     {
         iCmdIndex = pOp->m_stOpStatus.iCmdIndex;
     }
-
-    if (pOp->m_stOpStatus.stCycle.stPassChart.bClear)
+    if (pOp->m_stOpStatus.errOp != op_error )
     {
-        pOp->m_stOpStatus.stCycle.stPassChart.bClear = FALSE;
+        op_error = pOp->m_stOpStatus.errOp;
+        edm->EdmYellowLump( !(pOp->m_stOpStatus.errOp==OP_NO_ERR));
     }
-    else
-    {
-        if (pOp->m_stOpStatus.stCycle.stPassChart.bSet)
-        {
-            pOp->m_stOpStatus.stCycle.stPassChart.bSet = FALSE;
-        }
-        else
-        {
-            if (pOp->m_stOpStatus.stCycle.stPassChart.bRealTimeIn)
-            {
-                pOp->m_stOpStatus.stCycle.stPassChart.bRealTimeIn = FALSE;
-            }
-        }
-    }
-
-
-    if (pOp->m_stOpStatus.enErrAll.errOp != op_error )
-    {
-        op_error = pOp->m_stOpStatus.enErrAll.errOp;
-        edm->EdmYellowLump( !(pOp->m_stOpStatus.enErrAll.errOp==OP_NO_ERR));
-    }
-
-
-    if (pOp->m_stOpStatus.bCheck_C_Over)
-    {
-        pOp->m_stOpStatus.bCheck_C_Over = FALSE;
-    }
-
     if (bOver != edmOpList->m_bOver)
     {
         bOver = edmOpList->m_bOver;

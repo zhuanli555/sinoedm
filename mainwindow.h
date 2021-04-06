@@ -50,7 +50,7 @@ private:
     void OpFileCopyAndSend();
     void fillTableWidget(MAC_ELEC_PARA* pPara);
     void ReadParaFromTable(MAC_ELEC_PARA* pPara);
-    float PercentStr2int(QString str);
+    int PercentStr2int(QString str);
     void LawOfPara(MAC_ELEC_PARA* pPara);
     void LawInt(int& t,int low,int high);
 
@@ -81,6 +81,7 @@ private:
     QAction* unionZeroAction;
     QAction* axisSetAction;
     QAction* programAction;
+    QAction* simulateAction;
     QAction* settingAction;
     QAction* workZeroAction;
     QAction* exitAction;
@@ -130,6 +131,7 @@ signals:
 protected slots:
 
     void renderToProcess();
+    void renderToSimulate();
     void renderToProgram();
     void renderToSetting();
     void renderToUnionZero();

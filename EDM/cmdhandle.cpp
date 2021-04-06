@@ -983,7 +983,8 @@ void CmdHandle::LawOfPara(MAC_ELEC_PARA* pPara)
         LawInt(pPara->stElecPage[i].iServo,0,100);
         LawInt(pPara->stElecPage[i].iFeedSense,0,100);
         LawInt(pPara->stElecPage[i].iBackSense,0,1000000);
-        LawInt(pPara->stElecPage[i].iRotSpeed,1,8);
+        LawInt(pPara->stElecPage[i].iShake,300,800);
+        LawInt(pPara->stElecPage[i].iShakeSense,0,100);
     }
 
     LawInt(pPara->stElecOral.iOpHoleIndex,1,pPara->stElecOral.iOpHoleAll);

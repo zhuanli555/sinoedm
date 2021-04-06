@@ -135,7 +135,7 @@ bool EDM::GetEdmStatusData()
 {
 	short dwStatus;
 	int iLabel=0;
-
+    GetEdmComm();
 	memcpy(&m_stEdmShowData.stComm,&m_stEdmComm,sizeof(MAC_COMMON));
 	for (iLabel=0;iLabel<MAC_LABEL_COUNT;iLabel++)
 		m_stEdmShowData.iWorkPos[iLabel] = GetEdmAxisWorkPos(iLabel);
@@ -179,8 +179,7 @@ bool EDM::GetEdmStatusData()
 			}
 		}
 
-		m_bMachFault = m_bMachFault || m_stStatus.bDirect;
-		m_stStatus.bRalarm = m_stEdmShowData.stEdmInterfaceIn.btI148 & 0x02;
+        m_bMachFault = m_bMachFault || m_stStatus.bDirect;
 		m_stStatus.bLubricate = m_stEdmShowData.stEdmInterfaceIn.btI144 & 0x01;
 		m_stStatus.bAxisOffset = GetAxisOffset();
 		memcpy(&m_stEdmShowData.stStatus,&m_stStatus,sizeof(Mac_Status));
@@ -235,49 +234,6 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
     }
 
 	return false;
-}
-
-void EDM::EdmSetVectCenter_CPos()
-{
-	m_stSysSet.stSetNoneLabel.iLabel_C_xMachine =  m_stEdmComm.stMoveCtrlComm[0].iMachPos;
-	m_stSysSet.stSetNoneLabel.iLabel_C_yMachine =  m_stEdmComm.stMoveCtrlComm[1].iMachPos;
-	SaveMacPara(&m_stSysSet);
-	RetCenter_C_G59();
-}
-
-void EDM::RetCenter_C_G59()
-{
-	DIGIT_CMD cmd;
-	m_iCoor[0][5] = m_stSysSet.stSetNoneLabel.iLabel_C_xMachine;
-	m_iCoor[1][5] =  m_stSysSet.stSetNoneLabel.iLabel_C_yMachine;
-	m_pEdmAdoSys->SaveEdmCommPara(&m_stEdmShowData.stComm,5,m_iCoor);
-	if ((EDM_COOR_TYPE)m_iWorkIndex == COOR_G59)
-	{
-		memset(&cmd,0,sizeof(DIGIT_CMD));
-		cmd.enAim = AIM_G92;
-		cmd.enCoor = COOR_G59;
-		cmd.enOrbit = ORBIT_G01;
-		cmd.iFreq = MAC_INT_FREQ;
-		cmd.stAxisDigit[cmd.iAxisCnt].iLabel =0;
-		cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_stEdmComm.stMoveCtrlComm[0].iMachPos - m_stSysSet.stSetNoneLabel.iLabel_C_xMachine;
-		cmd.iAxisCnt++;
-		cmd.stAxisDigit[cmd.iAxisCnt].iLabel =1;
-		cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_stEdmComm.stMoveCtrlComm[1].iMachPos - m_stSysSet.stSetNoneLabel.iLabel_C_yMachine;
-		cmd.iAxisCnt++;
-		while (!EdmSendMovePara(&cmd))
-		{
-			for (int i=0;i<1000;i++)
-			{
-			}
-		}
-	}
-}
-
-void EDM::EdmSetVectWorkPos()
-{
-	m_stSysSet.stSetNoneLabel.iLabelWorkAbs_X =  m_stEdmComm.stMoveCtrlComm[0].iMachPos;
-	m_stSysSet.stSetNoneLabel.iLabelWorkAbs_Y =  m_stEdmComm.stMoveCtrlComm[1].iMachPos;
-	SaveMacPara(&m_stSysSet);
 }
 
 void EDM::EdmStop()
@@ -716,13 +672,16 @@ int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
     //伺服给定
     if(elec.iServo != pElecPara->iServo)
     {
-        if(pElecPara->iServo == 0)
-        {
-            m_stEdmInterfaceOut.btO18C &= 0xEF;
-        }
-        else {
-            m_stEdmInterfaceOut.btO18C |= 0x10;
-        }
+        elec.iServo = pElecPara->iServo;
+        SetServoToGive(elec.iServo);
+        bWrite = true;
+    }
+    //设定振动
+    if(elec.iShake != pElecPara->iShake||elec.iShakeSense != pElecPara->iShakeSense)
+    {
+        elec.iShake = pElecPara->iShake;
+        elec.iShakeSense = pElecPara->iShakeSense;
+        SetShakePara(elec.iShake,elec.iShakeSense);
         bWrite = true;
     }
     if(bWrite)::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
@@ -733,11 +692,42 @@ int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
 //设定伺服
 void EDM::SetServoToGive(int iPercent)
 {
-    if(iPercent == 0)
-        m_stEdmInterfaceOut.btO18C &= 0xEF;
-    else {
-        m_stEdmInterfaceOut.btO18C |= 0x10;
+    int iConverge =  (iPercent - 30) * 4;
+    unsigned char btServo;
+
+    if (iConverge>=10 && iConverge<=240)
+        btServo = iConverge;
+    else
+    {
+        if (iConverge < 10)
+            btServo = 10;
+        if (iConverge > 240)
+            btServo = 240;
     }
+
+    ioctl(fd,IOC_SERVO,&btServo);
+}
+
+//设定振动
+void EDM::SetShakePara(int shake,int shakeSense)
+{
+    int ishake,ishakeSense;
+    int i,j;
+    Shake_S shakePara;
+    memset(&shakePara,0,sizeof(Shake_S));
+    if (shake < 300)
+        ishake = 300;
+    if (shake > 800)
+        ishake = 800;
+    if (shakeSense < 5)
+        ishakeSense = 5;
+    if (shakeSense > 95)
+        ishakeSense = 95;
+    i = 1000000/(ishake*256);
+    j = i*shakeSense/100;
+    shakePara.iShake = i;
+    shakePara.iShakeSense = j;
+    ioctl(fd,IOC_SHAKE,&shakePara);
 }
 
 bool EDM::GetAxisOffset()
@@ -752,9 +742,8 @@ bool EDM::GetAxisOffset()
 			iOffsetDelay++;
 	}
 	else
-	{
-		if (iOffsetDelay!=0)
-			iOffsetDelay = 0;
+    {
+        iOffsetDelay = 0;
 	}
 
 	for (int i=0;i<MAC_LABEL_COUNT;i++)
@@ -771,9 +760,7 @@ bool EDM::GetAxisOffset()
 				iOffset = m_stSysSet.iPosPrecision[i] * 10;
 			}
 
-			if (!(abs(m_stEdmComm.stMoveCtrlComm[i].iMachPos-m_stEdmComm.stMoveCtrlComm[i].iRasilPos) <= iOffset
-			|| abs(m_stEdmComm.stMoveCtrlComm[i].iMachPos-m_stEdmComm.stMoveCtrlComm[i].iRasilPos+360000) <= iOffset
-			|| abs(m_stEdmComm.stMoveCtrlComm[i].iMachPos-m_stEdmComm.stMoveCtrlComm[i].iRasilPos-360000) <= iOffset))
+            if (abs(m_stEdmComm.stMoveCtrlComm[i].iMachPos-m_stEdmComm.stMoveCtrlComm[i].iRasilPos) > iOffset)
 			{
 				bAxisOffset = true;
 			}
@@ -823,8 +810,7 @@ bool EDM::SaveMacPara(MAC_SYSTEM_SET* pSysSet)
 	MAC_SYSTEM_SET sys;
 	short dwStatus;
 
-	memcpy(&sys,pSysSet,sizeof(MAC_SYSTEM_SET));
-	RetCenter_C_G59();
+    memcpy(&sys,pSysSet,sizeof(MAC_SYSTEM_SET));
 	dwStatus = ioctl(fd,IOC_SYSTEM_SET,&sys);
 	if (dwStatus ==1)
 	{
@@ -839,7 +825,7 @@ bool EDM::SaveMacPara(MAC_SYSTEM_SET* pSysSet)
 bool EDM::SwitchWorkIndex(int iSwitch)
 {
 	DIGIT_CMD cmd;
-	int iIndex;
+	int iIndex = -1;
 	short dwStatus;
 	if (m_stEdmComm.enMvStatus == RULE_MOVE_OVER)
 	{
@@ -882,34 +868,17 @@ bool EDM::SwitchWorkIndex(int iSwitch)
 	return false;
 }
 
-bool EDM::GetWorkPosSetByIndex(int iIndex,int iWork[])
+void EDM::ReSetWorkPosSetByIndex(int iIndex,int iWork[][6])
 {
 	if (iIndex>=0 && iIndex<6)
 	{
 		for (int i=0;i<MAC_LABEL_COUNT;i++)
 		{
-			iWork[i] = m_iCoor[i][iIndex];
+			m_iCoor[i][iIndex] = iWork[i][iIndex];		
 		}
-
-		return true;
+		
 	}
-
-	return false;
-}
-
-void EDM::ReSetWorkPosSetByIndex(int iIndex,int iWork[])
-{
-	if (iIndex>=0 && iIndex<6)
-	{
-		for (int i=0;i<MAC_LABEL_COUNT;i++)
-		{
-			if (i!=m_stSysSet.stSetNoneLabel.iOpLabel)
-			{
-				m_iCoor[i][iIndex] = iWork[i];
-			}			
-		}
-		m_pEdmAdoSys->SaveEdmWorkSet(iIndex,m_iCoor);
-	}
+	m_pEdmAdoSys->SaveEdmWorkSet(iIndex,m_iCoor);
 }
 
 
@@ -1384,32 +1353,6 @@ void EDM::EdmAxisAdjustCircleOutSide()
 			}
 		}
 	}
-}
-
-void EDM::EdmRtCenterC()
-{
-	DIGIT_CMD  cmd;
-	memset(&cmd,0,sizeof(DIGIT_CMD));
-	cmd.enAim = AIM_G90;
-	cmd.enOrbit = ORBIT_G01;
-	cmd.iFreq = 10000;
-	cmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-
-	GetEdmComm();
-	if (m_stEdmComm.enMvStatus == RULE_MOVE_OVER)
-	{
-		cmd.stAxisDigit[cmd.iAxisCnt].iLabel = 0;
-		cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_stSysSet.stSetNoneLabel.iLabel_C_xMachine
-			-m_stEdmComm.stMoveCtrlComm[0].iWorkPosSet;
-		cmd.iAxisCnt++;
-
-		cmd.stAxisDigit[cmd.iAxisCnt].iLabel = 1;
-		cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_stSysSet.stSetNoneLabel.iLabel_C_yMachine
-			-m_stEdmComm.stMoveCtrlComm[1].iWorkPosSet;
-		cmd.iAxisCnt++;
-
-		EdmSendMovePara(&cmd);
-	}	
 }
 
 void EDM::SetValMakeUp(int iVal_C,int iVal_X)

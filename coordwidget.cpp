@@ -15,122 +15,6 @@ CoordWidget::~CoordWidget()
 {
 
 }
-//void CoordWidget::setLabels()
-//{
-//    xLabel = new QLabel("X");
-//    yLabel = new QLabel("Y");
-//    cLabel = new QLabel("C");
-//    wLabel = new QLabel("W");
-//    aLabel = new QLabel("A");
-//    bLabel = new QLabel("B");
-//    zLabel = new QLabel("Z");
-//    //test
-//    QLabel* test = new QLabel;
-//    m_labels<<xLabel<<yLabel<<cLabel<<wLabel<<aLabel<<bLabel<<zLabel<<test;
-//    float zero = 0.000;
-//    QString tmp1 = QString("%1").arg("-123.567");
-//    QString tmp2 = QString("%1").arg(zero,8,'f',3);
-//    xValue = new QLabel(tmp1);
-//    yValue = new QLabel(tmp2);
-//    cValue = new QLabel(tmp2);
-//    zValue = new QLabel(tmp2);
-//    xMValue = new QLabel(tmp1);
-//    yMValue = new QLabel(tmp2);
-//    cMValue = new QLabel(tmp2);
-//    zMValue = new QLabel(tmp2);
-
-//    wValue = new QLabel(tmp1);
-//    aValue = new QLabel(tmp2);
-//    bValue = new QLabel(tmp2);
-//    wMValue = new QLabel(tmp1);
-//    aMValue = new QLabel(tmp2);
-//    bMValue = new QLabel(tmp2);
-
-//    xShow = new QLabel();
-//    yShow = new QLabel();
-//    cShow = new QLabel();
-//    wShow = new QLabel();
-//    aShow = new QLabel();
-//    bShow = new QLabel();
-//    zShow = new QLabel();
-
-//    xLabel->setAlignment(Qt::AlignVCenter);
-//    yLabel->setAlignment(Qt::AlignVCenter);
-//    cLabel->setAlignment(Qt::AlignVCenter);
-//    wLabel->setAlignment(Qt::AlignVCenter);
-//    aLabel->setAlignment(Qt::AlignVCenter);
-//    bLabel->setAlignment(Qt::AlignVCenter);
-//    zLabel->setAlignment(Qt::AlignVCenter);
-//    xValue->setAlignment(Qt::AlignRight);
-//    yValue->setAlignment(Qt::AlignRight);
-//    cValue->setAlignment(Qt::AlignRight);
-//    wValue->setAlignment(Qt::AlignRight);
-//    aValue->setAlignment(Qt::AlignRight);
-//    bValue->setAlignment(Qt::AlignRight);
-//    zValue->setAlignment(Qt::AlignRight);
-//    xMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-//    yMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-//    cMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-//    wMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-//    aMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-//    bMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-//    zMValue->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-
-//    leftLayout = new QGridLayout(this);
-//    leftLayout->addWidget(xLabel,0,0);
-//    leftLayout->addWidget(xValue,0,1);
-//    leftLayout->addWidget(xMValue,0,2);leftLayout->addWidget(xShow,0,3);
-//    leftLayout->addWidget(yLabel,1,0);
-//    leftLayout->addWidget(yValue,1,1);
-//    leftLayout->addWidget(yMValue,1,2);leftLayout->addWidget(yShow,1,3);
-//    leftLayout->addWidget(cLabel,2,0);
-//    leftLayout->addWidget(cValue,2,1);
-//    leftLayout->addWidget(cMValue,2,2);leftLayout->addWidget(cShow,2,3);
-//    leftLayout->addWidget(wLabel,3,0);
-//    leftLayout->addWidget(wValue,3,1);
-//    leftLayout->addWidget(wMValue,3,2);leftLayout->addWidget(wShow,3,3);
-//    leftLayout->addWidget(aLabel,4,0);
-//    leftLayout->addWidget(aValue,4,1);
-//    leftLayout->addWidget(aMValue,4,2);leftLayout->addWidget(aShow,4,3);
-//    leftLayout->addWidget(bLabel,5,0);
-//    leftLayout->addWidget(bValue,5,1);
-//    leftLayout->addWidget(bMValue,5,2);leftLayout->addWidget(bShow,5,3);
-//    leftLayout->addWidget(zLabel,6,0);
-//    leftLayout->addWidget(zValue,6,1);
-//    leftLayout->addWidget(zMValue,6,2);leftLayout->addWidget(zShow,6,3);
-//    //setStyleSheet("QLabel{background-color:yellow}");
-//    QString xstyle = "font-size:40px;";
-//    QString wstyle = "font-size:28px;";
-//    //bShow->setStyleSheet("border-image:url(icon/zx.png);")
-//    xLabel->setStyleSheet(xstyle);
-//    yLabel->setStyleSheet(xstyle);
-//    cLabel->setStyleSheet(xstyle);
-//    wLabel->setStyleSheet(wstyle);
-//    aLabel->setStyleSheet(xstyle);
-//    bLabel->setStyleSheet(xstyle);
-//    zLabel->setStyleSheet(xstyle);
-//    xValue->setStyleSheet(xstyle);
-//    yValue->setStyleSheet(xstyle);
-//    cValue->setStyleSheet(xstyle);
-//    wValue->setStyleSheet(xstyle);
-//    aValue->setStyleSheet(xstyle);
-//    bValue->setStyleSheet(xstyle);
-//    zValue->setStyleSheet(xstyle);
-//    xMValue->setStyleSheet("color:blue;font-size:24px;");
-//    yMValue->setStyleSheet("color:blue;font-size:24px;");
-//    cMValue->setStyleSheet("color:blue;font-size:24px;");
-//    wMValue->setStyleSheet("color:blue;font-size:24px;");
-//    aMValue->setStyleSheet("color:blue;font-size:24px;");
-//    bMValue->setStyleSheet("color:blue;font-size:24px;");
-//    zMValue->setStyleSheet("color:blue;font-size:24px;");
-//    xLabel->setMaximumWidth(85);
-//    yLabel->setMaximumWidth(85);
-//    cLabel->setMaximumWidth(85);
-//    wLabel->setMaximumWidth(85);
-//    aLabel->setMaximumWidth(85);
-//    bLabel->setMaximumWidth(85);
-//    zLabel->setMaximumWidth(85);
-//}
 
 void CoordWidget::setLabels()
 {
@@ -282,11 +166,10 @@ void CoordWidget::ShowData(const MAC_COMMON& stMaccomm,int iRelLabel[])
             stMaccomLast.stMoveCtrlComm[i].iMachPos = stMaccomm.stMoveCtrlComm[i].iMachPos;
             stMaccomLast.stMoveCtrlComm[i].iRasilPos = stMaccomm.stMoveCtrlComm[i].iRasilPos;
             iRelLabelLast[i]= iRelLabel[i];
-            fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
-            if(i == 0&&fTmp<2)qDebug()<<fTmp;
+            fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000;//机械坐标
             str = float2QString(fTmp);
             m_labels[i+14]->setText(str);
-            fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
+            fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000;//相对坐标
             str = float2QString(fTmp);
             m_labels[i+7]->setText(str);
         }
@@ -381,6 +264,7 @@ void CoordWidget::ShowMacUserStatus()
 
 void CoordWidget::setAxisValue(int label,QString str)
 {
+    qDebug()<<label<<str;
     if(!m_labels[label])return;
     m_labels[label+7]->setText(str);
 }

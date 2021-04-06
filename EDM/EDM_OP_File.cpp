@@ -160,19 +160,20 @@ void EDM_OP_File::PlusDigit2Cmd()
 	QString str_Loc;
     int iSum[MAC_LABEL_COUNT];
 	int iSumLastMac[MAC_LABEL_COUNT];
-	int iWorkPos_All[6][MAC_LABEL_COUNT];
+	int iWorkPos_All[MAC_LABEL_COUNT][6];
 	int iLabel;
 	unsigned char bFirstEntry = TRUE;
     CmdHandle* pCmdHandle;
 
 	m_enAim = AIM_G90;
 	m_enOrbit = ORBIT_G01;
-
-	for (int i=0;i<6;i++)
-	{
-		m_pEdm->GetWorkPosSetByIndex(i,&(iWorkPos_All[i][0]));
-	}
-
+    for(int i = 0;i<MAC_LABEL_COUNT;i++)
+    {
+        for(int j = 0;j<6;j++)
+        {
+            iWorkPos_All[i][j] = m_pEdm->m_iCoor[i][j];
+        }
+    }
 	m_vCmd.clear();
 	m_vCmdLoc.clear();
     for(iCmdIndex = 0;iCmdIndex<m_vCmdStd.size();iCmdIndex++)
@@ -209,7 +210,7 @@ void EDM_OP_File::PlusDigit2Cmd()
 
                 for (int k=0;k<MAC_LABEL_COUNT;k++)
                 {
-                    iSum[k] = m_pEdm->m_stEdmComm.stMoveCtrlComm[k].iMachPos  - iWorkPos_All[(int)cmd.enCoor][k];
+                    iSum[k] = m_pEdm->m_stEdmComm.stMoveCtrlComm[k].iMachPos  - iWorkPos_All[k][(int)cmd.enCoor];
                     if (m_pEdm->m_stEdmKpInt.stAxisCtrlKp[k].stSoftPara.bRotateLabel)
                     {
                         iSum[k] %= 360000;

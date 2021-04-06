@@ -106,8 +106,7 @@ typedef struct  edmMac_Status
 	unsigned long bPrune;      //ÐÞµç¼«
 	unsigned long bDirect;     //¶ÌÂ·
 	unsigned long bRotate;     //Ðý×ª
-	unsigned long bLowPressure;//Ç·Ë®Ñ¹
-	unsigned long bRalarm;    //RÖá±¨¾¯
+    unsigned long bLowPressure;//Ç·Ë®Ñ¹
 	unsigned long bLubricate;  //Èó»¬±¨¾¯
 	unsigned long bAxisOffset; //ÖáÆ«²î
 	unsigned long bKeyShut;    //¼üËø¶¨
@@ -144,7 +143,7 @@ public:
 	MAC_SYSTEM_SET m_stSysSet;
 	int m_iWorkIndex;
 	unsigned long m_bMachFault;
-
+    int m_iCoor[MAC_LABEL_COUNT][6];
     QString m_strSysPath;
     map<int,int> m_mpMakeUp_C;
 private:
@@ -154,7 +153,6 @@ private:
 	Mac_Status m_stStatus;
     MAC_HANDLE_ENTILE m_stEdmOpEntile;
 	
-	int m_iCoor[MAC_LABEL_COUNT][6];
     QString m_strOpName;
 	MAC_OTHER m_stMacOther;
     EDM_Db * m_pEdmAdoSys;
@@ -198,6 +196,7 @@ public:
 private:
     void EdmReadMacPara();
 	void SetServoToGive(int iPercent);
+    void SetShakePara(int shake,int shakeSense);
     bool GetAxisOffset();
 	int GetSpeed(int iFreq);
 	int HandBoxProcess();	
@@ -209,8 +208,8 @@ public:
     unsigned char FindElecManElem(QString str);
     void GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan);
     int WriteElecPara(Elec_Page *pElecPara,QString strFunc);
-	bool GetWorkPosSetByIndex(int iIndex,int iWork[]);
-	void ReSetWorkPosSetByIndex(int iIndex,int iWork[]);
+
+	void ReSetWorkPosSetByIndex(int iIndex,int iWork[][6]);
     void SaveElecElem(QString str,MAC_ELEC_PARA* pElec);
 public:
     bool SaveMacPara(MAC_SYSTEM_SET* pSysSet);
@@ -226,9 +225,6 @@ public slots:
     void EdmStop();
     bool EdmRtZero(int iLabel);
     bool EdmSendMovePara(DIGIT_CMD* pMacUser);
-    void EdmRtCenterC();
-    void EdmSetVectWorkPos();
-    void EdmSetVectCenter_CPos();
 
 };
 #endif // EDM_H

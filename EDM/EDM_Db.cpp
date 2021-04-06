@@ -156,7 +156,7 @@ void EDM_Db::GetAllCoor(int a[][6])
 {
 	int i = 0;
 	QString strTmp;
-	strTmp = QString("select iRelSet_0,iRelSet_1,iRelSet_2,iRelSet_3,iRelSet_4,iRelSet_5 from label_var");
+	strTmp = QString("select iRelSet_0,iRelSet_1,iRelSet_2,iRelSet_3,iRelSet_4,iRelSet_5 from label_var order by iIndex");
 	q.exec(strTmp);
 	while (q.next())
 	{

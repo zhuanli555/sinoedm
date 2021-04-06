@@ -106,11 +106,11 @@ private:
 	list<fEdmOpStage>::iterator m_it;
     MAC_PASS_PARA m_stMacPassPara;
 public:
-	virtual void EdmOpSetStart(unsigned char bStart);
-	virtual void EdmOpSetTest(unsigned char bTest);
+    virtual void EdmOpSetStart(unsigned char bStart);
 	virtual void EdmOpCarry();
 	virtual void EdmOpOver();
 	virtual void EdmOpStageRestart();
+
 protected:
 	void SetEdmHolePower(unsigned char bPower,unsigned char bPrune,unsigned char bOterClose);
 	void EdmHoleCarry();

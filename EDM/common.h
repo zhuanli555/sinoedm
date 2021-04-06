@@ -16,8 +16,10 @@
 #define IOC_INTERFACE_IN     _IOR(IOC_MAGIC, 8, int)
 #define IOC_ROTATE_CTL   _IOW(IOC_MAGIC, 9, int)
 #define IOC_PASS_CTL    _IOR(IOC_MAGIC, 10, int)
+#define IOC_SERVO		_IOW(IOC_MAGIC,11,int)
+#define IOC_SHAKE		_IOW(IOC_MAGIC,12,int)
 
-#define IOC_MAXNR  10
+#define IOC_MAXNR  12
 
 /* 上位机需要 */
 #define OPERATE_TRREAD_SLEEP_TIME        20
@@ -61,8 +63,15 @@ typedef struct isaElec_Page
 	int iBackSense;     //回退灵敏
 	int iOpLen;         //加工深度\修整长度
 	int iCap;           //加工电容
-	int iRotSpeed;      //R轴速度
+    int iShake;         //振动
+    int iShakeSense;    //振动灵敏
 }Elec_Page;
+
+typedef struct isaShake_S
+{
+    int iShake;
+    int iShakeSense;
+}Shake_S;
 
 typedef struct isaElec_Oral
 {	
