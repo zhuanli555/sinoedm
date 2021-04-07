@@ -178,22 +178,19 @@ void EDM_OP_HOLE::EdmOpCarry()
 			return;
 		}		
 
-		if (m_stOpStatus.bStart)
+		if (m_stOpCtrl.iWaitCnt>0)
 		{
-			if (m_stOpCtrl.iWaitCnt>0)
-			{
-				m_stOpCtrl.iWaitCnt--;
-				return;
-			}
-
-			if (ExteedTimeAlarm())
-			{
-				EdmHoleRecover();
-				return;
-			}
-
-			EdmHoleCarry();
+			m_stOpCtrl.iWaitCnt--;
+			return;
 		}
+
+		if (ExteedTimeAlarm())
+		{
+			EdmHoleRecover();
+			return;
+		}
+
+		EdmHoleCarry();
 	}
 }
 
@@ -325,10 +322,10 @@ void EDM_OP_HOLE::EdmHoleMvCmdProcess()
 	QString str;
 	DIGIT_CMD cmdDefault;
     CmdHandle* pCmdHandle;
-	INFO_PRINT();
 	memset(&cmdDefault,0,sizeof(DIGIT_CMD));
 	memset(&m_stMvCmd,0,sizeof(DIGIT_CMD));
 	str = m_pOpFile->m_vCmd[m_stOpStatus.iCmdIndex];
+	qDebug()<<"cmdProcess:"<<str;
     pCmdHandle = new CmdHandle(FALSE,str,&m_stMvCmd,&cmdDefault);
 	m_stMvCmd.iFreq = min(m_stMvCmd.iFreq,m_iWholeFreq);
 	m_stMvCmd.stOp.bShortDis = TRUE;

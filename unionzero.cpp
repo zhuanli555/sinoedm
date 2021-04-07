@@ -156,9 +156,7 @@ void UnionZero::accept()
                 cmd += chas[i];
                 cmd += sVal;
                 cmd += " ";
-                emit setAxisSig(i,sVal);
             }
-
         }
 
         pCmdHandle = new CmdHandle(FALSE,cmd,&stDigitCmd,&cmdDefault);

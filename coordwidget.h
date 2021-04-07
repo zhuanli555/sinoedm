@@ -28,9 +28,6 @@ public :
 	EDM_COOR_TYPE m_enCoorType;
 
 private:
-
-    void ShowData(const MAC_COMMON& stMaccomm,int iRelLabel[]);
-    void SaveData();
     void ShowAxisData();
     void ShowMacUserStatus();
     QString float2QString(float value);
@@ -40,7 +37,6 @@ private:
 
 signals:
 public slots:
-    void setAxisValue(int label,QString str);
     void HandleEdmCycleData();
     void setLabels();
 };

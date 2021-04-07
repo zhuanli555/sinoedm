@@ -45,7 +45,6 @@ private:
     QWidget* createCommandTab();
     QWidget* createProcessTab();
     void Char2QStringInBinary(unsigned char btVal,QString &str);
-    void setAxisValue(int label,QString str);
     void systemSetChangeForCoord();
     void OpFileCopyAndSend();
     void fillTableWidget(MAC_ELEC_PARA* pPara);
@@ -125,7 +124,6 @@ signals:
     void edmShakeSig();
     void edmPurgeSig();
     void edmStopSig();
-    void setAxisValueSig(int label,QString str);
     void systemSetChangeSig();
 
 protected slots:

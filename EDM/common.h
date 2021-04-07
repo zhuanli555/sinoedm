@@ -406,15 +406,15 @@ typedef struct  isaMAC_INTERFACE_OUT
 
 typedef struct isaMAC_SYSTEM_SET_NONE_LABEL
 {
-	unsigned long bWaterMonitor;
-	unsigned long bTempteratureMonitor;
-	unsigned long bPowerMonitor;
-	unsigned long bLowPumpUnion;
-	unsigned long bHighPumpUnion;
-	unsigned long bPass;
-	unsigned long bCycleMeasure;
-	unsigned long bOpDir;
-	unsigned long bDebug;
+	int bWaterMonitor;
+	int bTempteratureMonitor;
+	int bPowerMonitor;
+	int bLowPumpUnion;
+	int bHighPumpUnion;
+	int bPass;
+	int bCycleMeasure;
+	int bOpDir;
+	int bDebug;
 	int  iLabel_C_xMachine;
 	int  iLabel_C_yMachine;
 	int  iLabel_S_Length;
@@ -428,7 +428,7 @@ typedef struct isaMAC_SYSTEM_SET_NONE_LABEL
 	int iOpLabel;
 	int iPoleBoxWidth;
 	int iWholeSpeed;
-	unsigned long bHandWheel;
+	int bHandWheel;
 	int iNLabelLinear;
 	int iLabel_C_z_Dvalue;
 	int iLabel_A_C_Center;
@@ -437,7 +437,7 @@ typedef struct isaMAC_SYSTEM_SET_NONE_LABEL
 	int iLabelWorkAbs_Y;
 	int iTime;
 	int iTimeOp;
-	unsigned long bBlindAble;
+	int bBlindAble;
 	int iBlindPos_X;
 	int iBlindPos_Y;
 	int iBlind_Deviate;

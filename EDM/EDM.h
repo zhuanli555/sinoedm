@@ -135,7 +135,6 @@ private:
 	MAC_OTHER m_stMacOther;
     EDM_Db * m_pEdmAdoSys;
     MAP_ELEC_MAN  mp_ElecMan;
-    Axis_Adjust m_stAxisAdjust;
 
     QString m_strMakeUpFile;
 public:
@@ -153,10 +152,7 @@ public:
 	bool EdmStopMove(unsigned long bStatus);
 	void EdmStopSignClose();
 	void EdmZeroSignClose();
-	void EdmSaveMacComm();
-
-    void SetAxisAdjust(int iLabel, unsigned char bDir);
-    void EdmAxisAdjust();
+    void EdmSaveMacComm();
 
 	void SetValMakeUp(int iVal_C,int iVal_X);
     void SetMakeUpFile(QString strFile);
@@ -181,8 +177,6 @@ public:
 
 	void ReSetWorkPosSetByIndex(int iIndex,int iWork[][6]);
     void SaveElecElem(QString str,MAC_ELEC_PARA* pElec);
-public:
-    bool SaveMacPara(MAC_SYSTEM_SET* pSysSet);
 public slots:
 	bool EdmSetProtect(unsigned long bProtect);
 	bool EdmLowPump(unsigned long bOpen);

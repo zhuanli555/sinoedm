@@ -94,12 +94,12 @@ void CoordWidget::setLabels()
     {
         if(m_labels[i])
         {
-            fTmp = (float)edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iMachPos/1000.0;//机械坐标
-            str = float2QString(fTmp);
-            m_labels[i+14]->setText(str);
-            fTmp = (float)edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iRasilPos/1000.0;//相对坐标
+            fTmp = (float)edm->m_stEdmShowData.iWorkPos[i]/1000;//相对坐标
             str = float2QString(fTmp);
             m_labels[i+7]->setText(str);
+            fTmp = (float)edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iMachPos/1000;//机械坐标
+            str = float2QString(fTmp);
+            m_labels[i+14]->setText(str);
         }
     }
     for(i =0;i<MAC_LABEL_COUNT;i++)
@@ -145,63 +145,24 @@ CoordWidget* CoordWidget::getInstance()
 
 void CoordWidget::ShowAxisData()
 {
-    ShowData(edm->m_stEdmShowData.stComm,edm->m_stEdmShowData.iWorkPos);
-}
-
-
-void CoordWidget::ShowData(const MAC_COMMON& stMaccomm,int iRelLabel[])
-{
-    static MAC_COMMON stMaccomLast;
-    static int iRelLabelLast[MAC_LABEL_COUNT] = {0};
+    static int iMachPos[MAC_LABEL_COUNT] = {0};
+    static int iLabelValue[MAC_LABEL_COUNT] = {0};
     float fTmp;
     QString str;
-    memset(&stMaccomLast,0,sizeof(MAC_COMMON));
     for (int i=0;i<MAC_LABEL_COUNT;i++)
     {
         if(!m_labels[i])continue;
-        if (stMaccomm.stMoveCtrlComm[i].iMachPos != stMaccomLast.stMoveCtrlComm[i].iMachPos
-            || stMaccomm.stMoveCtrlComm[i].iRasilPos != stMaccomLast.stMoveCtrlComm[i].iRasilPos)
+        if (edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iMachPos != iMachPos[i]|| edm->m_stEdmShowData.iWorkPos[i] != iLabelValue[i])
         {
-
-            stMaccomLast.stMoveCtrlComm[i].iMachPos = stMaccomm.stMoveCtrlComm[i].iMachPos;
-            stMaccomLast.stMoveCtrlComm[i].iRasilPos = stMaccomm.stMoveCtrlComm[i].iRasilPos;
-            iRelLabelLast[i]= iRelLabel[i];
-            fTmp = (float)stMaccomm.stMoveCtrlComm[i].iMachPos/1000;//机械坐标
-            str = float2QString(fTmp);
-            m_labels[i+14]->setText(str);
-            fTmp = (float)stMaccomm.stMoveCtrlComm[i].iRasilPos/1000;//相对坐标
+            iLabelValue[i] = edm->m_stEdmShowData.iWorkPos[i];
+            iMachPos[i] = edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iMachPos;
+            fTmp = (float)iLabelValue[i]/1000;//相对坐标
             str = float2QString(fTmp);
             m_labels[i+7]->setText(str);
+            fTmp = (float)iMachPos[i]/1000;//机械坐标
+            str = float2QString(fTmp);
+            m_labels[i+14]->setText(str);
         }
-    }
-}
-
-void CoordWidget::SaveData()
-{
-    static MAC_COMMON stMaccomLast;
-    static int iSaveCnt = 0;
-    unsigned char bSave = FALSE;
-    memset(&stMaccomLast,0,sizeof(MAC_COMMON));
-    if (++iSaveCnt>=5)
-    {
-        //数据写入
-        iSaveCnt = 0;
-        for (int i=0;i<MAC_LABEL_COUNT;i++)
-        {
-            if ( edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iMachPos != stMaccomLast.stMoveCtrlComm[i].iMachPos
-                || edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].bDirMove != stMaccomLast.stMoveCtrlComm[i].bDirMove
-                || edm->m_stEdmShowData.stComm.stMoveCtrlComm[i].iWorkPosSet != stMaccomLast.stMoveCtrlComm[i].iWorkPosSet)
-            {
-                bSave = TRUE;
-                break;
-            }
-        }
-        if (bSave)
-        {
-            memcpy(&stMaccomLast,&edm->m_stEdmShowData.stComm,sizeof(MAC_COMMON));
-            edm->EdmSaveMacComm();
-        }
-        bSave = FALSE;
     }
 }
 
@@ -262,16 +223,8 @@ void CoordWidget::ShowMacUserStatus()
     }
 }
 
-void CoordWidget::setAxisValue(int label,QString str)
-{
-    qDebug()<<label<<str;
-    if(!m_labels[label])return;
-    m_labels[label+7]->setText(str);
-}
-
 void CoordWidget::HandleEdmCycleData()
 {
-    SaveData();              //存储数据
     ShowAxisData();          //显示数据
     ShowMacUserStatus();	 //状态显示
 }

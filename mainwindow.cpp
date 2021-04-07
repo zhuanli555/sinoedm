@@ -72,8 +72,6 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     t->start(1000);
     //多线程中不能操作gui，使用信号槽机制
     connect(this,&MainWindow::coordWidgetChanged,coordWidget,&CoordWidget::HandleEdmCycleData);
-    //connect(this,&MainWindow::systemSetChangeSig,coordWidget,&CoordWidget::setLabels);
-    connect(this,&MainWindow::setAxisValueSig,coordWidget,&CoordWidget::setAxisValue);
     connect(this,&MainWindow::edmPauseSig,alarmSignal,&AlarmSignal::edmPause);
     connect(this,&MainWindow::edmShakeSig,alarmSignal,&AlarmSignal::edmShake);
     connect(this,&MainWindow::edmPurgeSig,alarmSignal,&AlarmSignal::edmPurge);
@@ -110,7 +108,6 @@ void MainWindow::MacUserOperate()
             mutex.lock();
             edm->GetEdmStatusData();
             emit coordWidgetChanged();//机床命令周期性处理
-            //edm->EdmAxisAdjust();
             alarmSignal->EdmStatusSignChange();//机床信号周期性处理
             alarmSignal->edmHandProcess();//处理手盒
             mutex.unlock();
@@ -634,12 +631,6 @@ void MainWindow::systemSetChangeForCoord()
     //emit systemSetChangeSig();
 }
 
-void MainWindow::setAxisValue(int label,QString str)
-{
-    emit setAxisValueSig(label,str);
-}
-
-
 void MainWindow::renderToUnionZero()
 {
     unionZero = new UnionZero(0);
@@ -659,7 +650,6 @@ void MainWindow::renderToWorkZero()
 void MainWindow::renderToAxisSet()
 {
     unionZero = new UnionZero(2);
-    connect(unionZero,&UnionZero::setAxisSig,this,&MainWindow::setAxisValue);
     int res = unionZero->exec();
     if(res != QDialog::Accepted)return;
     delete unionZero;

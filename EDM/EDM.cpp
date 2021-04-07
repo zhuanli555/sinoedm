@@ -21,7 +21,6 @@ EDM::EDM(QObject *parent):QObject(parent)
 	memset(&m_stEdmInterfaceIn,0,sizeof(MAC_INTERFACE_IN));
 	memset(&m_stStatus,0,sizeof(Mac_Status));
     memset(&m_stEdmOpEntile,0,sizeof(MAC_HANDLE_ENTILE));
-    memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
     m_pEdmAdoSys = new EDM_Db();
 	m_bMachFault = FALSE;
     m_strMakeUpFile = "";
@@ -49,8 +48,10 @@ EDM::~EDM()
 {
 	if (m_pEdmAdoSys)
 	{
-		delete m_pEdmAdoSys;
-		m_pEdmAdoSys = NULL;
+        m_pEdmAdoSys->SaveEdmCommPara(&m_stEdmShowData.stComm,m_iWorkIndex,m_iCoor);
+        m_pEdmAdoSys->SaveMacSystemPara(&m_stSysSet);
+        m_pEdmAdoSys->SaveEdmKpIntPara(&m_stEdmKpInt,&m_stSysSet);
+        delete m_pEdmAdoSys;
     }
 }
 
@@ -84,7 +85,11 @@ unsigned long EDM::EdmInit()
         dwStatus = ioctl(fd,IOC_KP_INIT,&m_stEdmKpInt);
 		if (dwStatus ==1)
 		{
-			return 1;
+            dwStatus = ioctl(fd,IOC_SYSTEM_SET,&m_stSysSet);
+            if(dwStatus == 1)
+            {
+                return 1;
+            }
 		}
     }
 	return 0;
@@ -237,8 +242,7 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
 
 void EDM::EdmStop()
 {
-	CloseHardWare();
-    memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
+    CloseHardWare();
 	EdmStopMove(TRUE);
 }
 
@@ -578,7 +582,6 @@ void EDM::EdmSaveMacComm()
 	{
 		m_iCoor[i][m_iWorkIndex] = m_stEdmComm.stMoveCtrlComm[i].iWorkPosSet;
 	}
-	m_pEdmAdoSys->SaveEdmCommPara(&m_stEdmShowData.stComm,m_iWorkIndex,m_iCoor);
 }
 
 //设置电参数
@@ -791,23 +794,6 @@ void EDM::SaveElecElem(QString str,MAC_ELEC_PARA* pElec)
     m_pEdmAdoSys->SaveElecMan(str,&stElec);
 }
 
-bool EDM::SaveMacPara(MAC_SYSTEM_SET* pSysSet)
-{
-	MAC_SYSTEM_SET sys;
-	short dwStatus;
-
-    memcpy(&sys,pSysSet,sizeof(MAC_SYSTEM_SET));
-	dwStatus = ioctl(fd,IOC_SYSTEM_SET,&sys);
-	if (dwStatus ==1)
-	{
-		memcpy(&m_stSysSet,pSysSet,sizeof(MAC_SYSTEM_SET));
-		m_pEdmAdoSys->SaveMacSystemPara(&m_stSysSet);
-		m_pEdmAdoSys->SaveEdmKpIntPara(&m_stEdmKpInt,&m_stSysSet);
-		return true;
-	}	
-	return false;	
-}
-
 bool EDM::SwitchWorkIndex(int iSwitch)
 {
 	DIGIT_CMD cmd;
@@ -841,8 +827,7 @@ bool EDM::SwitchWorkIndex(int iSwitch)
         }
         dwStatus = ioctl(fd,IOC_MOVEPARA_FROM_USER,&cmd);
 		if (dwStatus==1)
-		{
-			m_pEdmAdoSys->SaveWorkPosSetIndex(m_iWorkIndex);			
+		{	
 			return true;
 		}
 		else
@@ -863,176 +848,6 @@ void EDM::ReSetWorkPosSetByIndex(int iIndex,int iWork[][6])
 			m_iCoor[i][iIndex] = iWork[i][iIndex];		
 		}
 		
-	}
-	m_pEdmAdoSys->SaveEdmWorkSet(iIndex,m_iCoor);
-}
-
-
-void EDM::SetAxisAdjust(int iLabel, unsigned char bDir)
-{
-	memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
-	m_stAxisAdjust.bAdjust = TRUE;
-	m_stAxisAdjust.iLabel = iLabel;
-	m_stAxisAdjust.bDir = bDir;
-}
-//对刀
-void EDM::EdmAxisAdjust()
-{
-	int iAim = 500000;
-	DIGIT_CMD stDigitCmd;
-	int iADJUST = 3;
-
-	if (m_stAxisAdjust.bAdjust)
-	{
-		if (m_stEdmComm.enMvStatus == RULE_MOVE_OVER)
-		{
-			if (m_stAxisAdjust.bOver)
-			{
-				EdmSetProtect(TRUE);
-				memset(&m_stAxisAdjust,0,sizeof(Axis_Adjust));
-				return;
-			}
-
-			if (m_stAxisAdjust.iAdjustCnt>=iADJUST)
-			{
-				EdmSetProtect(FALSE);
-
-				memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
-				stDigitCmd.iFreq = 2500;
-				stDigitCmd.enAim = AIM_G90;
-				stDigitCmd.enOrbit = ORBIT_G00;
-				stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-				stDigitCmd.stAxisDigit[0].iDistance = m_stAxisAdjust.iPos/iADJUST 
-					- m_stEdmComm.stMoveCtrlComm[m_stAxisAdjust.iLabel].iWorkPosSet;
-				stDigitCmd.stAxisDigit[0].iLabel = m_stAxisAdjust.iLabel;
-				stDigitCmd.iAxisCnt = 1;
-
-				if (EdmSendMovePara(&stDigitCmd))
-				{
-					m_stAxisAdjust.bOver = TRUE;
-				}
-				return;
-
-			}
-
-			if (m_stAxisAdjust.iStage ==0)
-			{
-				if (EdmSetProtect(FALSE))
-				{
-					if (m_stAxisAdjust.bDir)
-						iAim = 500;
-					else
-						iAim = -500;
-
-					memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
-					stDigitCmd.iFreq = 1000;
-					stDigitCmd.enAim = AIM_G91;
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					stDigitCmd.stAxisDigit[0].iDistance = iAim;
-					stDigitCmd.stAxisDigit[0].iLabel = m_stAxisAdjust.iLabel;
-					stDigitCmd.iAxisCnt = 1;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAxisAdjust.iStage++;
-					}
-				}
-			}
-			else if (m_stAxisAdjust.iStage==1)
-			{
-				if (EdmSetProtect(TRUE))
-				{
-					if (m_stAxisAdjust.bDir == FALSE)
-						iAim = -500000;
-
-					memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
-					stDigitCmd.iFreq = 2500;
-					stDigitCmd.enAim = AIM_G91;
-					stDigitCmd.enOrbit = ORBIT_G00;
-					stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-					stDigitCmd.stAxisDigit[0].iDistance = iAim;
-					stDigitCmd.stAxisDigit[0].iLabel = m_stAxisAdjust.iLabel;
-					stDigitCmd.iAxisCnt = 1;
-
-					if (EdmSendMovePara(&stDigitCmd))
-					{
-						m_stAxisAdjust.iStage++;
-					}
-				}				
-			}
-			else if (m_stAxisAdjust.iStage ==2)
-			{
-				if (m_stStatus.bDirect)
-				{
-					if (EdmSetProtect(FALSE))
-					{
-						while (!EdmStopMove(FALSE))
-						{
-						}
-						if (m_stAxisAdjust.bDir)
-							iAim = -10;
-						else
-							iAim = 10;
-
-						memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
-						stDigitCmd.iFreq = 1000;
-						stDigitCmd.enAim = AIM_G91;
-						stDigitCmd.enOrbit = ORBIT_G00;
-						stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-						stDigitCmd.stAxisDigit[0].iDistance = iAim;
-						stDigitCmd.stAxisDigit[0].iLabel = m_stAxisAdjust.iLabel;
-						stDigitCmd.iAxisCnt = 1;
-
-						if (EdmSendMovePara(&stDigitCmd))
-						{
-							m_stAxisAdjust.iStage = 2;
-						}
-					}
-				}
-				else
-				{
-					m_stAxisAdjust.iStage++;
-				}
-			}
-			else if (m_stAxisAdjust.iStage==3)
-			{
-				if (!m_stStatus.bDirect)
-				{
-					if (EdmSetProtect(FALSE))
-					{
-						while (!EdmStopMove(FALSE))
-						{
-						}						
-						GetEdmComm();
-						m_stAxisAdjust.iPos += m_stEdmComm.stMoveCtrlComm[m_stAxisAdjust.iLabel].iMachPos;
-
-						if (m_stAxisAdjust.bDir)
-							iAim = -1000;
-						else
-							iAim = 1000;
-
-						memset(&stDigitCmd,0,sizeof(DIGIT_CMD));
-						stDigitCmd.iFreq = 10000;
-						stDigitCmd.enAim = AIM_G91;						
-						stDigitCmd.enOrbit = ORBIT_G00;
-						stDigitCmd.enCoor = (EDM_COOR_TYPE)m_iWorkIndex;
-						stDigitCmd.stAxisDigit[0].iDistance = iAim;
-						stDigitCmd.stAxisDigit[0].iLabel = m_stAxisAdjust.iLabel;
-						stDigitCmd.iAxisCnt = 1;
-
-						if (EdmSendMovePara(&stDigitCmd))
-						{
-							m_stAxisAdjust.iAdjustCnt++;
-							m_stAxisAdjust.iStage = 0;
-						}
-
-					}
-				}
-				else
-					m_stAxisAdjust.iStage = 2;
-			}
-		}		
 	}
 }
 
