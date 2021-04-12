@@ -46,13 +46,13 @@ void EDM_OP_HOLE::EdmHoleOpTypeInit()
 	else if (m_stOpStatus.enOpType==OP_HOLE_PROGRAME)
 	{
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleUp2Safe);	
+        //m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleUp2Safe);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleSynchro);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleLocation);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleDownFromSafe);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleZeroAdjust);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHolePrune);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleOpPage);
+        //m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleDownFromSafe);
+        m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleZeroAdjust);//电极对零
+        m_ListStage.push_back(&EDM_OP_HOLE::EdmHolePrune);//电极修整
+        m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleOpPage);//加工
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRepeat);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRootSleep);			
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
@@ -67,10 +67,10 @@ void EDM_OP_HOLE::EdmHoleOpTypeInit()
 	else if (m_stOpStatus.enOpType==OP_HOLE_SIMULATE)
 	{
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleUp2Safe);
+        //m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleUp2Safe);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleSynchro);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleLocation);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleDownFromSafe);
+        //m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleDownFromSafe);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRootSleep);		
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
 	}
@@ -116,7 +116,7 @@ void EDM_OP_HOLE::EdmOpSetStart(unsigned char bStart)
 
 		if (!m_stOpStatus.stCycle.bCycleStart)
 		{
-            m_stOpStatus.iCmdIndex = m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile].stElecOral.iOpHoleIndex-1;
+            m_stOpStatus.iCmdIndex = m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile].stElecOral.iOpHoleIndex;
 			m_stOpStatus.iCmdIndex = max(m_stOpStatus.iCmdIndex,0);
 			m_stOpStatus.iCmdIndex = min(m_stOpStatus.iCmdIndex,m_pOpFile->m_iCmdNum);
 			memset(&m_stOpStatus.stCycle,0,sizeof(STATUS_NEW_CYCYLE));			
@@ -324,8 +324,7 @@ void EDM_OP_HOLE::EdmHoleMvCmdProcess()
     CmdHandle* pCmdHandle;
 	memset(&cmdDefault,0,sizeof(DIGIT_CMD));
 	memset(&m_stMvCmd,0,sizeof(DIGIT_CMD));
-	str = m_pOpFile->m_vCmd[m_stOpStatus.iCmdIndex];
-	qDebug()<<"cmdProcess:"<<str;
+    str = m_pOpFile->m_vCmd[m_stOpStatus.iCmdIndex];
     pCmdHandle = new CmdHandle(FALSE,str,&m_stMvCmd,&cmdDefault);
 	m_stMvCmd.iFreq = min(m_stMvCmd.iFreq,m_iWholeFreq);
 	m_stMvCmd.stOp.bShortDis = TRUE;
@@ -363,19 +362,19 @@ unsigned char EDM_OP_HOLE::EdmHoleRise()
 
 		if (bRise)
 		{
-			memset(&cmd,0,sizeof(DIGIT_CMD));
-			cmd.enAim = AIM_G90;
-			cmd.enOrbit = ORBIT_G00;
-			cmd.enCoor = m_pOpFile->m_enCoor;
-			cmd.iAxisCnt = 1;
-			cmd.stAxisDigit[0].iDistance = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iRisePos;
-			cmd.stAxisDigit[0].iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;
+            memset(&cmd,0,sizeof(DIGIT_CMD));
+            cmd.enAim = AIM_G90;
+            cmd.enOrbit = ORBIT_G00;
+            cmd.enCoor = m_pOpFile->m_enCoor;
+            cmd.iAxisCnt = 1;
+            cmd.stAxisDigit[0].iDistance = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iRisePos;
+            cmd.stAxisDigit[0].iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;
 
-			if (m_pEdm->EdmSendMovePara(&cmd))
-			{
-				m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-				return FALSE;
-			}
+            if (m_pEdm->EdmSendMovePara(&cmd))
+            {
+                m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
+                return FALSE;
+            }
 		}
 		else
 		{
@@ -406,26 +405,25 @@ unsigned char EDM_OP_HOLE::EdmHoleUp2Safe()
 		return TRUE;
 	}
 
-	if (!m_stOpCtrl.stZeroCtrl.bStageLast && m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel==4)
+    if (!m_stOpCtrl.stZeroCtrl.bStageLast && m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel==6)
 	{	
-		memset(&cmd,0,sizeof(DIGIT_CMD));
-		cmd.enAim = AIM_G90;
-		cmd.enCoor = m_pOpFile->m_enCoor;
-		cmd.enOrbit = ORBIT_G01;
-		cmd.iFreq = MAC_INT_FREQ;
-		cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.iAxistLabel;
-		cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iSafePos;
-		cmd.iAxisCnt++;
-		if (m_pEdm->EdmSendMovePara(&cmd))
-		{
+        memset(&cmd,0,sizeof(DIGIT_CMD));
+        cmd.enAim = AIM_G90;
+        cmd.enCoor = m_pOpFile->m_enCoor;
+        cmd.enOrbit = ORBIT_G01;
+        cmd.iFreq = MAC_INT_FREQ;
+        cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.iAxistLabel;
+        cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iSafePos;
+        cmd.iAxisCnt++;
+        if (m_pEdm->EdmSendMovePara(&cmd))
+        {
             m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-		}
+        }
 	}
 	else
 	{
-		m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
+        m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
 	}
-
 	return FALSE;
 }
 
@@ -441,7 +439,7 @@ unsigned char EDM_OP_HOLE::EdmHoleDownFromSafe()
 	if (m_pEdm->m_stSysSet.iAxistLabel<0 || m_pEdm->m_stSysSet.iAxistLabel>=MAC_LABEL_COUNT)
 	{
 		if (m_stOpCtrl.stZeroCtrl.bEmptyMove)
-		{
+        {
 			CycleOver();
 		}
 		return TRUE;
@@ -452,32 +450,32 @@ unsigned char EDM_OP_HOLE::EdmHoleDownFromSafe()
         m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
 		if (m_stOpCtrl.stZeroCtrl.bEmptyMove)
 		{
+            INFO_PRINT();
 			CycleOver();
 		}		
 		return TRUE;
 	}
 
-	if (!m_stOpCtrl.stZeroCtrl.bStageLast && m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel==4)
+    if (!m_stOpCtrl.stZeroCtrl.bStageLast && m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel==6)
     {
 
-		memset(&cmd,0,sizeof(DIGIT_CMD));
-		cmd.enAim = AIM_G90;
-		cmd.enCoor = m_pOpFile->m_enCoor;
-		cmd.enOrbit = ORBIT_G01;
-		cmd.iFreq = m_iWholeFreq;
-		cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.iAxistLabel;
-		cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_iSafeLabelMacPos - m_pEdm->m_stEdmComm.stMoveCtrlComm[ m_pEdm->m_stSysSet.iAxistLabel].iWorkPosSet;
-		cmd.iAxisCnt++;
-		if (m_pEdm->EdmSendMovePara(&cmd))
-		{
-			m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-		}
-	}
+        memset(&cmd,0,sizeof(DIGIT_CMD));
+        cmd.enAim = AIM_G90;
+        cmd.enCoor = m_pOpFile->m_enCoor;
+        cmd.enOrbit = ORBIT_G01;
+        cmd.iFreq = m_iWholeFreq;
+        cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.iAxistLabel;
+        cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_iSafeLabelMacPos - m_pEdm->m_stEdmComm.stMoveCtrlComm[ m_pEdm->m_stSysSet.iAxistLabel].iWorkPosSet;
+        cmd.iAxisCnt++;
+        if (m_pEdm->EdmSendMovePara(&cmd))
+        {
+            m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
+        }
+    }
 	else
 	{
-		m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
+        m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
 	}
-
 	return FALSE;
 }
 
@@ -692,7 +690,7 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 {
 	Elec_Page stElec;
 	DIGIT_CMD cmd;
-
+    INFO_PRINT();
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
 
@@ -708,7 +706,7 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 		}
 		return TRUE;
 	}
-
+    INFO_PRINT();
 	m_stOpStatus.stCycle.iCycleIndex = 3;
 	m_stOpStatus.stCycle.iOpPage = -1;
 
@@ -842,7 +840,7 @@ unsigned char EDM_OP_HOLE::EdmHoleOpPage()
 	int iPassLen;
     DIGIT_CMD cmd;
     Elec_Page elec;
-
+    INFO_PRINT();
 	if (m_stOpCtrl.stZeroCtrl.bStageLast)
     {
 		m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
@@ -1185,9 +1183,8 @@ unsigned char EDM_OP_HOLE::EdmHoleMillPage()
 //重复加工
 unsigned char EDM_OP_HOLE::EdmHoleRepeat()
 {
-	DIGIT_CMD cmd;
-	QString strRec;
-	QString strTmpRec;
+    DIGIT_CMD cmd;
+    INFO_PRINT();
 
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
@@ -1266,7 +1263,6 @@ unsigned char EDM_OP_HOLE::EdmHoleRepeat()
 //底部停留
 unsigned char EDM_OP_HOLE::EdmHoleRootSleep()
 {
-    INFO_PRINT();
 	if (m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iBottomSleep>0)
 	{
 		if (!EDM_OP::m_bSetPower && m_stOpStatus.enOpType!= OP_HOLE_SIMULATE)
@@ -1287,7 +1283,7 @@ unsigned char EDM_OP_HOLE::EdmHoleRootSleep()
 			return TRUE;
 		}
 		else
-		{
+        {
 			return FALSE;
 		}
 	}
@@ -1596,7 +1592,7 @@ void EDM_OP_HOLE::CycleOver()
 			m_stOpStatus.iCmdIndex = 0;
 			m_stOpStatus.bOpOver = TRUE;
 		}
-        m_pOpFile->SetEdmElecIndex(m_stOpStatus.iCmdIndex+1);
+        m_pOpFile->SetEdmElecIndex(m_stOpStatus.iCmdIndex);
 	}
 
 	if (m_stOpStatus.enOpType==OP_HOLE_SING || 

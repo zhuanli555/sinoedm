@@ -27,7 +27,6 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    process.cpp \
     program.cpp \
     EDM/common.cpp\
     EDM/EDM.cpp \
@@ -46,7 +45,6 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    process.h \
     program.h \
     EDM/common.h \
     EDM/EDM.h \

@@ -116,7 +116,6 @@ bool EDM::GetEdmComm()
 bool EDM::GetEdmMacPassPara(MAC_PASS_PARA* pPass)
 {
 	short dwStatus;
-
     memset(pPass,0,sizeof(MAC_PASS_PARA));
     dwStatus = ioctl(fd,IOC_PASS_CTL,pPass);
 	return dwStatus==1;
@@ -209,7 +208,7 @@ int EDM::GetSpeed(int iFreq)
 
 bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
 {
-	short dwStatus;
+    short dwStatus;
 	bool bSwitchOver = false;
     QString str;	
 
@@ -590,6 +589,7 @@ int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
     unsigned char btTmp;
     static Elec_Page elec;
     bool bWrite = false;
+    qDebug()<<"writeElecPara from "<<strFunc;
     //ÉèÖÃÂö¿í
     if(elec.iTon != pElecPara->iTon)
     {

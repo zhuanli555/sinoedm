@@ -20,7 +20,7 @@ public:
 	void StageRestart();
 	void EdmOpListOver();
 
-    unsigned char GetOpFileInfo(QString& sFile,MAP_ELEC_MAN* pElec,vector<QString>& pCmd,vector<QString>& pCmdAbs);
+    unsigned char GetOpFileInfo(QString& sFile,MAC_ELEC_PARA* pElec);
 	void DeleteEdmOp();
 public:
 	unsigned char m_bChange;
@@ -31,7 +31,7 @@ private:
 	MAC_OPERATE_TYPE m_enOpType;
 	
 	QString m_sPath;
-	QString m_sFile;
+    QString m_sFile;
 public slots:
     void SetEdmOpElec(QString str,MAC_ELEC_PARA elec);
 };

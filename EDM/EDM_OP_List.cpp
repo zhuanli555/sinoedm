@@ -171,20 +171,10 @@ void EDM_OP_List::CarryOn()
 }
 
 
-unsigned char EDM_OP_List::GetOpFileInfo(QString& stringFile,MAP_ELEC_MAN* pElec,vector<QString>& pCmd,vector<QString>& pCmdAbs)
+unsigned char EDM_OP_List::GetOpFileInfo(QString& stringFile,MAC_ELEC_PARA* pElec)
 {
-	map<QString,MAC_ELEC_PARA>::iterator it = pElec->begin();
-	vector<QString>::iterator itVect;
-	QString str;
-	MAC_ELEC_PARA elec;
-	int i=0;
-
-    pCmd.clear();
-    pCmdAbs.clear();
-
-	it = pElec->begin();
-	while(it!=pElec->end())
-		pElec->erase(it++);
+    map<QString,MAC_ELEC_PARA>::iterator it;
+    QString str;
 
 	if ( !m_pEdmOp->m_pOpFile || !m_pEdmOp)
 	{
@@ -202,29 +192,13 @@ unsigned char EDM_OP_List::GetOpFileInfo(QString& stringFile,MAP_ELEC_MAN* pElec
 	while (it != m_pEdmOp->m_pOpFile->m_mpElecMan.end())
 	{
 		str = it->first;
-		memcpy(&elec,&(it->second),sizeof(MAC_ELEC_PARA));
-		pElec->insert(make_pair(str,elec));
+        if(str == stringFile)
+        {
+            memcpy(pElec,&(it->second),sizeof(MAC_ELEC_PARA));
+            break;
+        }
 		it++;
 	}
-
-	itVect = m_pEdmOp->m_pOpFile->m_vCmdStd.begin();
-	i=0;
-	while (itVect != m_pEdmOp->m_pOpFile->m_vCmdStd.end())
-	{
-        pCmd.push_back(m_pEdmOp->m_pOpFile->m_vCmdStd[i]);
-		itVect++;
-		i++;
-	}
-
-	itVect = m_pEdmOp->m_pOpFile->m_vCmd.begin();
-	i=0;
-	while (itVect != m_pEdmOp->m_pOpFile->m_vCmd.end())
-	{
-        pCmdAbs.push_back(m_pEdmOp->m_pOpFile->m_vCmd[i]);
-		itVect++;
-		i++;
-	}
-
 	return TRUE;
 }
 

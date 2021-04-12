@@ -69,6 +69,7 @@ void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bSta
 
 	if (bStart)
     {
+        INFO_PRINT();
         m_mpElecMan[str].stElecOral.iOpHoleIndex = iHoleIndexBak;
         if (m_strElec==str && iPageIndex==elec.iParaIndex)
 		{
@@ -78,7 +79,7 @@ void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bSta
 	else
     {
 		if (bCycleStart)
-		{
+        {
             INFO_PRINT();
 			elec.stElecOral.iOpHoleIndex = iHoleIndexBak;
             if (m_strElec==str && iPageIndex==elec.iParaIndex)
@@ -90,6 +91,7 @@ void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bSta
 
     if (bWrite)
     {
+        INFO_PRINT();
         if(m_pEdm->WriteElecPara(&elec.stElecPage[elec.iParaIndex],"EDM_OP_File::SetEdmOpElec") ==-1)
             m_enOpFileErr=OP_FILE_ERR_ELEC;
     }
@@ -98,7 +100,7 @@ void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bSta
 
 void EDM_OP_File::SetEdmElecIndex(int iCmdIndex)
 {
-	iCmdIndex = max(iCmdIndex,1);
+	iCmdIndex = max(iCmdIndex,0);
 	iCmdIndex = min(iCmdIndex,m_iCmdNum);
     m_mpElecMan[m_sFile].stElecOral.iOpHoleIndex = iCmdIndex;
     m_mpElecMan[m_sFile].stElecOral.iOpHoleAll = m_iCmdNum;

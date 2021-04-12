@@ -46,7 +46,7 @@ private:
     QWidget* createProcessTab();
     void Char2QStringInBinary(unsigned char btVal,QString &str);
     void systemSetChangeForCoord();
-    void OpFileCopyAndSend();
+    void setOpStatus(int status);
     void fillTableWidget(MAC_ELEC_PARA* pPara);
     void ReadParaFromTable(MAC_ELEC_PARA* pPara);
     int PercentStr2int(QString str);
@@ -56,6 +56,7 @@ private:
 private:
     EDM* edm;
     MAC_SYSTEM_SET mSysSet;
+    MAC_ELEC_PARA m_elec;
     EDM_COOR_TYPE m_enCoorType;
     EDM_OP_List* edmOpList;
     EDM_OP* edmOp;
@@ -108,6 +109,11 @@ private:
     QComboBox* speedValue;
     QTableWidget* elecPageTable;
     QTableWidget* elecOralTable;
+    QLabel *holeRise;
+    QLabel *holeLoc;
+    QLabel *holeZero;
+    QLabel *holePrune;
+    QLabel *holeOp;
     bool m_quit = false;
 protected:
     void keyPressEvent(QKeyEvent *e) override;
