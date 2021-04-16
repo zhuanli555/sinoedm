@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "EDM/initdb.h"
 #include <QDialog>
 #include <QtGui/QKeyEvent>
 #include <QTimer>
@@ -21,8 +20,6 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     this->setCentralWidget(widget);
     setWindowTitle(QString::fromLocal8Bit("Êý¿Ø»ú´²v1.0"));
     setGeometry(0,0,QApplication::desktop()->width(),QApplication::desktop()->height());
-    //init db
-    initDb();
     //init edm
     EDMMacInit();
     //×´Ì¬À¸
@@ -344,37 +341,25 @@ void MainWindow::setOpStatus(int status)
     switch (status) {
     case 1:
         holeRise->setStyleSheet("background-color:red;");
-        holeLoc->setStyleSheet("background-color:green;");
-        holeZero->setStyleSheet("background-color:green;");
-        holePrune->setStyleSheet("background-color:green;");
-        holeOp->setStyleSheet("background-color:green;");
+        holeLoc->setStyleSheet("");
+        holeZero->setStyleSheet("");
+        holePrune->setStyleSheet("");
+        holeOp->setStyleSheet("");
         break;
     case 2:
-        holeRise->setStyleSheet("background-color:green;");
+        holeRise->setStyleSheet("");
         holeLoc->setStyleSheet("background-color:red;");
-        holeZero->setStyleSheet("background-color:green;");
-        holePrune->setStyleSheet("background-color:green;");
-        holeOp->setStyleSheet("background-color:green;");
         break;
     case 3:
-        holeRise->setStyleSheet("background-color:green;");
-        holeLoc->setStyleSheet("background-color:green;");
+        holeLoc->setStyleSheet("");
         holeZero->setStyleSheet("background-color:red;");
-        holePrune->setStyleSheet("background-color:green;");
-        holeOp->setStyleSheet("background-color:green;");
         break;
     case 4:
-        holeRise->setStyleSheet("background-color:green;");
-        holeLoc->setStyleSheet("background-color:green;");
-        holeZero->setStyleSheet("background-color:green;");
+        holeZero->setStyleSheet("");
         holePrune->setStyleSheet("background-color:red;");
-        holeOp->setStyleSheet("background-color:green;");
         break;
     case 5:
-        holeRise->setStyleSheet("background-color:green;");
-        holeLoc->setStyleSheet("background-color:green;");
-        holeZero->setStyleSheet("background-color:green;");
-        holePrune->setStyleSheet("background-color:green;");
+        holePrune->setStyleSheet("");
         holeOp->setStyleSheet("background-color:red;");
         break;
     default:
@@ -914,7 +899,7 @@ void MainWindow::HandleEdmOpStatus()
             emit edmPauseSig();
         }
     }
-    //setOpStatus(edmOpList->m_pEdmOp->m_stOpStatus.stCycle.iCycleIndex);
+    setOpStatus(edmOpList->m_pEdmOp->m_stOpStatus.stCycle.iCycleIndex);
     if(pOp->m_stOpStatus.iCmdIndex != iCmdIndex && EDM_OP::m_bStartCount)
     {
         iCmdIndex = pOp->m_stOpStatus.iCmdIndex;

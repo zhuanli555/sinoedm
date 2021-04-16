@@ -26,8 +26,7 @@ EDM_OP_File::~EDM_OP_File()
 //ÒªÐÞ¸Ä
 unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 {
-	vector<QString>::iterator it;
-	int iHoleIndexBak;
+    vector<QString>::iterator it;
 
 	m_iCmdNum = 0;
 	m_enOpFileErr = OP_FILE_NO_ERR;

@@ -49,7 +49,6 @@ HEADERS += \
     EDM/common.h \
     EDM/EDM.h \
     EDM/EDM_Db.h \
-    EDM/initdb.h \
     coordwidget.h \
     unionzero.h \
     codeeditor.h \

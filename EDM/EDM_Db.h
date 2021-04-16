@@ -3,6 +3,7 @@
 #include "common.h"
 #include <QString>
 #include <QtSql>
+#include <QMessageBox>
 #include <map>
 #include <vector>
 
@@ -12,8 +13,8 @@ typedef map<QString ,MAC_ELEC_PARA> MAP_ELEC_MAN;
 class EDM_Db
 {
 public:
+    EDM_Db();
 	void GetAxisLuoBuData(char cSymbol,int iVal[],int nCount);
-
     void GetEdmCommPara(MAC_COMMON* pComm,int iWorkIndex);
     void SaveEdmCommPara(MAC_COMMON* pComm,int iWorkIndex,int a[][6]);
     void SaveEdmWorkSet(int iWorkIndex,int a[][6]);
@@ -38,5 +39,7 @@ public:
 
     void GetPrunePara(MAC_OTHER* pPrune);
 private:	
+    QSqlError initDb();
+    QSqlDatabase db;
     QSqlQuery q;
 };

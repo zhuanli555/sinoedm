@@ -4,14 +4,6 @@
 #include <list>
 using std::list;
 
-//通透控制模式
-typedef enum
-{
-	PASS_NONE = 0,
-	PASS_HIGH = 1,
-	PASS_LOW  = 2,
-}PASS_MODE;
-
 //测量模式
 typedef enum
 {
@@ -19,48 +11,6 @@ typedef enum
 	CHECK_ELASTIC = 1,  //伸缩模式
 	CHECK_ELEC  = 2,    //光电模式
 }CHECK_MODE;
-
-
-typedef struct  isaMAC_OPERATE_PASS_CTRL
-{
-	PASS_MODE enPassMode;
-	int iFeedStd;
-	int iVoltageStd;
-	int iSpeedStd;
-	int iSpeedCalc;
-	int iFeedStable[6];
-	int iBackStable[6];
-	int iVoltageStable[6];
-	int iSpeedStable[100];
-	int iSpeedRec[50];
-	int iVoltageRec[100];
-	int iStabelIndex;
-	int iSpeedIndex;
-	int iSpeedRecIndex;
-	int iVoltageRecIndex;
-	int iSum;
-	int iSumSpeed;
-	int iStageCnt;	
-	int iVoltage;
-	long int iVoltageSum;
-	int iPosMax;
-	unsigned char bStop;
-	unsigned char bPassLowSet;
-
-	int iFeedEntry;
-	unsigned char bEntryOver;
-	unsigned char bEntrySet;
-	int iHighTimeCnt;
-	int iFiltCnt;
-
-	int iPassRelWork;
-
-	unsigned char bPoleSet;
-	unsigned char bPole;
-	unsigned char bPoleStable;
-
-	unsigned char bHighModeStop;
-}MAC_OPERATE_PASS_CTRL;
 
 typedef struct holeZeroCtrl
 {
@@ -79,8 +29,7 @@ typedef struct holeZeroCtrl
 	int  iOpLenSum;            //加工累计深度
 	int  iRepeatCnt;           //重复次数
 	int  iOpLabelBasePos;      //加工轴底部坐标
-	int  iOpPageBak;           //加工页备份
-	MAC_OPERATE_PASS_CTRL stPassCtl;//通透控制
+    int  iOpPageBak;           //加工页备份
 }HOLE_ZERO_CTRL;
 
 //加工控制变量
@@ -132,8 +81,7 @@ private:
 	unsigned char EdmHoleMillPage();
 	unsigned char EdmHoleRepeat();
 	unsigned char EdmHoleRootSleep();
-	unsigned char EdmHoleSynchro();
-    void EdmHolePassCtl();
+    unsigned char EdmHoleSynchro();
 
 	unsigned char EdmHoleGo2AdjustPos();
 	unsigned char EdmHoleReturnOpPos();

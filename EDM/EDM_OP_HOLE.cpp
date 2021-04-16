@@ -21,10 +21,7 @@ EDM_OP_HOLE::~EDM_OP_HOLE()
 {
 	if (!m_ListStage.empty())
 		m_ListStage.clear();
-    if (m_enOpType!=OP_TYPE_NONE)
-    {
-        m_pEdm->SaveElecElem(m_pOpFile->m_sFile,&m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile]);
-    }
+
 	EdmHoleRecover();
 	m_pEdm = NULL;
 }
@@ -836,8 +833,7 @@ unsigned char EDM_OP_HOLE::EdmHolePrune()
 unsigned char EDM_OP_HOLE::EdmHoleOpPage()
 {
 	int iSum =0;
-	int iPage = 0;
-	int iPassLen;
+    int iPage = 0;
     DIGIT_CMD cmd;
     Elec_Page elec;
     INFO_PRINT();
@@ -853,182 +849,83 @@ unsigned char EDM_OP_HOLE::EdmHoleOpPage()
 	m_stOpStatus.stCycle.iCycleIndex = 5;
 	m_stOpStatus.stCycle.iTimeCnt++;
 
-	if (m_pEdm->m_stSysSet.stSetNoneLabel.bPass 
-		&& (m_stOpStatus.enOpType==OP_HOLE_SING|| m_stOpStatus.enOpType==OP_HOLE_PROGRAME))
-	{
-		EdmHolePassCtl();
-	}
+    m_stOpCtrl.stZeroCtrl.iOpLenSum = abs(m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iMachPos
+                                      - m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iWorkPosSet);
 
-	if(m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode == PASS_HIGH)
-	{
-		if (!m_stOpCtrl.stZeroCtrl.stPassCtl.bHighModeStop)
-		{
-			while (!m_pEdm->EdmStopMove(false))
-			{
-			}
-		}
-
-		m_stOpCtrl.stZeroCtrl.stPassCtl.bHighModeStop = TRUE;
-		if (++m_stOpCtrl.stZeroCtrl.stPassCtl.iHighTimeCnt  > 200/OPERATE_TRREAD_SLEEP_TIME)
-		{			
-			m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-			return FALSE;
-		}
-	}
-
-	if (m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode == PASS_NONE)
-	{
-		m_stOpCtrl.stZeroCtrl.iOpLenSum = abs(m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iMachPos
-			                              - m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iWorkPosSet);
-
-		if (m_pEdm->m_stEdmComm.enMvStatus == RULE_MOVE_OVER
-			|| (!m_stOpCtrl.stZeroCtrl.stPassCtl.bEntrySet && m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver))
-		{
-			if (!m_stOpCtrl.stZeroCtrl.stPassCtl.bEntrySet && m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver) 
-			{
-				m_stOpCtrl.stZeroCtrl.stPassCtl.bEntrySet = TRUE;
-				while (!m_pEdm->EdmStopMove(false))
-				{
-				}
-			}
-
-			for (int i=0;i<OP_HOLE_PAGE_MAX;i++)
-			{
-				iSum += m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[i].iOpLen;
-				if (iSum > m_stOpCtrl.stZeroCtrl.iOpLenSum)
-				{
-					iPage = i;
-					break;
-				}
-				
-				if (iSum >= m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iOpLenAll)
-				{
-					iPage = i;
-					iSum = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iOpLenAll;
-					break;
-				}
-			}
-
-			if (m_stOpCtrl.stZeroCtrl.iOpLenSum >= m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iOpLenAll)
-			{
-				m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-				return FALSE;
-			}
-
-			if(m_pEdm->WriteElecPara(&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage]),"EdmHoleOpPage_2")==-1)
-			{
-				m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
-				return FALSE;
-			}
-			if (!EDM_OP::m_bSetPower)
-			{
-				SetEdmHolePower(TRUE,FALSE,FALSE);
-				m_stOpCtrl.iWaitCnt = EDM_OP_WAIT_COUNT;
-				return FALSE;
-			}
-
-			memset(&cmd,0,sizeof(DIGIT_CMD));
-			cmd.enAim = AIM_G90;
-			cmd.enOrbit = ORBIT_G01;
-			cmd.enCoor = m_pOpFile->m_enCoor;
-
-			cmd.stOp.bOpenPower = TRUE;
-			cmd.stOp.enOpType = OP_HOLE_SING;
-			cmd.stOp.iBackSense = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage].iBackSense;
-			cmd.stOp.iFeedSense = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage].iFeedSense;			
-
-			cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;
-			cmd.stAxisDigit[cmd.iAxisCnt].iDistance = iSum;
-			if (!m_pEdm->m_stSysSet.stSetNoneLabel.bOpDir)
-			{
-				cmd.stAxisDigit[cmd.iAxisCnt].iDistance = 0-iSum;
-			}
-			cmd.iAxisCnt++;
-
-			if ( m_pEdm->m_stSysSet.stSetNoneLabel.bPass &&
-				(!m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver|| (m_stOpCtrl.stZeroCtrl.stPassCtl.bPole &&m_pEdm->m_stSysSet.stSetNoneLabel.iPoleMode)))
-			{
-				memset(&elec,0,sizeof(Elec_Page));
-                memcpy(&elec,&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage]),sizeof(Elec_Page));
-				elec.iServo = 55;
-				if(m_pEdm->WriteElecPara(&elec,"EdmHoleOpPage_1")==-1)
-				{
-					m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
-					return FALSE;
-				}
-			}
-
-			if (m_pEdm->EdmSendMovePara(&cmd))
+    if (m_pEdm->m_stEdmComm.enMvStatus == RULE_MOVE_OVER)
+    {
+        for (int i=0;i<OP_HOLE_PAGE_MAX;i++)
+        {
+            iSum += m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[i].iOpLen;
+            if (iSum > m_stOpCtrl.stZeroCtrl.iOpLenSum)
             {
-				m_stOpStatus.stCycle.iOpPage = iPage;				
-				m_stOpCtrl.stZeroCtrl.iOpPageBak =  m_stOpStatus.stCycle.iOpPage;				
-				return FALSE;
-			}
-		}		
-	}
-	else
-	{
-		if (m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iMachPos
-			- m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iWorkPosSet == m_stOpCtrl.stZeroCtrl.stPassCtl.iPassRelWork)
-		{
-			m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-			return FALSE;
-		}
+                iPage = i;
+                break;
+            }
 
-		if (m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode==PASS_LOW && !m_stOpCtrl.stZeroCtrl.stPassCtl.bPassLowSet)
-		{
-			if (!EDM_OP::m_bSetPower)
-			{
-				SetEdmHolePower(TRUE,FALSE,FALSE);
-				m_stOpCtrl.iWaitCnt = EDM_OP_WAIT_COUNT;
-				return FALSE;
-			}
+            if (iSum >= m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iOpLenAll)
+            {
+                iPage = i;
+                iSum = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iOpLenAll;
+                break;
+            }
+        }
 
-			if (m_pEdm->EdmStopMove(false))
-			{
-				iPassLen =  m_pEdm->m_stSysSet.stSetNoneLabel.iPassLen;
-				iPassLen = max(10,iPassLen);
+        if (m_stOpCtrl.stZeroCtrl.iOpLenSum >= m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iOpLenAll)
+        {
+            m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
+            return FALSE;
+        }
 
-				memset(&cmd,0,sizeof(DIGIT_CMD));
-				cmd.enAim = AIM_G90;
-				cmd.enOrbit = ORBIT_G01;
-				cmd.enCoor = m_pOpFile->m_enCoor;
-				cmd.stOp.bOpenPower = TRUE;
-				cmd.stOp.iBackSense = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage].iBackSense;
-				cmd.stOp.iFeedSense = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage].iFeedSense;
-				cmd.stOp.enOpType = OP_HOLE_SING;
+        if(m_pEdm->WriteElecPara(&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage]),"EdmHoleOpPage_2")==-1)
+        {
+            m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
+            return FALSE;
+        }
+        if (!EDM_OP::m_bSetPower)
+        {
+            SetEdmHolePower(TRUE,FALSE,FALSE);
+            m_stOpCtrl.iWaitCnt = EDM_OP_WAIT_COUNT;
+            return FALSE;
+        }
 
-				cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;
-				cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iMachPos
-					- m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iWorkPosSet;
-				if (m_pEdm->m_stSysSet.stSetNoneLabel.bOpDir)
-				{
-					cmd.stAxisDigit[cmd.iAxisCnt].iDistance += iPassLen;
-				} 
-				else
-				{
-					cmd.stAxisDigit[cmd.iAxisCnt].iDistance -= iPassLen;
-				}
-				cmd.iAxisCnt++;
+        memset(&cmd,0,sizeof(DIGIT_CMD));
+        cmd.enAim = AIM_G90;
+        cmd.enOrbit = ORBIT_G01;
+        cmd.enCoor = m_pOpFile->m_enCoor;
 
-                memcpy(&elec,&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[m_stOpStatus.stCycle.iOpPage]),sizeof(Elec_Page));
-				elec.iServo += m_pEdm->m_stSysSet.stSetNoneLabel.iSifu;
-				if(m_pEdm->WriteElecPara(&elec,"EdmHoleOpPage_3")==-1)
-				{
-					m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
-					return FALSE;
-				}
+        cmd.stOp.bOpenPower = TRUE;
+        cmd.stOp.enOpType = OP_HOLE_SING;
+        cmd.stOp.iBackSense = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage].iBackSense;
+        cmd.stOp.iFeedSense = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage].iFeedSense;
 
-				if (m_pEdm->EdmSendMovePara(&cmd))
-				{
+        cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;
+        cmd.stAxisDigit[cmd.iAxisCnt].iDistance = iSum;
+        if (!m_pEdm->m_stSysSet.stSetNoneLabel.bOpDir)
+        {
+            cmd.stAxisDigit[cmd.iAxisCnt].iDistance = 0-iSum;
+        }
+        cmd.iAxisCnt++;
 
-					m_stOpCtrl.stZeroCtrl.stPassCtl.bPassLowSet = TRUE;
-					m_stOpCtrl.stZeroCtrl.stPassCtl.iPassRelWork = cmd.stAxisDigit[0].iDistance;
-					return FALSE;
-				}
-			}
-		}
-	}
+        if ( m_pEdm->m_stSysSet.stSetNoneLabel.bPass)
+        {
+            memset(&elec,0,sizeof(Elec_Page));
+            memcpy(&elec,&(m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[iPage]),sizeof(Elec_Page));
+            elec.iServo = 55;
+            if(m_pEdm->WriteElecPara(&elec,"EdmHoleOpPage_1")==-1)
+            {
+                m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
+                return FALSE;
+            }
+        }
+
+        if (m_pEdm->EdmSendMovePara(&cmd))
+        {
+            m_stOpStatus.stCycle.iOpPage = iPage;
+            m_stOpCtrl.stZeroCtrl.iOpPageBak =  m_stOpStatus.stCycle.iOpPage;
+            return FALSE;
+        }
+    }
 
 	return FALSE;
 }
@@ -1291,172 +1188,6 @@ unsigned char EDM_OP_HOLE::EdmHoleRootSleep()
 	return TRUE;
 }
 
-void EDM_OP_HOLE::EdmHolePassCtl()
-{
-	float fStable;
-	int iCnt=0;
-    int iCalc =0;
-    int iStartStable;
-	int iOpLabelWorkPos;	
-
-	m_pEdm->GetEdmMacPassPara(&m_stMacPassPara);
-
-	if (!m_stMacPassPara.bOver)
-		return;
-
-    m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltage = 0;
-
-	if (++m_stOpCtrl.stZeroCtrl.stPassCtl.iFiltCnt<5)
-		return;
-
-
-	iCalc = 0;
-	for (int i=0;i<m_stOpCtrl.stZeroCtrl.stPassCtl.iSpeedIndex;i++)
-	{
-		iCalc += m_stOpCtrl.stZeroCtrl.stPassCtl.iSpeedStable[i];
-	}
-	iCalc =  iCalc/(m_stOpCtrl.stZeroCtrl.stPassCtl.iSpeedIndex+1);
-
-	iCnt=0;
-	for (int i=0;i<=m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageRecIndex&& m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageRecIndex>0;i++)
-	{
-		iCnt += m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageRec[i];
-	}
-	iCnt = iCnt/(m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageRecIndex+1);
-
-	iOpLabelWorkPos = m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iMachPos 
-		              - m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iWorkPosSet;
-
-	if (m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode == PASS_NONE
-		&& iOpLabelWorkPos>= m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[0].iOpLen+1000
-		&& !m_stOpCtrl.stZeroCtrl.stPassCtl.bStop)
-	{
-		m_stOpCtrl.stZeroCtrl.stPassCtl.iSum += m_stMacPassPara.iFeedCnt;
-		m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageSum += m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltage;
-		m_stOpCtrl.stZeroCtrl.stPassCtl.iStageCnt++;
-	}
-
-	if ( iOpLabelWorkPos>= m_stOpCtrl.stZeroCtrl.stPassCtl.iPosMax)
-	{
-		m_stOpCtrl.stZeroCtrl.stPassCtl.iPosMax = iOpLabelWorkPos;
-	}
-
-	if (m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode == PASS_NONE
-		&& iOpLabelWorkPos>=m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecPage[0].iOpLen+500
-		&& !m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver)
-	{
-		if (m_stMacPassPara.iBackCnt<20)
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedEntry++;
-		else
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedEntry = 0;
-
-		if (m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedEntry>=20 && iOpLabelWorkPos>=500
-			|| iOpLabelWorkPos>=1500)
-		{
-			m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver = TRUE;
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iSum = 0;
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageSum = 0;
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iStageCnt = 0;
-		}
-	}
-
-	iStartStable = m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iOpLenAll/4;
-	if (iStartStable>10000)
-		iStartStable = 10000;
-
-	m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex] = m_stMacPassPara.iFeedCnt;
-	m_stOpCtrl.stZeroCtrl.stPassCtl.iBackStable[m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex] = m_stMacPassPara.iBackCnt;
-	m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageStable[m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex] = m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltage;
-
-	if (iOpLabelWorkPos>=m_pOpFile->m_mpElecMan[m_pOpFile->m_strElec].stElecOral.iJudgePos)
-    {
-		if (!m_stOpCtrl.stZeroCtrl.stPassCtl.bStop && m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver && m_stOpCtrl.stZeroCtrl.stPassCtl.iStageCnt>1) 
-		{
-            m_stOpCtrl.stZeroCtrl.stPassCtl.bStop = TRUE;
-            iCalc = m_stOpCtrl.stZeroCtrl.stPassCtl.iSum/m_stOpCtrl.stZeroCtrl.stPassCtl.iStageCnt*0.7;
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd = iCalc;
-			if (m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd>35)
-				m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd=35;
-			if (m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd<15)
-				m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd=15;
-		}
-
-
-		if (m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode == PASS_NONE)
-		{
-			if (m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode == PASS_NONE)
-			{
-				iCnt = 0;
-				for (int i=0;i<=m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex;i++)
-				{
-					if (m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i]<=m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStd)
-					{
-						if(m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i]+m_stOpCtrl.stZeroCtrl.stPassCtl.iBackStable[i]==0)
-							fStable =  1;
-						else
-							fStable =  (float)m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i]/
-							(float)(m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i]+m_stOpCtrl.stZeroCtrl.stPassCtl.iBackStable[i]);
-
-						if (fStable<=0.75)
-							iCnt++;					
-					}
-				}
-				if (iCnt>=4 && m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver)
-				{
-					m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode = PASS_LOW;
-				}		
-
-				iCnt = 0;
-				for (int i=0;i<=m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex;i++)
-				{
-					if (m_stOpCtrl.stZeroCtrl.stPassCtl.iBackStable[i]>=16)
-						iCnt++;				
-				}
-				if (iCnt>=4 && m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver)
-				{
-					m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode = PASS_LOW;
-				}
-
-
-				iCnt = 0;
-				if (m_stOpCtrl.stZeroCtrl.stPassCtl.iPosMax<=iOpLabelWorkPos)
-				{
-					for (int i=0;i<=m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex;i++)
-					{
-						if (m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageStable[i]<=m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageStd)
-						{
-							if(m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i]+m_stOpCtrl.stZeroCtrl.stPassCtl.iBackStable[i]==0)
-								fStable =  1;
-							else
-								fStable =  (float)m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i]/
-								(float)(m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i]+m_stOpCtrl.stZeroCtrl.stPassCtl.iBackStable[i]);
-
-							if (fStable>=0.9)
-								iCnt++;
-						}
-					}
-				}			
-				if (iCnt==5 && m_stOpCtrl.stZeroCtrl.stPassCtl.bEntryOver)
-				{
-					m_stOpCtrl.stZeroCtrl.stPassCtl.enPassMode = PASS_LOW;
-				}
-			}		
-		}
-	}
-
-
-	if (++m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex>=5)
-	{
-		m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex = 5;
-		for (int i=0;i<m_stOpCtrl.stZeroCtrl.stPassCtl.iStabelIndex;i++)
-		{
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i]= m_stOpCtrl.stZeroCtrl.stPassCtl.iFeedStable[i+1];
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iBackStable[i]= m_stOpCtrl.stZeroCtrl.stPassCtl.iBackStable[i+1];
-			m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageStable[i] = m_stOpCtrl.stZeroCtrl.stPassCtl.iVoltageStable[i+1];
-		}
-	}
-}
-
 //µç¼«ÐÞÕû
 unsigned char EDM_OP_HOLE::EdmHoleGo2AdjustPos()
 {
@@ -1611,12 +1342,13 @@ void EDM_OP_HOLE::EdmHoleRecover()
 	DIGIT_CMD cmd;
     EDM_OP::m_bSetPower = FALSE;
     m_pEdm->CloseHardWare();
-    INFO_PRINT();
+    if(m_enOpType != OP_TYPE_NONE)
+        m_pEdm->SaveElecElem(m_pOpFile->m_sFile,&m_pOpFile->m_mpElecMan[m_pOpFile->m_sFile]);
 	if (m_enOpType == OP_TYPE_NONE || EDM_OP::m_bInOp==FALSE)
 	{
 		return;
-	}
-
+    }
+    INFO_PRINT();
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 	{
 		while (!m_pEdm->EdmStopMove(false))
@@ -1681,7 +1413,7 @@ void EDM_OP_HOLE::SetEdmHolePower(unsigned char bPower,unsigned char bPrune,unsi
 
 	m_pEdm->EdmPower(bPower);
 	m_pEdm->EdmPrune(bPrune);	
-
+    m_pEdm->EdmSetShake(bPower);
 	if (bPower || bOtherClose)
 	{
 		m_pEdm->EdmLowPump(bLowPump);

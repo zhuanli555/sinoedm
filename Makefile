@@ -300,7 +300,6 @@ DIST          = ../qt5/5.12.1/gcc_64/mkspecs/features/spec_pre.prf \
 		EDM/common.h \
 		EDM/EDM.h \
 		EDM/EDM_Db.h \
-		EDM/initdb.h \
 		coordwidget.h \
 		unionzero.h \
 		codeeditor.h \
@@ -751,7 +750,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../qt5/5.12.1/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents mainwindow.h program.h EDM/common.h EDM/EDM.h EDM/EDM_Db.h EDM/initdb.h coordwidget.h unionzero.h codeeditor.h EDM/cmdhandle.h alarmsignal.h EDM/EDM_OP.h EDM/EDM_OP_File.h EDM/EDM_OP_HOLE.h EDM/EDM_OP_List.h EDM/electool.h settingdialog.h $(DISTDIR)/
+	$(COPY_FILE) --parents mainwindow.h program.h EDM/common.h EDM/EDM.h EDM/EDM_Db.h coordwidget.h unionzero.h codeeditor.h EDM/cmdhandle.h alarmsignal.h EDM/EDM_OP.h EDM/EDM_OP_File.h EDM/EDM_OP_HOLE.h EDM/EDM_OP_List.h EDM/electool.h settingdialog.h $(DISTDIR)/
 	$(COPY_FILE) --parents main.cpp mainwindow.cpp program.cpp EDM/common.cpp EDM/EDM.cpp EDM/EDM_Db.cpp coordwidget.cpp unionzero.cpp codeeditor.cpp EDM/cmdhandle.cpp alarmsignal.cpp EDM/EDM_OP.cpp EDM/EDM_OP_File.cpp EDM/EDM_OP_HOLE.cpp EDM/EDM_OP_List.cpp EDM/electool.cpp settingdialog.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents settingdialog.ui $(DISTDIR)/
 
@@ -1093,6 +1092,9 @@ moc_mainwindow.cpp: mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		coordwidget.h \
@@ -1115,7 +1117,6 @@ moc_mainwindow.cpp: mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qfontdatabase.h \
 		settingdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QDialog \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QSettings \
 		unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QCheckBox \
@@ -1527,6 +1528,9 @@ moc_EDM.cpp: EDM/EDM.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		EDM/EDM.h \
@@ -1806,6 +1810,9 @@ moc_coordwidget.cpp: coordwidget.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		moc_predefs.h \
@@ -2095,6 +2102,8 @@ moc_unionzero.cpp: unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		moc_predefs.h \
@@ -2488,6 +2497,9 @@ moc_alarmsignal.cpp: alarmsignal.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		EDM/EDM_OP_List.h \
@@ -2771,6 +2783,9 @@ moc_EDM_OP_List.cpp: EDM/EDM_OP_List.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		EDM/EDM_OP_File.h \
@@ -3210,6 +3225,9 @@ main.o: main.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		coordwidget.h \
@@ -3232,7 +3250,6 @@ main.o: main.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qfontdatabase.h \
 		settingdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QDialog \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QSettings \
 		unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QCheckBox \
@@ -3546,6 +3563,9 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		coordwidget.h \
@@ -3568,16 +3588,12 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qfontdatabase.h \
 		settingdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QDialog \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QSettings \
 		unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QCheckBox \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qcheckbox.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QButtonGroup \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qbuttongroup.h \
-		EDM/initdb.h \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
-		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QKeyEvent \
 		../qt5/5.12.1/gcc_64/include/QtCore/QTimer \
 		../qt5/5.12.1/gcc_64/include/QtCore/QDateTime \
@@ -4035,6 +4051,9 @@ EDM.o: EDM/EDM.cpp EDM/EDM.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QDebug
@@ -4301,6 +4320,9 @@ EDM_Db.o: EDM/EDM_Db.cpp EDM/EDM_Db.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/cmdhandle.h \
 		EDM/EDM.h \
 		EDM/electool.h
@@ -4578,6 +4600,9 @@ coordwidget.o: coordwidget.cpp coordwidget.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QDebug \
@@ -4868,6 +4893,8 @@ unionzero.o: unionzero.cpp unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QKeyEvent \
@@ -5602,6 +5629,9 @@ cmdhandle.o: EDM/cmdhandle.cpp EDM/cmdhandle.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cmdhandle.o EDM/cmdhandle.cpp
 
@@ -5869,6 +5899,9 @@ alarmsignal.o: alarmsignal.cpp alarmsignal.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		EDM/EDM_OP_List.h \
@@ -6149,6 +6182,9 @@ EDM_OP.o: EDM/EDM_OP.cpp EDM/EDM_OP.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		EDM/EDM_OP_File.h
@@ -6417,6 +6453,9 @@ EDM_OP_File.o: EDM/EDM_OP_File.cpp EDM/EDM_OP_File.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EDM_OP_File.o EDM/EDM_OP_File.cpp
@@ -6685,6 +6724,9 @@ EDM_OP_HOLE.o: EDM/EDM_OP_HOLE.cpp EDM/EDM_OP_HOLE.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		EDM/EDM_OP_File.h
@@ -6955,6 +6997,9 @@ EDM_OP_List.o: EDM/EDM_OP_List.cpp EDM/EDM_OP_List.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqltablemodel.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qsqlresult.h \
 		../qt5/5.12.1/gcc_64/include/QtSql/qtsqlversion.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QMessageBox \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		EDM/EDM_OP_File.h

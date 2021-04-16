@@ -9,7 +9,7 @@
 
 #define INTERFACE_HANDWHEEL_IN_FIRST 0x1D0    //手轮所在接口，轴及速率,0x310
 #define INTERFACE_HANDWHEEL_IN_SECOND 0x1D2   //手轮所在接口，脉冲,0x312
-
+//#define EDM_DEBUG
 EDM* EDM::m_pEdm = NULL;
 QString EDM::m_strElecDefault="DEFAULT";
 
@@ -62,8 +62,8 @@ unsigned long EDM::EdmInit()
     m_stEdmInterfaceOut.btO140 = 0xFF;
     m_stEdmInterfaceOut.btO144 = 0xFF;
 	m_stEdmInterfaceOut.btO184 = 0xFF;
-    m_stEdmInterfaceOut.btO188 = 0xFB;
-	m_stEdmInterfaceOut.btO18C = 0x07;//中断号设置
+    m_stEdmInterfaceOut.btO188 = 0xEB;
+    m_stEdmInterfaceOut.btO18C = 0x1F;//中断号设置
     m_stEdmInterfaceOut.btO190 = 0xFB;
     m_stEdmInterfaceOut.btO198 = 0xFF;//控制电流档位
     m_stEdmInterfaceOut.btO199 = 0xFF;
@@ -109,6 +109,9 @@ unsigned long EDM::EdmClose()
 bool EDM::GetEdmComm()
 {
     short dwStatus;
+#ifdef EDM_DEBUG
+    return true;
+#endif
     dwStatus = ioctl(fd,IOC_COMM_TO_USER,&m_stEdmComm);
 	return dwStatus==1;
 }
@@ -211,7 +214,9 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
     short dwStatus;
 	bool bSwitchOver = false;
     QString str;	
-
+#ifdef EDM_DEBUG
+    return true;
+#endif
     if (m_iWorkIndex != (int)pMacUser->enCoor)
     {
         if (SwitchWorkIndex((int)pMacUser->enCoor))
@@ -248,7 +253,9 @@ void EDM::EdmStop()
 bool EDM::EdmStopMove(unsigned long bStatus)
 {
 	short dwStatus;
-    QString str = "stop move";
+#ifdef EDM_DEBUG
+    return true;
+#endif
     m_stEdmOpEntile.bStop = TRUE;
     dwStatus = ioctl(fd,IOC_MAC_OPERATE,&m_stEdmOpEntile);
     m_stEdmOpEntile.bStop = FALSE;
@@ -298,6 +305,9 @@ bool EDM::EdmSetProtect(unsigned long bProtect)
     short dwStatus;
 	if (m_stEdmComm.enMvStatus==RULE_RTZERO)
         return false;
+#ifdef EDM_DEBUG
+    return true;
+#endif
     m_stEdmOpEntile.bNoProtect = !bProtect;
     dwStatus = ioctl(fd,IOC_MAC_OPERATE,&m_stEdmOpEntile);
 	if (dwStatus == 1)
@@ -483,13 +493,13 @@ bool EDM::EdmSetShake(unsigned long bShake)
     return true;
 }
 
-//电源
+//电源(高频)
 bool EDM::EdmPower(unsigned long bOpen)
 {
 	if (bOpen)
-        m_stEdmInterfaceOut.btO188 &=0xFD;
+        m_stEdmInterfaceOut.btO188 &=0xDF;
 	else
-        m_stEdmInterfaceOut.btO188 |=0x02;
+        m_stEdmInterfaceOut.btO188 |=0x20;
 
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	m_stStatus.bPower = bOpen;
@@ -497,13 +507,13 @@ bool EDM::EdmPower(unsigned long bOpen)
 	return true;
 }
 
-//修电级 true是正常加工 false是反修
+//修电级 1是反修
 bool EDM::EdmPrune(unsigned long bOpen)
 {
 	if (bOpen)
-        m_stEdmInterfaceOut.btO188 &=0xFE;
+        m_stEdmInterfaceOut.btO188 |=0x10;
 	else
-        m_stEdmInterfaceOut.btO188 |=0x01;
+        m_stEdmInterfaceOut.btO188 &=0xEF;
 
 	::write(fd,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 	m_stStatus.bPrune = bOpen;
@@ -646,7 +656,7 @@ int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
     if(elec.iCap != pElecPara->iCap)
     {
         elec.iCap = pElecPara->iCap;
-        btTmp = (64-pElecPara->iCap)&0xFF;
+        btTmp = (63-pElecPara->iCap)&0xFF;
         m_stEdmInterfaceOut.btO190 |= 0x08;
         if(btTmp&0x20)
         {
@@ -789,9 +799,7 @@ void EDM::GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan)
 
 void EDM::SaveElecElem(QString str,MAC_ELEC_PARA* pElec)
 {
-    MAC_ELEC_PARA stElec;
-    memcpy(&stElec,pElec,sizeof(MAC_ELEC_PARA));
-    m_pEdmAdoSys->SaveElecMan(str,&stElec);
+    m_pEdmAdoSys->SaveElecMan(str,pElec);
 }
 
 bool EDM::SwitchWorkIndex(int iSwitch)
