@@ -771,12 +771,12 @@ bool EDM::GetAxisOffset()
 unsigned char EDM::FindElecManElem(QString str)
 {
     QString strTmp;
-    map<QString,MAC_ELEC_PARA>::iterator it;
+    QMap<QString,MAC_ELEC_PARA>::ConstIterator it = mp_ElecMan.constBegin();
     it=mp_ElecMan.begin();
     str = str.toUpper();
-    while(it!=mp_ElecMan.end())
+    while(it!=mp_ElecMan.constEnd())
     {
-        strTmp = it->first;
+        strTmp = it.key();
         strTmp = strTmp.toUpper();
 
         if (strTmp==str)
@@ -795,7 +795,7 @@ void EDM::GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan)
     {
         memcpy(pElecMan,&mp_ElecMan[str],sizeof(MAC_ELEC_PARA));
     }else {
-        (&mp_ElecMan)->insert(make_pair(str,mp_ElecMan[EDM::m_strElecDefault]));
+        mp_ElecMan.insert(str,mp_ElecMan[EDM::m_strElecDefault]);
         memcpy(pElecMan,&mp_ElecMan[EDM::m_strElecDefault],sizeof(MAC_ELEC_PARA));
         m_pEdmAdoSys->NewElecElem(str,pElecMan);
     }
@@ -804,7 +804,11 @@ void EDM::GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan)
 void EDM::SaveElecElem(QString str,MAC_ELEC_PARA* pElec)
 {
     memcpy(&mp_ElecMan[str],pElec,sizeof(MAC_ELEC_PARA));
-    m_pEdmAdoSys->SaveElecMan(str,pElec);
+}
+
+void EDM::SaveElecElemDB(QString str)
+{
+    m_pEdmAdoSys->SaveElecMan(str,&mp_ElecMan[str]);
 }
 
 bool EDM::SwitchWorkIndex(int iSwitch)
@@ -866,7 +870,7 @@ void EDM::ReSetWorkPosSetByIndex(int iIndex,int iWork[][6])
 
 void EDM::SetValMakeUp(int iVal_C,int iVal_X)
 {
-	m_mpMakeUp_C.insert(make_pair(iVal_C,iVal_X));
+    m_mpMakeUp_C.insert(iVal_C,iVal_X);
 }
 
 void EDM::SetMakeUpFile(QString strFile)
@@ -880,8 +884,8 @@ void EDM::SetMakeUpFile(QString strFile)
 
 void EDM::ClearMakeUpVal()
 {
-	map<int,int>::iterator it=m_mpMakeUp_C.begin();
-	while (it != m_mpMakeUp_C.end())
+    QMap<int,int>::Iterator it=m_mpMakeUp_C.begin();
+    while (it!=m_mpMakeUp_C.end())
 	{
 		m_mpMakeUp_C.erase(it++);
 	}
@@ -889,13 +893,7 @@ void EDM::ClearMakeUpVal()
 
 bool EDM::HasMakeUpVal()
 {
-	map<int,int>::iterator it=m_mpMakeUp_C.begin();
-	if (it != m_mpMakeUp_C.end())
-	{
-		return true;
-	}
-
-	return false;
+    return !m_mpMakeUp_C.isEmpty();
 }
 
 bool EDM::GetMakeUpVal(int iVal_C,int* pVal)
@@ -903,18 +901,18 @@ bool EDM::GetMakeUpVal(int iVal_C,int* pVal)
 	bool bExist_1 = false;
 	int iVal_1,iVal_2;
 
-	map<int,int>::iterator it=m_mpMakeUp_C.begin();
+    QMap<int,int>::Iterator it=m_mpMakeUp_C.begin();
 	if (it != m_mpMakeUp_C.end())
 	{
-		iVal_1 = it->second;
+        iVal_1 = it.value();
 	}
 
 	while (it != m_mpMakeUp_C.end())
 	{
-		if (it->first==iVal_C)
+        if (it.key()==iVal_C)
 		{
 			bExist_1 = true;
-			iVal_2 = it->second;
+            iVal_2 = it.value();
 		}
 		it++;
 	}

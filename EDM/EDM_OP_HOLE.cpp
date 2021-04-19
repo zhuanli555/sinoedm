@@ -1330,7 +1330,7 @@ void EDM_OP_HOLE::EdmHoleRecover()
     EDM_OP::m_bSetPower = FALSE;
     m_pEdm->CloseHardWare();
     if(m_enOpType != OP_TYPE_NONE)
-        m_pEdm->SaveElecElem(m_pOpFile->m_sFile,&m_pEdm->mp_ElecMan[m_pOpFile->m_sFile]);
+        m_pEdm->SaveElecElemDB(m_pOpFile->m_sFile);
 	if (m_enOpType == OP_TYPE_NONE || EDM_OP::m_bInOp==FALSE)
 	{
 		return;

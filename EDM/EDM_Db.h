@@ -4,11 +4,11 @@
 #include <QString>
 #include <QtSql>
 #include <QMessageBox>
-#include <map>
+#include <QMap>
 #include <vector>
 
 using namespace std;
-typedef map<QString ,MAC_ELEC_PARA> MAP_ELEC_MAN;
+typedef QMap<QString ,MAC_ELEC_PARA> MAP_ELEC_MAN;
 
 class EDM_Db
 {

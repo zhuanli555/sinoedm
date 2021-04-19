@@ -261,7 +261,7 @@ elec_page_3,elec_page_4,elec_page_5,elec_oral from elec");
         GetElecPageParaFromQString(q.value(7).toString(),&(stMacElecPara.stElecPage[5]));
         GetElecOralParaFromQString(q.value(8).toString(),&(stMacElecPara.stElecOral));
 
-        pElecMan->insert(pair<QString,MAC_ELEC_PARA>(strTmp,stMacElecPara));
+        pElecMan->insert(strTmp,stMacElecPara);
     }
 }
 
@@ -276,18 +276,14 @@ void EDM_Db::SaveElecMan(QString str,MAC_ELEC_PARA* pElec)
     str3 = GetElecPagePara2QString(&pElec->stElecPage[3]);
     str4 = GetElecPagePara2QString(&pElec->stElecPage[4]);
     str5 = GetElecPagePara2QString(&pElec->stElecPage[5]);
-    strOral = GetElecOralPara2QString(&pElec->stElecOral);
+    //strOral = GetElecOralPara2QString(&pElec->stElecOral);
 
         sql = QString("update elec set elec_page_0='%1',elec_page_1='%2',elec_page_2='%3',elec_page_3='%4',\
-                                    elec_page_4='%5',elec_page_5='%6',elec_oral='%7' where eName='%8'").arg(str0).arg(str1)\
-                .arg(str2).arg(str3).arg(str4).arg(str5).arg(strOral).arg(str);
+                                    elec_page_4='%5',elec_page_5='%6' where eName='%7'").arg(str0).arg(str1)\
+                .arg(str2).arg(str3).arg(str4).arg(str5).arg(str);
 
                 bool a = q.exec(sql);
         qDebug()<<sql<<a;
-
-
-
-
 }
 
 

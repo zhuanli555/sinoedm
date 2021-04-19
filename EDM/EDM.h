@@ -9,8 +9,8 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include <map>
 #include <vector>
+#include <QMap>
 
 //¥Ú”°
 #define INFO_PRINT(info,...)  \
@@ -123,7 +123,7 @@ public:
 	unsigned long m_bMachFault;
     int m_iCoor[MAC_LABEL_COUNT][6];
     QString m_strSysPath;
-    map<int,int> m_mpMakeUp_C;
+    QMap<int,int> m_mpMakeUp_C;
     MAP_ELEC_MAN  mp_ElecMan;
 private:
     int fd;
@@ -175,6 +175,7 @@ public:
 
 	void ReSetWorkPosSetByIndex(int iIndex,int iWork[][6]);
     void SaveElecElem(QString str,MAC_ELEC_PARA* pElec);
+    void SaveElecElemDB(QString str);
 public slots:
 	bool EdmSetProtect(unsigned long bProtect);
 	bool EdmLowPump(unsigned long bOpen);
