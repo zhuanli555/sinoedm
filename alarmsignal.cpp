@@ -130,7 +130,7 @@ void AlarmSignal::edmLowerPump()
 
 void AlarmSignal::edmShake()
 {
-    edm->EdmSetShake(edm->m_stEdmShowData.stStatus.bShake);
+    edm->EdmSetShake(!edm->m_stEdmShowData.stStatus.bShake);
     if(edm->m_stEdmShowData.stStatus.bShake)
     {
         shakeValue->setStyleSheet("background-color:green;");
@@ -149,7 +149,7 @@ void AlarmSignal::edmHandProcess()
 
 void AlarmSignal::edmProtect()
 {
-    edm->EdmSetProtect(edm->m_stEdmShowData.stStatus.bNoProtect);
+    edm->EdmSetProtect(!edm->m_stEdmShowData.stStatus.bNoProtect);
     if(edm->m_stEdmShowData.stStatus.bNoProtect)
     {
         protectValue->setStyleSheet("background-color:green;");

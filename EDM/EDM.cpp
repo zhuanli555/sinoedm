@@ -215,6 +215,8 @@ bool EDM::EdmSendMovePara(DIGIT_CMD* pMacUser)
 	bool bSwitchOver = false;
     QString str;	
 #ifdef EDM_DEBUG
+    CmdHandle::DigitCmd2QString(pMacUser,str);
+    qDebug()<<str;
     return true;
 #endif
     if (m_iWorkIndex != (int)pMacUser->enCoor)
@@ -770,16 +772,10 @@ bool EDM::GetAxisOffset()
 
 unsigned char EDM::FindElecManElem(QString str)
 {
-    QString strTmp;
     QMap<QString,MAC_ELEC_PARA>::ConstIterator it = mp_ElecMan.constBegin();
-    it=mp_ElecMan.begin();
-    str = str.toUpper();
     while(it!=mp_ElecMan.constEnd())
     {
-        strTmp = it.key();
-        strTmp = strTmp.toUpper();
-
-        if (strTmp==str)
+        if (it.key()==str)
         {
             return TRUE;
         }
@@ -887,7 +883,8 @@ void EDM::ClearMakeUpVal()
     QMap<int,int>::Iterator it=m_mpMakeUp_C.begin();
     while (it!=m_mpMakeUp_C.end())
 	{
-		m_mpMakeUp_C.erase(it++);
+        m_mpMakeUp_C.erase(it);
+        it++;
 	}
 }
 
@@ -898,32 +895,8 @@ bool EDM::HasMakeUpVal()
 
 bool EDM::GetMakeUpVal(int iVal_C,int* pVal)
 {
-	bool bExist_1 = false;
-	int iVal_1,iVal_2;
-
-    QMap<int,int>::Iterator it=m_mpMakeUp_C.begin();
-	if (it != m_mpMakeUp_C.end())
-	{
-        iVal_1 = it.value();
-	}
-
-	while (it != m_mpMakeUp_C.end())
-	{
-        if (it.key()==iVal_C)
-		{
-			bExist_1 = true;
-            iVal_2 = it.value();
-		}
-		it++;
-	}
-
-	if (bExist_1)
-	{
-		*pVal = iVal_2 - iVal_1;
-		return true;
-	}
-
-	return false;
+    *pVal = m_mpMakeUp_C.value(iVal_C,0);
+    return true;
 }
 
 

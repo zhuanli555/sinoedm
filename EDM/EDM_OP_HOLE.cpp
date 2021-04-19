@@ -131,10 +131,10 @@ void EDM_OP_HOLE::EdmOpSetStart(unsigned char bStart)
 		m_stOpStatus.bStart = FALSE;
 		EDM_OP::m_bInOp = FALSE; 
 		m_stOpStatus.stCycle.bPauseCmd = TRUE;
-		while (!m_pEdm->EdmStopMove(false))
+        while (!m_pEdm->EdmStopMove(FALSE))
 		{
 		}
-		m_pEdm->EdmSetProtect(true);
+        m_pEdm->EdmSetProtect(TRUE);
 		SetEdmHolePower(FALSE,FALSE,FALSE);
 		m_stOpCtrl.iWaitCnt = 0;
 		m_stOpCtrl.stZeroCtrl.bWait = FALSE;
@@ -207,7 +207,7 @@ void EDM_OP_HOLE::EdmOpOver()
 
 void EDM_OP_HOLE::EdmOpStageRestart()
 {
-	while (!m_pEdm->EdmStopMove(false))
+    while (!m_pEdm->EdmStopMove(FALSE))
 	{
 	}
 	m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
@@ -466,10 +466,6 @@ unsigned char EDM_OP_HOLE::EdmHoleDownFromSafe()
 
 unsigned char EDM_OP_HOLE::EdmHoleLocation()
 {
-	int iLabel;
-	int iVal;
-	unsigned char bExist = FALSE;
-	unsigned char bAddCycleMeasVal = FALSE;
     DIGIT_CMD cmd2Send;
 	unsigned char bEmptyMove=FALSE;
     INFO_PRINT();
@@ -479,14 +475,7 @@ unsigned char EDM_OP_HOLE::EdmHoleLocation()
 	if (m_stOpCtrl.stZeroCtrl.bStageLast)
 	{
         m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
-		if (m_stOpCtrl.stZeroCtrl.bSafeLabelExist)
-		{
-			if (m_pEdm->m_stSysSet.iAxistLabel>=0 && m_pEdm->m_stSysSet.iAxistLabel<MAC_LABEL_COUNT)
-			{
-				m_iSafeLabelMacPos = m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.iAxistLabel].iMachPos;
-			}			
-		}
-		
+
 		return TRUE;
 	}
 
@@ -495,48 +484,10 @@ unsigned char EDM_OP_HOLE::EdmHoleLocation()
 	if (!m_stOpCtrl.stZeroCtrl.bStageLast)
     {
 		m_stOpCtrl.bSynchro = FALSE;
-
-		for (int i=0;i<m_stMvCmd.iAxisCnt;i++)
-		{
-			iLabel = m_stMvCmd.stAxisDigit[i].iLabel;
-			if (iLabel == m_pEdm->m_stSysSet.iAxistLabel)
-			{
-				m_stOpCtrl.stZeroCtrl.bSafeLabelExist = TRUE;
-			}
-
-			if (iLabel==2 
-				&& m_pEdm->HasMakeUpVal() 
-				&& m_pEdm->m_stSysSet.stSetNoneLabel.bCycleMeasure 
-				&& m_stOpStatus.enOpType!=OP_HOLE_CHECK_C)
-			{
-				bAddCycleMeasVal = m_pEdm->GetMakeUpVal(m_stOpStatus.iCmdIndex,&iVal);
-			}
-		}
-
 		memcpy(&cmd2Send,&m_stMvCmd,sizeof(DIGIT_CMD));
-
-		if (bAddCycleMeasVal && m_stOpStatus.enOpType!=OP_HOLE_CHECK_C)
-		{
-			bExist = FALSE;
-			m_stOpCtrl.bSynchro = TRUE;
-			for (int i=0;i<m_stMvCmd.iAxisCnt;i++)
-			{
-				iLabel = m_stMvCmd.stAxisDigit[i].iLabel;
-				if (iLabel==0)
-				{
-					bExist = TRUE;
-					cmd2Send.stAxisDigit[i].iDistance +=iVal;
-					break;
-				}
-			}
-
-			if (!bExist)
-			{
-				cmd2Send.stAxisDigit[cmd2Send.iAxisCnt].iLabel = 0;
-				cmd2Send.stAxisDigit[cmd2Send.iAxisCnt].iDistance = m_pEdm->m_stEdmComm.stMoveCtrlComm[0].iMachPos
-					- m_pEdm->m_stEdmComm.stMoveCtrlComm[0].iWorkPosSet + iVal;
-				cmd2Send.iAxisCnt++;
-			}
+        if (m_stOpStatus.enOpType!=OP_HOLE_CHECK_C)
+        {
+            m_stOpCtrl.bSynchro = TRUE;
 		}
 
 		if (cmd2Send.enOrbit == ORBIT_G00)
@@ -544,10 +495,10 @@ unsigned char EDM_OP_HOLE::EdmHoleLocation()
 			bEmptyMove = TRUE;
 		}
 
-		while (!m_pEdm->EdmSetProtect(true))
+        while (!m_pEdm->EdmSetProtect(TRUE))
 		{
 		}
-		cmd2Send.enOrbit = ORBIT_G01;
+        //cmd2Send.enOrbit = ORBIT_G01;
 		if(m_pEdm->EdmSendMovePara(&cmd2Send))
 		{
 			m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
@@ -602,7 +553,7 @@ unsigned char EDM_OP_HOLE::EdmHoleSynchro()
 			return TRUE;
         }
 
-		while (!m_pEdm->EdmSetProtect(true))
+        while (!m_pEdm->EdmSetProtect(TRUE))
 		{
         }
         m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
@@ -1281,7 +1232,7 @@ unsigned char EDM_OP_HOLE::EdmHoleResetStartPos()
 
 	m_stOpStatus.stCycle.iCycleIndex = 5;
     memset(&cmd,0,sizeof(DIGIT_CMD));
-    m_pEdm->EdmSetProtect(false);
+    m_pEdm->EdmSetProtect(FALSE);
 
     cmd.enAim = AIM_G92;
     cmd.enOrbit = ORBIT_G00;
@@ -1338,7 +1289,7 @@ void EDM_OP_HOLE::EdmHoleRecover()
     INFO_PRINT();
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 	{
-		while (!m_pEdm->EdmStopMove(false))
+        while (!m_pEdm->EdmStopMove(FALSE))
 		{
 			for (int i=0;i<1000;i++)
 			{
@@ -1375,7 +1326,7 @@ void EDM_OP_HOLE::EdmHoleRecover()
 
 	m_pEdm->ReSetWorkPosSetByIndex((int)m_pOpFile->m_enCoor,m_iWorkPos_All);	
 
-	m_pEdm->EdmSetProtect(true);
+    m_pEdm->EdmSetProtect(TRUE);
 }
 
 
@@ -1529,7 +1480,7 @@ unsigned char EDM_OP_HOLE::EdmOpMvAheadChkLabel()
 		return TRUE;
 	}
 
-	m_pEdm->EdmStopMove(false);
+    m_pEdm->EdmStopMove(FALSE);
 
 	if (enMode==CHECK_ELEC)
 	{
