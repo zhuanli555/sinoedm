@@ -95,10 +95,11 @@ void EDM_OP::SetEdmOpElec(QString str,MAC_ELEC_PARA elec)
 {
 	if (m_pOpFile)
     {
-		m_pOpFile->SetEdmOpElec(str,elec,m_stOpStatus.bStart,m_stOpStatus.stCycle.bCycleStart,m_stOpStatus.stCycle.iOpPage);
+        m_pEdm->SaveElecElem(str,&elec);
 		if (m_stOpStatus.bStart)
 		{
 			EdmOpStageRestart();
+
 		}
 	}
 }

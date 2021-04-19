@@ -47,10 +47,10 @@ public:
 	static unsigned char m_bInOp;	
 	EDM_OP* m_pEdmOpPre;
 	OP_STATUS m_stOpStatus;	
-
+    EDM* m_pEdm;
 	EDM_OP_File* m_pOpFile;
 protected:
-    EDM* m_pEdm;
+
 	MAC_OPERATE_TYPE m_enOpType;
 	QString m_sPath;
 	int m_iWorkPos_All[MAC_LABEL_COUNT][6];

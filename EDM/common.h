@@ -87,8 +87,8 @@ typedef struct isaElec_Oral
 	int iOpLenAll;          //总深度
 	int iOpHoleIndex;       //加工孔号
 	int iOpHoleAll;         //加工总孔数
-	unsigned long bRotateValidate;   //旋转有效
-	unsigned long bContinueOp;       //继续加工
+    int bRotateValidate;   //旋转有效
+    int bContinueOp;       //继续加工
 }Elec_Oral;
 
 //电加工参数

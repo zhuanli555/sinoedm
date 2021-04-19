@@ -4,7 +4,6 @@
 
 EDM_OP_File::EDM_OP_File()
 {
-	m_strElec = EDM::m_strElecDefault;
 	m_sFile = "";
 	m_pEdm =  EDM::GetEdmInstance();
 
@@ -22,7 +21,31 @@ EDM_OP_File::~EDM_OP_File()
     m_pEdm = NULL;
 }
 
+unsigned char EDM_OP_File::ReadCmdFromFile(QString strPath,QString strFile)
+{
+    QString	  strFullName =  strPath + "/" + strFile;
+    QFile inFile(strFullName);
+    QString str;
 
+    if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
+              return 0;
+
+    m_vCmdStd.clear();
+    QTextStream in(&inFile);
+    while(!in.atEnd())
+    {
+        str = in.readLine();
+        if (!str.isEmpty())
+        {
+            str = str.trimmed().toUpper();
+            m_vCmdStd.push_back(str);
+        }
+    }
+
+    inFile.close();
+
+    return 1;
+}
 //要修改
 unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 {
@@ -31,7 +54,7 @@ unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 	m_iCmdNum = 0;
 	m_enOpFileErr = OP_FILE_NO_ERR;
 
-    if (CmdHandle::ReadCmdFromFile(sPath,sFile,m_vCmdStd,&m_mpElecMan))
+    if (ReadCmdFromFile(sPath,sFile))
     {
 		it=m_vCmdStd.begin();
 		if (it==m_vCmdStd.end())
@@ -55,54 +78,6 @@ unsigned char EDM_OP_File::SetEdmOpFile(QString sPath,QString sFile)
 	}
 
 	return FALSE;
-}
-
-//要修改
-void EDM_OP_File::SetEdmOpElec(QString str,MAC_ELEC_PARA elec,unsigned char bStart,unsigned char bCycleStart,int iPageIndex)
-{
-    int iHoleIndexBak = 0;
-	unsigned char bWrite = FALSE;
-
-    iHoleIndexBak = m_mpElecMan[str].stElecOral.iOpHoleIndex;
-    memcpy(&m_mpElecMan[str],&elec,sizeof(MAC_ELEC_PARA));
-
-	if (bStart)
-    {
-        INFO_PRINT();
-        m_mpElecMan[str].stElecOral.iOpHoleIndex = iHoleIndexBak;
-        if (m_strElec==str && iPageIndex==elec.iParaIndex)
-		{
-			bWrite = TRUE;
-		}
-	}
-	else
-    {
-		if (bCycleStart)
-        {
-            INFO_PRINT();
-			elec.stElecOral.iOpHoleIndex = iHoleIndexBak;
-            if (m_strElec==str && iPageIndex==elec.iParaIndex)
-			{
-				bWrite = TRUE;
-			}
-		}
-	}
-
-    if (bWrite)
-    {
-        INFO_PRINT();
-        if(m_pEdm->WriteElecPara(&elec.stElecPage[elec.iParaIndex],"EDM_OP_File::SetEdmOpElec") ==-1)
-            m_enOpFileErr=OP_FILE_ERR_ELEC;
-    }
-}
-
-
-void EDM_OP_File::SetEdmElecIndex(int iCmdIndex)
-{
-	iCmdIndex = max(iCmdIndex,0);
-	iCmdIndex = min(iCmdIndex,m_iCmdNum);
-    m_mpElecMan[m_sFile].stElecOral.iOpHoleIndex = iCmdIndex;
-    m_mpElecMan[m_sFile].stElecOral.iOpHoleAll = m_iCmdNum;
 }
 
 unsigned char EDM_OP_File::IsPauseCmd(QString str)
@@ -150,11 +125,9 @@ void EDM_OP_File::SetOpType(MAC_OPERATE_TYPE enOpType)
 void EDM_OP_File::PlusDigit2Cmd()
 {
 	DIGIT_CMD cmd;
-	DIGIT_CMD cmdDefault;
-	DIGIT_CMD cmd_Loc;
+    DIGIT_CMD cmdDefault;
 	int iCmdIndex=0;
-	QString str;
-	QString str_Loc;
+    QString str;
     int iSum[MAC_LABEL_COUNT];
 	int iSumLastMac[MAC_LABEL_COUNT];
 	int iWorkPos_All[MAC_LABEL_COUNT][6];
@@ -171,12 +144,10 @@ void EDM_OP_File::PlusDigit2Cmd()
             iWorkPos_All[i][j] = m_pEdm->m_iCoor[i][j];
         }
     }
-	m_vCmd.clear();
-	m_vCmdLoc.clear();
+    m_vCmd.clear();
     for(iCmdIndex = 0;iCmdIndex<m_vCmdStd.size();iCmdIndex++)
     {
         str = m_vCmdStd[iCmdIndex];
-        str_Loc = m_vCmdStd[iCmdIndex];
         if (IsPauseCmd(str) || IsOverCmd(str))
         {
         }
@@ -223,10 +194,6 @@ void EDM_OP_File::PlusDigit2Cmd()
             {
                 m_enOpFileErr = OP_FILE_EDIT_ERR;
             }
-
-            //命令起始点
-            CalcStartPt(&cmd_Loc,iSumLastMac);
-
             //计算点位
             for (int k=0;k<cmd.iAxisCnt;k++)
             {
@@ -258,39 +225,8 @@ void EDM_OP_File::PlusDigit2Cmd()
             cmd.enAim = AIM_G90;
             cmd.enCoor = m_enCoor;
             CmdHandle::DigitCmd2QString(&cmd,str);
-            CmdHandle::DigitCmd2QString(&cmd_Loc,str_Loc);
         }
         m_vCmd.push_back(str);
-        m_vCmdLoc.push_back(str_Loc);
     }
 
 }
-
-void EDM_OP_File::CalcStartPt(DIGIT_CMD* pCmd,int iSum[])
-{
-
-	//命令起始点
-	memset(pCmd,0,sizeof(DIGIT_CMD));
-	pCmd->enAim = AIM_G90;
-	pCmd->enCoor = m_enCoor;
-	pCmd->enOrbit = ORBIT_G01;
-	pCmd->iFreq = MAC_INT_FREQ;
-	for (int k=0;k<MAC_LABEL_COUNT;k++)
-	{
-		if (m_pEdm->m_stEdmKpInt.stAxisCtrlKp[k].stSoftPara.bRotateLabel)
-		{
-			iSum[k] %= 360000;
-			if (iSum[k] <0)
-				iSum[k] += 360000;
-		}
-
-		if (k==m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel)
-		{
-			continue;
-		}
-		pCmd->stAxisDigit[pCmd->iAxisCnt].iLabel = k;
-		pCmd->stAxisDigit[pCmd->iAxisCnt].iDistance = iSum[k];
-		pCmd->iAxisCnt++;
-	}
-}
-

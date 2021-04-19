@@ -124,18 +124,16 @@ public:
     int m_iCoor[MAC_LABEL_COUNT][6];
     QString m_strSysPath;
     map<int,int> m_mpMakeUp_C;
+    MAP_ELEC_MAN  mp_ElecMan;
 private:
     int fd;
 	MAC_INTERFACE_OUT m_stEdmInterfaceOut;
 	MAC_INTERFACE_IN m_stEdmInterfaceIn;	
 	Mac_Status m_stStatus;
     MAC_HANDLE_ENTILE m_stEdmOpEntile;
-	
     QString m_strOpName;
 	MAC_OTHER m_stMacOther;
     EDM_Db * m_pEdmAdoSys;
-    MAP_ELEC_MAN  mp_ElecMan;
-
     QString m_strMakeUpFile;
 public:
 	unsigned long EdmInit();

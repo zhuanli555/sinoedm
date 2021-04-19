@@ -13,19 +13,6 @@ public:
     static void DigitCmd2QString(DIGIT_CMD *pCmd,QString& strCmd);
     static int  GetSpeedFreq(int iSpeed);
     static int GetSpeed(int iFreq);
-    //from ccmdhandle
-
-    static QString GetElecPagePara2QString(Elec_Page* pElecPage);
-    static QString GetElecOralPara2QString(Elec_Oral* pElecOral);
-    static QString GetElecPara2QString(QString strName,MAC_ELEC_PARA* pElecPara);
-    static QString GetElecPageParaFromQString(QString strCmd,Elec_Page* pElecPage);
-    static QString GetElecOralParaFromQString(QString strCmd,Elec_Oral* pElecOral);
-    static unsigned char ReadCmdFromFile(QString strPath,QString strFile,vector<QString>& pVector,MAP_ELEC_MAN* pMap);
-
-    static void LawInt(int& t,int low,int high);
-    static int  PercentStr2int(QString str);
-    static void SetCmdCount(int iCount);
-    static void LawOfPara(MAC_ELEC_PARA* pPara);
 
 private:
     void AnalyseCmdMode(QString &str,DIGIT_CMD *pDigitCmd);

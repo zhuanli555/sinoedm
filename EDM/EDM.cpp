@@ -794,11 +794,16 @@ void EDM::GetElecManElem(QString str,MAC_ELEC_PARA* pElecMan)
     if (FindElecManElem(str))
     {
         memcpy(pElecMan,&mp_ElecMan[str],sizeof(MAC_ELEC_PARA));
+    }else {
+        (&mp_ElecMan)->insert(make_pair(str,mp_ElecMan[EDM::m_strElecDefault]));
+        memcpy(pElecMan,&mp_ElecMan[EDM::m_strElecDefault],sizeof(MAC_ELEC_PARA));
+        m_pEdmAdoSys->NewElecElem(str,pElecMan);
     }
 }
 
 void EDM::SaveElecElem(QString str,MAC_ELEC_PARA* pElec)
 {
+    memcpy(&mp_ElecMan[str],pElec,sizeof(MAC_ELEC_PARA));
     m_pEdmAdoSys->SaveElecMan(str,pElec);
 }
 

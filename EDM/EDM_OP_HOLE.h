@@ -48,6 +48,7 @@ public:
 	EDM_OP_HOLE(MAC_OPERATE_TYPE enOpType);
 	virtual  ~EDM_OP_HOLE();
 private:	
+    QString m_Cmd;
 	HOLE_CTRL m_stOpCtrl;
 	DIGIT_CMD m_stOpLabelInit;	
 	DIGIT_CMD m_stMvCmd;

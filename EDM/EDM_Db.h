@@ -28,7 +28,7 @@ public:
     void GetElecMan(MAP_ELEC_MAN* pElecMan);
     void SaveElecMan(QString str,MAC_ELEC_PARA* pElec);
     void DelElecMan(QString str);
-    void NewElecElem(QString str);
+    void NewElecElem(QString str,MAC_ELEC_PARA* pElec);
 
     void GetWorkPosSetIndex(int& iIndex);
     void SaveWorkPosSetIndex(int iIndex);
@@ -42,4 +42,8 @@ private:
     QSqlError initDb();
     QSqlDatabase db;
     QSqlQuery q;
+    QString GetElecPagePara2QString(Elec_Page* pElecPage);
+    QString GetElecOralPara2QString(Elec_Oral* pElecOral);
+    QString GetElecPageParaFromQString(QString strCmd,Elec_Page* pElecPage);
+    QString GetElecOralParaFromQString(QString strCmd,Elec_Oral* pElecOral);
 };

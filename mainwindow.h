@@ -46,8 +46,8 @@ private:
     QWidget* createProcessTab();
     void Char2QStringInBinary(unsigned char btVal,QString &str);
     void systemSetChangeForCoord();
-    void setOpStatus(int status);
-    void fillTableWidget(MAC_ELEC_PARA* pPara);
+
+
     void ReadParaFromTable(MAC_ELEC_PARA* pPara);
     int PercentStr2int(QString str);
     void LawOfPara(MAC_ELEC_PARA* pPara);
@@ -119,6 +119,8 @@ protected:
     void keyPressEvent(QKeyEvent *e) override;
     void timeUpdate();
 signals:
+    void setOpStatusSig(int);
+    void fillTableWidgetSig(MAC_ELEC_PARA*);
     void coordWidgetChanged();
     void edmOPSig(MAC_OPERATE_TYPE);
     void edmCloseSig();
@@ -144,6 +146,8 @@ protected slots:
     void edmStop();
     void edmSendComand();
     void elecTableChanged();
+    void fillTableWidget(MAC_ELEC_PARA* pPara);
+    void setOpStatus(int status);
     void printInterface();
 };
 

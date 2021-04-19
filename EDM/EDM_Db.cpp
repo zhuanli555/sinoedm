@@ -247,18 +247,19 @@ void EDM_Db::GetElecMan(MAP_ELEC_MAN* pElecMan)
     sql = QString("select iIndex,eName,elec_page_0,elec_page_1,elec_page_2,\
 elec_page_3,elec_page_4,elec_page_5,elec_oral from elec");
     q.exec(sql);
+
     while (q.next())
     {
         memset(&stMacElecPara,0,sizeof(MAC_ELEC_PARA));
         stMacElecPara.iParaIndex = q.value(0).toInt();
         strTmp = q.value(1).toString();
-        CmdHandle::GetElecPageParaFromQString(q.value(2).toString(),&(stMacElecPara.stElecPage[0]));
-        CmdHandle::GetElecPageParaFromQString(q.value(3).toString(),&(stMacElecPara.stElecPage[1]));
-        CmdHandle::GetElecPageParaFromQString(q.value(4).toString(),&(stMacElecPara.stElecPage[2]));
-        CmdHandle::GetElecPageParaFromQString(q.value(5).toString(),&(stMacElecPara.stElecPage[3]));
-        CmdHandle::GetElecPageParaFromQString(q.value(6).toString(),&(stMacElecPara.stElecPage[4]));
-        CmdHandle::GetElecPageParaFromQString(q.value(7).toString(),&(stMacElecPara.stElecPage[5]));
-        CmdHandle::GetElecOralParaFromQString(q.value(8).toString(),&(stMacElecPara.stElecOral));
+        GetElecPageParaFromQString(q.value(2).toString(),&(stMacElecPara.stElecPage[0]));
+        GetElecPageParaFromQString(q.value(3).toString(),&(stMacElecPara.stElecPage[1]));
+        GetElecPageParaFromQString(q.value(4).toString(),&(stMacElecPara.stElecPage[2]));
+        GetElecPageParaFromQString(q.value(5).toString(),&(stMacElecPara.stElecPage[3]));
+        GetElecPageParaFromQString(q.value(6).toString(),&(stMacElecPara.stElecPage[4]));
+        GetElecPageParaFromQString(q.value(7).toString(),&(stMacElecPara.stElecPage[5]));
+        GetElecOralParaFromQString(q.value(8).toString(),&(stMacElecPara.stElecOral));
 
         pElecMan->insert(pair<QString,MAC_ELEC_PARA>(strTmp,stMacElecPara));
     }
@@ -269,13 +270,13 @@ void EDM_Db::SaveElecMan(QString str,MAC_ELEC_PARA* pElec)
 {
     QString sql;
     QString str0,str1,str2,str3,str4,str5,strOral;
-    str0 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[0]);
-    str1 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[1]);
-    str2 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[2]);
-    str3 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[3]);
-    str4 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[4]);
-    str5 = CmdHandle::GetElecPagePara2QString(&pElec->stElecPage[5]);
-    strOral = CmdHandle::GetElecOralPara2QString(&pElec->stElecOral);
+    str0 = GetElecPagePara2QString(&pElec->stElecPage[0]);
+    str1 = GetElecPagePara2QString(&pElec->stElecPage[1]);
+    str2 = GetElecPagePara2QString(&pElec->stElecPage[2]);
+    str3 = GetElecPagePara2QString(&pElec->stElecPage[3]);
+    str4 = GetElecPagePara2QString(&pElec->stElecPage[4]);
+    str5 = GetElecPagePara2QString(&pElec->stElecPage[5]);
+    strOral = GetElecOralPara2QString(&pElec->stElecOral);
 
         sql = QString("update elec set elec_page_0='%1',elec_page_1='%2',elec_page_2='%3',elec_page_3='%4',\
                                     elec_page_4='%5',elec_page_5='%6',elec_oral='%7' where eName='%8'").arg(str0).arg(str1)\
@@ -285,20 +286,26 @@ void EDM_Db::SaveElecMan(QString str,MAC_ELEC_PARA* pElec)
         qDebug()<<sql<<a;
 
 
-//    sql = QString("insert into elec(eName,elec_page_0,elec_page_1,elec_page_2,elec_page_3,\
-//                                elec_page_4,elec_page_5,elec_oral) values('%1','%2','%3','%4','%5','%6','%7','%8')").arg(str)\
-//                  .arg(str0).arg(str1).arg(str2).arg(str3).arg(str4).arg(str5).arg(strOral);
-//            qDebug()<<sql;
-//    q.exec(sql);
+
 
 }
 
 
-void EDM_Db::NewElecElem(QString str)
+void EDM_Db::NewElecElem(QString str,MAC_ELEC_PARA* pElec)
 {
     QString sql;
+    QString str0,str1,str2,str3,str4,str5,strOral;
+    str0 = GetElecPagePara2QString(&pElec->stElecPage[0]);
+    str1 = GetElecPagePara2QString(&pElec->stElecPage[1]);
+    str2 = GetElecPagePara2QString(&pElec->stElecPage[2]);
+    str3 = GetElecPagePara2QString(&pElec->stElecPage[3]);
+    str4 = GetElecPagePara2QString(&pElec->stElecPage[4]);
+    str5 = GetElecPagePara2QString(&pElec->stElecPage[5]);
+    strOral = GetElecOralPara2QString(&pElec->stElecOral);
+    sql = QString("insert into elec(eName,elec_page_0,elec_page_1,elec_page_2,elec_page_3,\
+                                elec_page_4,elec_page_5,elec_oral) values('%1','%2','%3','%4','%5','%6','%7','%8')").arg(str)\
+                  .arg(str0).arg(str1).arg(str2).arg(str3).arg(str4).arg(str5).arg(strOral);
 
-    sql = QString("insert into elec(eName) values('%1')").arg(str);
     q.exec(sql);
 }
 
@@ -371,4 +378,70 @@ void EDM_Db::GetPrunePara(MAC_OTHER *pPrune)
         iSet[i++] = str.toInt();
     }
     memcpy(pPrune,iSet,sizeof(MAC_OTHER));
+}
+
+QString EDM_Db::GetElecPagePara2QString(Elec_Page* pElecPage)
+{
+    int iCount=0;
+    QString str;
+    int iPara[20]={0};
+
+    memcpy(iPara,pElecPage,sizeof(Elec_Page));
+    iCount =  sizeof(Elec_Page)/sizeof(int);
+    str = "";
+    for (int i=0;i<iCount;i++)
+    {
+        str += QString("%1").arg(iPara[i]);
+        str +=" ";
+    }
+
+    return str;
+}
+
+QString EDM_Db::GetElecOralPara2QString(Elec_Oral* pElecOral)
+{
+    int iCount=0;
+    QString str;
+    int iPara[20]={0};
+
+    memcpy(iPara,pElecOral,sizeof(Elec_Oral));
+    iCount =  sizeof(Elec_Oral)/sizeof(int);
+    str = "";
+    for (int i=0;i<iCount;i++)
+    {
+        str += QString("%1").arg(iPara[i]);
+        str +=" ";
+    }
+
+    return str;
+}
+
+QString EDM_Db::GetElecPageParaFromQString(QString strCmd,Elec_Page* pElecPage)
+{
+    int iPara[20]={0};
+    int i = 0;
+
+    QString strTmp = strCmd.trimmed();
+    QStringList list = strTmp.split(' ');
+
+    foreach (const QString &str, list) {
+        iPara[i++] = str.trimmed().toInt();
+    }
+    memcpy(pElecPage,iPara,sizeof(Elec_Page));
+    return strTmp;
+}
+
+QString EDM_Db::GetElecOralParaFromQString(QString strCmd,Elec_Oral* pElecOral)
+{
+    int iPara[20]={0};
+    int i = 0;
+
+    QString strTmp = strCmd.trimmed();
+    QStringList list = strTmp.split(' ');
+    foreach (const QString &str, list) {
+        iPara[i++] = str.trimmed().toInt();
+    }
+
+    memcpy(pElecOral,iPara,sizeof(Elec_Oral));
+    return strTmp;
 }

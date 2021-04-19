@@ -170,38 +170,6 @@ void EDM_OP_List::CarryOn()
 	}
 }
 
-
-unsigned char EDM_OP_List::GetOpFileInfo(QString& stringFile,MAC_ELEC_PARA* pElec)
-{
-    map<QString,MAC_ELEC_PARA>::iterator it;
-    QString str;
-
-	if ( !m_pEdmOp->m_pOpFile || !m_pEdmOp)
-	{
-		return FALSE;
-	}
-
-	if (m_pEdmOp->m_pOpFile->m_enOpFileErr)
-	{
-		return FALSE;
-	}
-
-    stringFile = m_pEdmOp->m_pOpFile->m_sFile;
-
-	it = m_pEdmOp->m_pOpFile->m_mpElecMan.begin();
-	while (it != m_pEdmOp->m_pOpFile->m_mpElecMan.end())
-	{
-		str = it->first;
-        if(str == stringFile)
-        {
-            memcpy(pElec,&(it->second),sizeof(MAC_ELEC_PARA));
-            break;
-        }
-		it++;
-	}
-	return TRUE;
-}
-
 void EDM_OP_List::EdmOpListOver()
 {
 	if (m_pEdmOp)

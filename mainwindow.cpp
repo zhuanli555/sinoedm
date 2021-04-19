@@ -15,6 +15,7 @@
 extern QString path;
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 {
+    //showFullScreen();
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
     QWidget* widget = new QWidget();
     this->setCentralWidget(widget);
@@ -67,7 +68,9 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     QTimer *t = new QTimer(this);
     connect(t,&QTimer::timeout,this,&MainWindow::timeUpdate);
     t->start(1000);
-    //多线程中不能操作gui，使用信号槽机制
+    //只能在UI线程里绘制界面，不能在子线程里绘制，使用信号槽机制
+    connect(this,&MainWindow::setOpStatusSig,this,&MainWindow::setOpStatus);
+    connect(this,&MainWindow::fillTableWidgetSig,this,&MainWindow::fillTableWidget);
     connect(this,&MainWindow::coordWidgetChanged,coordWidget,&CoordWidget::HandleEdmCycleData);
     connect(this,&MainWindow::edmPauseSig,alarmSignal,&AlarmSignal::edmPause);
     connect(this,&MainWindow::edmShakeSig,alarmSignal,&AlarmSignal::edmShake);
@@ -127,12 +130,9 @@ void MainWindow::MacProcessOperate()
             {
                 edmOpList->CarryOn();
             }
-            if (edmOpList && edmOpList->m_pEdmOp)
-            {
-                edmOpList->GetOpFileInfo(m_strElecName,&m_elec);
-                fillTableWidget(&m_elec);
 
-            }
+            edm->GetElecManElem(m_strElecName,&m_elec);
+            emit fillTableWidgetSig(&m_elec);
             mutex.unlock();
         }
         QThread::msleep(20);
@@ -306,11 +306,10 @@ QWidget* MainWindow::createProcessTab()
     {
         elecOralTable->setItem(0,col,new QTableWidgetItem("0"));
     }
-    if (edmOpList && edmOpList->m_pEdmOp)
-    {
-        edmOpList->GetOpFileInfo(m_strElecName,&m_elec);
-        fillTableWidget(&m_elec);
-    }
+
+    edm->GetElecManElem(m_strElecName,&m_elec);
+    emit fillTableWidgetSig(&m_elec);
+
     holeRise = new QLabel(QString::fromLocal8Bit("主轴回升"));holeRise->setAlignment(Qt::AlignCenter);
     holeLoc = new QLabel(QString::fromLocal8Bit("确认孔位"));holeLoc->setAlignment(Qt::AlignCenter);
     holeZero = new QLabel(QString::fromLocal8Bit("电极对零"));holeZero->setAlignment(Qt::AlignCenter);
@@ -863,11 +862,9 @@ void MainWindow::showFileText()
     fileLabel->setText(QString::fromLocal8Bit("加工文件名(F11):")+m_strElecName);
     emit edmOpFileSig(path,m_strElecName);
     //重新渲染表格
-    if (edmOpList && edmOpList->m_pEdmOp)
-    {
-        edmOpList->GetOpFileInfo(m_strElecName,&m_elec);
-        fillTableWidget(&m_elec);
-    }
+
+    edm->GetElecManElem(m_strElecName,&m_elec);
+    emit fillTableWidgetSig(&m_elec);
 }
 
 //处理加工状态
@@ -899,7 +896,7 @@ void MainWindow::HandleEdmOpStatus()
             emit edmPauseSig();
         }
     }
-    setOpStatus(edmOpList->m_pEdmOp->m_stOpStatus.stCycle.iCycleIndex);
+    emit setOpStatusSig(edmOpList->m_pEdmOp->m_stOpStatus.stCycle.iCycleIndex);
     if(pOp->m_stOpStatus.iCmdIndex != iCmdIndex && EDM_OP::m_bStartCount)
     {
         iCmdIndex = pOp->m_stOpStatus.iCmdIndex;

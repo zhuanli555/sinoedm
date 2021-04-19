@@ -18,9 +18,7 @@ public:
 	void CarryOnBefore(MAC_OPERATE_TYPE enType);
 	void CarryOn();
 	void StageRestart();
-	void EdmOpListOver();
-
-    unsigned char GetOpFileInfo(QString& sFile,MAC_ELEC_PARA* pElec);
+    void EdmOpListOver();
 	void DeleteEdmOp();
 public:
 	unsigned char m_bChange;
