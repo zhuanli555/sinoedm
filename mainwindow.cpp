@@ -11,6 +11,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QtConcurrent>
+#include "EDM/initdb.h"
 
 extern QString path;
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     setWindowTitle(QString::fromLocal8Bit("数控机床v1.0"));
     setGeometry(0,0,QApplication::desktop()->width(),QApplication::desktop()->height());
     //init edm
+    initDb();
     EDMMacInit();
     //状态栏
     statBar = this->statusBar();
@@ -173,47 +175,39 @@ void MainWindow::createActions()
 {
     stopAction = new QAction(QString::fromLocal8Bit("总停(ESC)"),this);
     stopAction->setShortcut(tr("ESC"));
-    stopAction->setStatusTip(tr("总停"));
     connect(stopAction,&QAction::triggered,this,&MainWindow::edmStop);
 
     processAction = new QAction(QString::fromLocal8Bit("加工(F1)"),this);
     processAction->setShortcut(tr("F1"));
-    processAction->setStatusTip(tr("加工"));
     connect(processAction,&QAction::triggered,this,&MainWindow::renderToProcess);
 
     unionZeroAction = new QAction(QString::fromLocal8Bit("回机械零(F2)"),this);
     unionZeroAction->setShortcut(tr("F2"));
-    unionZeroAction->setStatusTip(tr("回机械零"));
     connect(unionZeroAction,&QAction::triggered,this,&MainWindow::renderToUnionZero);
 
     programAction = new QAction(QString::fromLocal8Bit("编程(F3)"),this);
     programAction->setShortcut(tr("F3"));
-    programAction->setStatusTip(tr("编程文件"));
     connect(programAction,&QAction::triggered,this,&MainWindow::renderToProgram);
 
     workZeroAction = new QAction(QString::fromLocal8Bit("回工作零(Ctrl-R)"),this);
     workZeroAction->setShortcut(tr("Ctrl+R"));
-    workZeroAction->setStatusTip(tr("回工作零"));
     connect(workZeroAction,&QAction::triggered,this,&MainWindow::renderToWorkZero);
 
     axisSetAction = new QAction(QString::fromLocal8Bit("轴置数(Ctrl-/)"),this);
     axisSetAction->setShortcut(tr("Ctrl+/"));
-    axisSetAction->setStatusTip(tr("轴置数"));
     connect(axisSetAction,&QAction::triggered,this,&MainWindow::renderToAxisSet);
 
     simulateAction = new QAction(QString::fromLocal8Bit("模拟加工(F9)"),this);
     simulateAction->setShortcut(tr("F9"));
-    simulateAction->setStatusTip(tr("模拟加工"));
     connect(simulateAction,&QAction::triggered,this,&MainWindow::renderToSimulate);
 
     settingAction = new QAction(QString::fromLocal8Bit("设置(F10)"),this);
     settingAction->setShortcut(tr("F10"));
-    settingAction->setStatusTip("设置");
     connect(settingAction,&QAction::triggered,this,&MainWindow::renderToSetting);
 
     exitAction = new QAction(QString::fromLocal8Bit("退出(Ctrl-Q)"),this);
     exitAction->setShortcut(QKeySequence::Quit);
-    exitAction->setStatusTip("退出");
+    exitAction->setStatusTip("Quit");
     connect(exitAction,&QAction::triggered,this,&MainWindow::close);
 
 }
@@ -731,6 +725,7 @@ void MainWindow::LawInt(int& t,int low,int high)
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
+    static unsigned long gaopin=0;
     switch (e->key()) {
     case Qt::Key_Escape:
         edmStop();break;
@@ -752,6 +747,13 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         if(!bPrint){
             if(tv1->width()>0)tv1->setMaximumWidth(0);
         }
+        break;
+    }
+    case Qt::Key_G:
+    {
+        gaopin = !gaopin;
+        edm->EdmPower(gaopin);
+        statBar->setStatusTip(QString("edmPower is %1").arg(gaopin));
         break;
     }
     default:

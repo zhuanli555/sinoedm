@@ -5,7 +5,7 @@
 
 EDM_Db::EDM_Db()
 {
-    initDb();
+    //initDb();
 }
 
 QSqlError EDM_Db::initDb()

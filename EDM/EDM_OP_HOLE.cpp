@@ -653,9 +653,9 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 		{
 			m_stOpCtrl.stZeroCtrl.bWait = TRUE;
 			memset(&stElec,0,sizeof(Elec_Page));
-            stElec.iTon  = 200;
-            stElec.iToff = 200;
-			stElec.iElecLow = 1;
+            stElec.iTon  = 300;
+            stElec.iToff = 300;
+            stElec.iElecLow = 3;
 			stElec.iElecHigh = 0;
 			stElec.iCap = 0;
 			stElec.iServo = 75;
@@ -671,7 +671,7 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 			}
 			return FALSE;
 		}
-
+        INFO_PRINT();
 		memset(&cmd,0,sizeof(DIGIT_CMD));
 		cmd.stOp.bOpenPower = TRUE;
 		cmd.stOp.enOpType = OP_HOLE_DISCHARGE;

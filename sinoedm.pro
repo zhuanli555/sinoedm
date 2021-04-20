@@ -59,7 +59,8 @@ HEADERS += \
     EDM/EDM_OP_HOLE.h \
     EDM/EDM_OP_List.h \
     EDM/electool.h \
-    settingdialog.h
+    settingdialog.h \
+    EDM/initdb.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
