@@ -9,7 +9,7 @@
 
 #define INTERFACE_HANDWHEEL_IN_FIRST 0x1D0    //手轮所在接口，轴及速率,0x310
 #define INTERFACE_HANDWHEEL_IN_SECOND 0x1D2   //手轮所在接口，脉冲,0x312
-#define EDM_DEBUG
+//#define EDM_DEBUG
 EDM* EDM::m_pEdm = NULL;
 QString EDM::m_strElecDefault="DEFAULT";
 
@@ -658,13 +658,12 @@ int EDM::WriteElecPara(Elec_Page *pElecPara,QString strFunc)
     if(elec.iCap != pElecPara->iCap)
     {
         elec.iCap = pElecPara->iCap;
-        btTmp = (63-pElecPara->iCap)&0xFF;
-        m_stEdmInterfaceOut.btO190 |= 0x08;
+        btTmp = 63-pElecPara->iCap;
         if(btTmp&0x20)
         {
-            m_stEdmInterfaceOut.btO190 &= 0xFF;
+            m_stEdmInterfaceOut.btO190 &= 0xFB;
         }else{
-            m_stEdmInterfaceOut.btO190 &= 0xF7;
+            m_stEdmInterfaceOut.btO190 &= 0xF3;
         }
         m_stEdmInterfaceOut.btO144 |= 0xF8;
         m_stEdmInterfaceOut.btO144 &= ((btTmp&0x1F)<<3|0x07);

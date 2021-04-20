@@ -13,9 +13,7 @@ public:
 	static EDM_OP_List* GetEdmOpListPtr();
     static void DeleteEdmOpList();
 	void SetEdmOpType(MAC_OPERATE_TYPE enType);
-	unsigned char SetEdmOpFile(QString sPath,QString sFile);
 	void SetStart(bool bStart);
-	void CarryOnBefore(MAC_OPERATE_TYPE enType);
 	void CarryOn();
 	void StageRestart();
     void EdmOpListOver();
@@ -31,7 +29,9 @@ private:
 	QString m_sPath;
     QString m_sFile;
 public slots:
+	void CarryOnBefore(MAC_OPERATE_TYPE enType);
     void SetEdmOpElec(QString str,MAC_ELEC_PARA elec);
+	unsigned char SetEdmOpFile(QString sPath,QString sFile);
 };
 
 
