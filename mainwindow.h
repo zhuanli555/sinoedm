@@ -133,6 +133,7 @@ signals:
     void edmPurgeSig();
     void edmStopSig();
     void systemSetChangeSig();
+    void printInterfaceSig();
 
 protected slots:
 

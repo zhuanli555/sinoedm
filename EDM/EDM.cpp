@@ -12,7 +12,7 @@
 //#define EDM_DEBUG
 EDM* EDM::m_pEdm = NULL;
 QString EDM::m_strElecDefault="DEFAULT";
-
+QMutex EDM::mutex;
 EDM::EDM(QObject *parent):QObject(parent)
 {
 	memset(&m_stEdmComm,0,sizeof(MAC_COMMON));
@@ -29,8 +29,15 @@ EDM::EDM(QObject *parent):QObject(parent)
 
 EDM* EDM::GetEdmInstance()
 {
-	if (!m_pEdm)
-		m_pEdm = new EDM();
+    if (m_pEdm == NULL)
+    {
+        mutex.lock();
+        if(m_pEdm == NULL)
+        {
+            m_pEdm = new EDM();
+        }
+        mutex.unlock();
+    }
 	return m_pEdm;
 }
 

@@ -498,7 +498,7 @@ unsigned char EDM_OP_HOLE::EdmHoleLocation()
         while (!m_pEdm->EdmSetProtect(TRUE))
 		{
 		}
-        //cmd2Send.enOrbit = ORBIT_G01;
+        cmd2Send.enOrbit = ORBIT_G01;
 		if(m_pEdm->EdmSendMovePara(&cmd2Send))
 		{
 			m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
@@ -626,9 +626,8 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 {
 	Elec_Page stElec;
 	DIGIT_CMD cmd;
-    INFO_PRINT();
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
-		return FALSE;
+        return FALSE;
 
 	if (m_stOpCtrl.stZeroCtrl.bStageLast)
 	{
@@ -663,18 +662,18 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
             stElec.iShakeSense = 50;
 			m_pEdm->WriteElecPara(&stElec,"EdmHoleZeroAdjust");
 
-			m_stOpCtrl.iWaitCnt = 1;
+            m_stOpCtrl.iWaitCnt = EDM_OP_WAIT_COUNT;
 			if (!EDM_OP::m_bSetPower)
 			{
 				SetEdmHolePower(TRUE,FALSE,FALSE);
-				m_stOpCtrl.iWaitCnt = EDM_OP_WAIT_COUNT;				
+                m_stOpCtrl.iWaitCnt = 2*EDM_OP_WAIT_COUNT;
 			}
 			return FALSE;
 		}
         INFO_PRINT();
 		memset(&cmd,0,sizeof(DIGIT_CMD));
 		cmd.stOp.bOpenPower = TRUE;
-		cmd.stOp.enOpType = OP_HOLE_DISCHARGE;
+        cmd.stOp.enOpType = OP_HOLE_DISCHARGE;
 		cmd.stOp.iBackSense = 100;
 		cmd.stOp.iFeedSense = 100;
 
@@ -695,7 +694,6 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 			m_stOpCtrl.stZeroCtrl.bWait = FALSE;
 		}
 	}
-	
 	return FALSE;
 }
 
@@ -774,8 +772,10 @@ unsigned char EDM_OP_HOLE::EdmHoleOpPage()
 	int iSum =0;
     int iPage = 0;
     DIGIT_CMD cmd;
-    Elec_Page elec;
     INFO_PRINT();
+    if(m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
+        return FALSE;
+
 	if (m_stOpCtrl.stZeroCtrl.bStageLast)
     {
 		m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
@@ -791,79 +791,63 @@ unsigned char EDM_OP_HOLE::EdmHoleOpPage()
     m_stOpCtrl.stZeroCtrl.iOpLenSum = abs(m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iMachPos
                                       - m_pEdm->m_stEdmComm.stMoveCtrlComm[m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel].iWorkPosSet);
 
-    if (m_pEdm->m_stEdmComm.enMvStatus == RULE_MOVE_OVER)
+    for (int i=0;i<OP_HOLE_PAGE_MAX;i++)
     {
-        for (int i=0;i<OP_HOLE_PAGE_MAX;i++)
+        iSum += m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[i].iOpLen;
+        if (iSum > m_stOpCtrl.stZeroCtrl.iOpLenSum)
         {
-            iSum += m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[i].iOpLen;
-            if (iSum > m_stOpCtrl.stZeroCtrl.iOpLenSum)
-            {
-                iPage = i;
-                break;
-            }
-
-            if (iSum >= m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iOpLenAll)
-            {
-                iPage = i;
-                iSum = m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iOpLenAll;
-                break;
-            }
+            iPage = i;
+            break;
         }
 
-        if (m_stOpCtrl.stZeroCtrl.iOpLenSum >= m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iOpLenAll)
+        if (iSum >= m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iOpLenAll)
         {
-            m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-            return FALSE;
+            iPage = i;
+            iSum = m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iOpLenAll;
+            break;
         }
+    }
 
-        if(m_pEdm->WriteElecPara(&(m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[iPage]),"EdmHoleOpPage_2")==-1)
-        {
-            m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
-            return FALSE;
-        }
-        if (!EDM_OP::m_bSetPower)
-        {
-            SetEdmHolePower(TRUE,FALSE,FALSE);
-            m_stOpCtrl.iWaitCnt = EDM_OP_WAIT_COUNT;
-            return FALSE;
-        }
+    if (m_stOpCtrl.stZeroCtrl.iOpLenSum >= m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iOpLenAll)
+    {
+        m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
+        return FALSE;
+    }
 
-        memset(&cmd,0,sizeof(DIGIT_CMD));
-        cmd.enAim = AIM_G90;
-        cmd.enOrbit = ORBIT_G01;
-        cmd.enCoor = m_pOpFile->m_enCoor;
+    if(m_pEdm->WriteElecPara(&(m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[iPage]),"EdmHoleOpPage_2")==-1)
+    {
+        m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
+        return FALSE;
+    }
+    if (!EDM_OP::m_bSetPower)
+    {
+        SetEdmHolePower(TRUE,FALSE,FALSE);
+        m_stOpCtrl.iWaitCnt = EDM_OP_WAIT_COUNT;
+        return FALSE;
+    }
 
-        cmd.stOp.bOpenPower = TRUE;
-        cmd.stOp.enOpType = OP_HOLE_SING;
-        cmd.stOp.iBackSense = m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[iPage].iBackSense;
-        cmd.stOp.iFeedSense = m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[iPage].iFeedSense;
+    memset(&cmd,0,sizeof(DIGIT_CMD));
+    cmd.enAim = AIM_G90;
+    cmd.enOrbit = ORBIT_G01;
+    cmd.enCoor = m_pOpFile->m_enCoor;
 
-        cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;
-        cmd.stAxisDigit[cmd.iAxisCnt].iDistance = iSum;
-        if (!m_pEdm->m_stSysSet.stSetNoneLabel.bOpDir)
-        {
-            cmd.stAxisDigit[cmd.iAxisCnt].iDistance = 0-iSum;
-        }
-        cmd.iAxisCnt++;
+    cmd.stOp.bOpenPower = TRUE;
+    cmd.stOp.enOpType = OP_HOLE_SING;
+    cmd.stOp.iBackSense = m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[iPage].iBackSense;
+    cmd.stOp.iFeedSense = m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[iPage].iFeedSense;
 
-        if ( m_pEdm->m_stSysSet.stSetNoneLabel.bPass)
-        {
-            memset(&elec,0,sizeof(Elec_Page));
-            memcpy(&elec,&(m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecPage[iPage]),sizeof(Elec_Page));
-            elec.iServo = 55;
-            if(m_pEdm->WriteElecPara(&elec,"EdmHoleOpPage_1")==-1)
-            {
-                m_pOpFile->m_enOpFileErr = OP_FILE_ERR_ELEC;
-                return FALSE;
-            }
-        }
-
-        if (m_pEdm->EdmSendMovePara(&cmd))
-        {
-            m_stOpStatus.stCycle.iOpPage = iPage;
-            m_stOpCtrl.stZeroCtrl.iOpPageBak =  m_stOpStatus.stCycle.iOpPage;
-            return FALSE;
-        }
+    cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;
+    cmd.stAxisDigit[cmd.iAxisCnt].iDistance = iSum;
+    if (!m_pEdm->m_stSysSet.stSetNoneLabel.bOpDir)
+    {
+        cmd.stAxisDigit[cmd.iAxisCnt].iDistance = 0-iSum;
+    }
+    cmd.iAxisCnt++;
+    if (m_pEdm->EdmSendMovePara(&cmd))
+    {
+        m_stOpStatus.stCycle.iOpPage = iPage;
+        m_stOpCtrl.stZeroCtrl.iOpPageBak =  m_stOpStatus.stCycle.iOpPage;
+        return FALSE;
     }
 
 	return FALSE;
@@ -1025,7 +1009,7 @@ unsigned char EDM_OP_HOLE::EdmHoleRepeat()
 	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
 		return FALSE;
 
-    if (m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iRepeatLen<0 || m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iRepeatCount<0)
+    if (m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iRepeatLen<0 || m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iRepeatCount<=0)
 	{
 		m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
 		return TRUE;

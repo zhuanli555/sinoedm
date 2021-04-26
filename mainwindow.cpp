@@ -73,6 +73,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     //只能在UI线程里绘制界面，不能在子线程里绘制，使用信号槽机制
     connect(this,&MainWindow::setOpStatusSig,this,&MainWindow::setOpStatus);
     connect(this,&MainWindow::fillTableWidgetSig,this,&MainWindow::fillTableWidget);
+    connect(this,&MainWindow::printInterfaceSig,this,&MainWindow::printInterface);
     connect(this,&MainWindow::coordWidgetChanged,coordWidget,&CoordWidget::HandleEdmCycleData);
     connect(this,&MainWindow::edmPauseSig,alarmSignal,&AlarmSignal::edmPause);
     connect(this,&MainWindow::edmShakeSig,alarmSignal,&AlarmSignal::edmShake);
@@ -165,10 +166,7 @@ unsigned char MainWindow::EDMMacInit()
 
 void MainWindow::timeUpdate()
 {
-    if(bPrint)//打印接口
-    {
-        printInterface();
-    }
+    emit printInterfaceSig();//打印接口
 }
 
 void MainWindow::createActions()
@@ -742,13 +740,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     case Qt::Key_F11:
         showFileText();break;
     case Qt::Key_F12:
-    {
-        bPrint = !bPrint;
-        if(!bPrint){
-            if(tv1->width()>0)tv1->setMaximumWidth(0);
-        }
-        break;
-    }
+        bPrint = !bPrint;break;
     case Qt::Key_G:
     {
         gaopin = !gaopin;
@@ -956,6 +948,10 @@ void MainWindow::Char2QStringInBinary(unsigned char btVal,QString &str)
 void MainWindow::printInterface()
 {
     QString str;
+    if(!bPrint){
+        if(tv1->width()>0)tv1->setMaximumWidth(0);
+        return;
+    }
     tv1->setMaximumWidth(320);tv1->setColumnCount(2);tv1->setRowCount(10);
     tv1->setColumnWidth(0,160);tv1->setColumnWidth(1,160);
     tv1->setHorizontalHeaderItem(0,new QTableWidgetItem(QString("PORT OUT")));
@@ -995,6 +991,7 @@ void MainWindow::printInterface()
     {
         mOut.btO190 = edm->m_stEdmShowData.stEdmInterfaceOut.btO190;
         Char2QStringInBinary(mOut.btO190,str);
+        statBar->setStatusTip(QString("O190 <span style=\"color:red;\"> %1</span>").arg(str));
         tv1->setItem(5,0,new QTableWidgetItem(QString("O190    %1").arg(str)));
     }
     if(edm->m_stEdmShowData.stEdmInterfaceOut.btO198 != mOut.btO198)

@@ -10,6 +10,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <vector>
+#include <QMutex>
 #include <QMap>
 
 //¥Ú”°
@@ -109,6 +110,7 @@ class EDM : public QObject
 private:
     explicit EDM(QObject *parent = nullptr);
     static EDM* m_pEdm;
+    static QMutex mutex;
 	virtual ~EDM();
 public:
 	static EDM* GetEdmInstance();
