@@ -1,7 +1,6 @@
 #include "alarmsignal.h"
 #include <QTextCodec>
 
-AlarmSignal* AlarmSignal::m_alarmSig = nullptr;
 AlarmSignal::AlarmSignal(QWidget *parent) : QWidget(parent)
 {
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
@@ -11,7 +10,7 @@ AlarmSignal::AlarmSignal(QWidget *parent) : QWidget(parent)
     bPause = false;
     memset(&m_stEntileStatus,0,sizeof(EDM_SHOW_STATUS));
     purgeValue = new QLabel(QString::fromLocal8Bit("³åÒº(F4)"));
-    lowPumpValue = new QLabel(QString::fromLocal8Bit("µÍÑ¹±Ã(F5)"));
+    powerValue = new QLabel(QString::fromLocal8Bit("¸ßÆµ(F5)"));
     shakeValue = new QLabel(QString::fromLocal8Bit("Õñ¶¯(F6)"));
     protectValue = new QLabel(QString::fromLocal8Bit("·À×²±£»¤(F7)"));
     pauseValue = new QLabel(QString::fromLocal8Bit("ÔÝÍ£(F8)"));
@@ -19,26 +18,20 @@ AlarmSignal::AlarmSignal(QWidget *parent) : QWidget(parent)
     mainLayout = new QGridLayout(this);
     mainLayout->setSpacing(20);
     mainLayout->addWidget(purgeValue,0,0);
-    mainLayout->addWidget(lowPumpValue,1,0);
+    mainLayout->addWidget(powerValue,1,0);
     mainLayout->addWidget(shakeValue,2,0);
     mainLayout->addWidget(protectValue,3,0);
     mainLayout->addWidget(pauseValue,4,0);
     mainLayout->addWidget(findCenter,5,0);
     findCenter->setMaximumWidth(85);
     purgeValue->setStyleSheet("background-color:green;");
-    lowPumpValue->setStyleSheet("background-color:green;");
+    powerValue->setStyleSheet("background-color:green;");
     shakeValue->setStyleSheet("background-color:green;");
     protectValue->setStyleSheet("background-color:green;");
     pauseValue->setStyleSheet("background-color:green;");
 
 }
 
-AlarmSignal* AlarmSignal::getInstance()
-{
-    if (!m_alarmSig)
-        m_alarmSig = new AlarmSignal();
-    return m_alarmSig;
-}
 
 int AlarmSignal::addAlarm(const QString &text)
 {
@@ -70,7 +63,8 @@ void AlarmSignal::reSort()
 
 void AlarmSignal::EdmStatusSignChange()
 {
-    static unsigned long bDirect = FALSE;
+    static Mac_Status status;
+    memset(&status,0,sizeof(Mac_Status));
     if (edm->m_stEdmShowData.stStatus.bStop || m_stEntileStatus.bStop)
     {
         if (++m_stEntileStatus.iStopCnt >= 10)
@@ -97,45 +91,54 @@ void AlarmSignal::EdmStatusSignChange()
         }
     }
 
-    if (bDirect != edm->m_stEdmShowData.stStatus.bDirect)
+    if (status.bDirect != edm->m_stEdmShowData.stStatus.bDirect)
     {
-        bDirect = edm->m_stEdmShowData.stStatus.bDirect;
-        edm->EdmHummer(bDirect);
+        status.bDirect = edm->m_stEdmShowData.stStatus.bDirect;
+        edm->EdmHummer(status.bDirect);
     }
-}
-
-void AlarmSignal::edmPurge()
-{
-    edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);//µÍÑ¹ ³åÒº£¿
-    if(edm->m_stEdmShowData.stStatus.bPumpLow)
+    if (status.bPower != edm->m_stEdmShowData.stStatus.bPower)
     {
-        purgeValue->setStyleSheet("background-color:red;");
+        status.bPower = edm->m_stEdmShowData.stStatus.bPower;
+        if(status.bPower)
+        {
+            powerValue->setStyleSheet("background-color:red;");
+        }
+        else{
+            powerValue->setStyleSheet("background-color:green;");
+        }
     }
-    else{
-        purgeValue->setStyleSheet("background-color:green;");
-    }
-}
-
-void AlarmSignal::edmLowerPump()
-{
-    edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);//µÍÑ¹
-    if(edm->m_stEdmShowData.stStatus.bPumpLow)
+    if (status.bNoProtect != edm->m_stEdmShowData.stStatus.bNoProtect)
     {
-        lowPumpValue->setStyleSheet("background-color:red;");
+        status.bNoProtect = edm->m_stEdmShowData.stStatus.bNoProtect;
+        if(status.bNoProtect)
+        {
+            protectValue->setStyleSheet("background-color:red;");
+        }
+        else{
+            protectValue->setStyleSheet("background-color:green;");
+        }
     }
-    else{
-        lowPumpValue->setStyleSheet("background-color:green;");
-    }
-}
-
-void AlarmSignal::edmShake()
-{
-    edm->EdmSetShake(!edm->m_stEdmShowData.stStatus.bShake);
-    if(edm->m_stEdmShowData.stStatus.bShake)
+    if (status.bShake != edm->m_stEdmShowData.stStatus.bShake)
     {
-        shakeValue->setStyleSheet("background-color:green;");
-    }else{
-        shakeValue->setStyleSheet("background-color:red;");
+        status.bShake = edm->m_stEdmShowData.stStatus.bShake;
+        if(status.bShake)
+        {
+            shakeValue->setStyleSheet("background-color:red;");
+        }
+        else{
+            shakeValue->setStyleSheet("background-color:green;");
+        }
+    }
+    if (status.bPumpLow != edm->m_stEdmShowData.stStatus.bPumpLow)
+    {
+        status.bPumpLow = edm->m_stEdmShowData.stStatus.bPumpLow;
+        if(status.bPumpLow)
+        {
+            purgeValue->setStyleSheet("background-color:red;");
+        }
+        else{
+            purgeValue->setStyleSheet("background-color:green;");
+        }
     }
 }
 
@@ -144,17 +147,6 @@ void AlarmSignal::edmHandProcess()
     if (!m_stEntileStatus.bOpIn && !m_stEntileStatus.bRTzero)
     {
         edm->EdmHandProcess();
-    }
-}
-
-void AlarmSignal::edmProtect()
-{
-    edm->EdmSetProtect(!edm->m_stEdmShowData.stStatus.bNoProtect);
-    if(edm->m_stEdmShowData.stStatus.bNoProtect)
-    {
-        protectValue->setStyleSheet("background-color:green;");
-    }else{
-        protectValue->setStyleSheet("background-color:red;");
     }
 }
 

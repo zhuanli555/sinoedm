@@ -57,7 +57,6 @@ private:
     EDM* edm;
     MAC_SYSTEM_SET mSysSet;
     MAC_ELEC_PARA m_elec;
-    EDM_COOR_TYPE m_enCoorType;
     EDM_OP_List* edmOpList;
     EDM_OP* edmOp;
     MAC_SYSTEM_SET m_stSysSet;
@@ -121,16 +120,13 @@ protected:
 signals:
     void setOpStatusSig(int);
     void fillTableWidgetSig(MAC_ELEC_PARA*);
-    void coordWidgetChanged();
+    void coordWidgetChangedSig();
     void edmOPSig(MAC_OPERATE_TYPE);
     void edmCloseSig();
     void edmMoveParaSendSig(DIGIT_CMD*);
     void edmOpFileSig(QString,QString);
-    void edmOpElecSig(QString,MAC_ELEC_PARA);
-    void edmWriteElecSig(Elec_Page*,QString);
+    void EdmStatusSignChangeSig();
     void edmPauseSig();
-    void edmShakeSig();
-    void edmPurgeSig();
     void edmStopSig();
     void systemSetChangeSig();
     void printInterfaceSig();

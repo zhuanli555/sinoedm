@@ -74,17 +74,14 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     connect(this,&MainWindow::setOpStatusSig,this,&MainWindow::setOpStatus);
     connect(this,&MainWindow::fillTableWidgetSig,this,&MainWindow::fillTableWidget);
     connect(this,&MainWindow::printInterfaceSig,this,&MainWindow::printInterface);
-    connect(this,&MainWindow::coordWidgetChanged,coordWidget,&CoordWidget::HandleEdmCycleData);
+    connect(this,&MainWindow::coordWidgetChangedSig,coordWidget,&CoordWidget::HandleEdmCycleData);
+    connect(this,&MainWindow::EdmStatusSignChangeSig,alarmSignal,&AlarmSignal::EdmStatusSignChange);
     connect(this,&MainWindow::edmPauseSig,alarmSignal,&AlarmSignal::edmPause);
-    connect(this,&MainWindow::edmShakeSig,alarmSignal,&AlarmSignal::edmShake);
-    connect(this,&MainWindow::edmPurgeSig,alarmSignal,&AlarmSignal::edmPurge);
     connect(this,&MainWindow::edmStopSig,alarmSignal,&AlarmSignal::edmStop);
     connect(this,&MainWindow::edmCloseSig,edm,&EDM::CloseHardWare);
     connect(this,&MainWindow::edmMoveParaSendSig,edm,&EDM::EdmSendMovePara);
-    connect(this,&MainWindow::edmWriteElecSig,edm,&EDM::WriteElecPara);
     connect(this,&MainWindow::edmOPSig,edmOpList,&EDM_OP_List::CarryOnBefore);
     connect(this,&MainWindow::edmOpFileSig,edmOpList,&EDM_OP_List::SetEdmOpFile);
-    connect(this,&MainWindow::edmOpElecSig,edmOpList,&EDM_OP_List::SetEdmOpElec);
 }
 
 MainWindow::~MainWindow()
@@ -110,8 +107,12 @@ void MainWindow::MacUserOperate()
         {
             mutex.lock();
             edm->GetEdmStatusData();
-            emit coordWidgetChanged();//机床命令周期性处理
-            alarmSignal->EdmStatusSignChange();//机床信号周期性处理
+            if(bPrint)
+            {
+                emit printInterfaceSig();//打印接口
+            }
+            emit coordWidgetChangedSig();//机床命令周期性处理
+            emit EdmStatusSignChangeSig();//机床信号周期性处理
             alarmSignal->edmHandProcess();//处理手盒
             mutex.unlock();
         }
@@ -166,7 +167,7 @@ unsigned char MainWindow::EDMMacInit()
 
 void MainWindow::timeUpdate()
 {
-    emit printInterfaceSig();//打印接口
+
 }
 
 void MainWindow::createActions()
@@ -368,10 +369,10 @@ void MainWindow::elecTableChanged()
     {
         if (elec.iParaIndex >=0 && elec.iParaIndex < OP_HOLE_PAGE_MAX)
         {
-            emit edmWriteElecSig(&elec.stElecPage[elec.iParaIndex],"");
+            edm->WriteElecPara(&elec.stElecPage[elec.iParaIndex],"elecTableChanged");
         }
     }else{
-        emit edmOpElecSig(m_strElecName,elec);
+        edmOpList->m_pEdmOp->SetEdmOpElec(m_strElecName,elec);
     }
     elecOralTable->blockSignals(false);
 }
@@ -723,35 +724,34 @@ void MainWindow::LawInt(int& t,int low,int high)
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
-    static unsigned long gaopin=0;
     switch (e->key()) {
     case Qt::Key_Escape:
         edmStop();break;
     case Qt::Key_F4:
-        emit edmPurgeSig();break;
+        INFO_PRINT();
+        edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);break;//低压 冲液
     case Qt::Key_F5:
-        alarmSignal->edmLowerPump();break;
+        edm->EdmPower(!edm->m_stEdmShowData.stStatus.bPower);break;
     case Qt::Key_F6:
-        emit edmShakeSig();break;
+        edm->EdmSetShake(!edm->m_stEdmShowData.stStatus.bShake);break;
     case Qt::Key_F7:
-        alarmSignal->edmProtect();break;
+        edm->EdmSetProtect(!edm->m_stEdmShowData.stStatus.bNoProtect);break;
     case Qt::Key_F8:
         emit edmPauseSig();break;
     case Qt::Key_F11:
         showFileText();break;
     case Qt::Key_F12:
-        bPrint = !bPrint;break;
-    case Qt::Key_G:
     {
-        gaopin = !gaopin;
-        edm->EdmPower(gaopin);
-        statBar->setStatusTip(QString("edmPower is %1").arg(gaopin));
+        bPrint = !bPrint;
+        if(!bPrint){
+            if(tv1->width()>0)tv1->setMaximumWidth(0);
+            return;
+        }
         break;
     }
     default:
         break;
     }
-
 
 }
 
@@ -948,10 +948,6 @@ void MainWindow::Char2QStringInBinary(unsigned char btVal,QString &str)
 void MainWindow::printInterface()
 {
     QString str;
-    if(!bPrint){
-        if(tv1->width()>0)tv1->setMaximumWidth(0);
-        return;
-    }
     tv1->setMaximumWidth(320);tv1->setColumnCount(2);tv1->setRowCount(10);
     tv1->setColumnWidth(0,160);tv1->setColumnWidth(1,160);
     tv1->setHorizontalHeaderItem(0,new QTableWidgetItem(QString("PORT OUT")));

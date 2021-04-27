@@ -180,11 +180,3 @@ void EDM_OP_List::EdmOpListOver()
     SetEdmOpType(OP_TYPE_NONE);
     m_pEdmOp->SetEdmOpFile(m_sPath,m_sFile);
 }
-
-void EDM_OP_List::SetEdmOpElec(QString str,MAC_ELEC_PARA elec)
-{
-    if(m_pEdmOp)
-    {
-        m_pEdmOp->SetEdmOpElec(str,elec);
-    }
-}

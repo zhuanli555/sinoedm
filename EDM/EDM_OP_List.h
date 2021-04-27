@@ -29,8 +29,7 @@ private:
 	QString m_sPath;
     QString m_sFile;
 public slots:
-	void CarryOnBefore(MAC_OPERATE_TYPE enType);
-    void SetEdmOpElec(QString str,MAC_ELEC_PARA elec);
+    void CarryOnBefore(MAC_OPERATE_TYPE enType);
 	unsigned char SetEdmOpFile(QString sPath,QString sFile);
 };
 

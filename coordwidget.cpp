@@ -3,7 +3,6 @@
 #include <QPixmap>
 #include <QSettings>
 
-CoordWidget* CoordWidget::m_coordWid = nullptr;
 CoordWidget::CoordWidget(QWidget *parent) : QWidget(parent)
 {
     edm = EDM::GetEdmInstance();
@@ -134,14 +133,6 @@ QString CoordWidget::float2QString(float value)
     str = QString("%1").arg(value,8,'f',3);
     return str;
 }
-
-CoordWidget* CoordWidget::getInstance()
-{
-    if (!m_coordWid)
-        m_coordWid = new CoordWidget();
-    return m_coordWid;
-}
-
 
 void CoordWidget::ShowAxisData()
 {

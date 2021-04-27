@@ -28,7 +28,6 @@ public:
     void removeAlarm(int index);
     void reSort();
     void EdmStatusSignChange();
-    static AlarmSignal* getInstance();
     void edmHandProcess();
 public:
     EDM_SHOW_STATUS m_stEntileStatus;
@@ -36,13 +35,12 @@ public:
 private:
     QGridLayout* mainLayout;
     EDM *edm;
-    static AlarmSignal* m_alarmSig;
     EDM_OP_List* edmOpList;
     QLabel* purgeValue;
     QLabel* shakeValue;
     QLabel* protectValue;
     QLabel* speedValue;
-    QLabel* lowPumpValue;
+    QLabel* powerValue;
     QLabel* fixElecValue;
     QLabel* findCenter;
     QLabel* pauseValue;
@@ -53,10 +51,6 @@ private:
 signals:
 
 public slots:
-    void edmProtect();
-    void edmPurge();
-    void edmShake();
-    void edmLowerPump();
     void edmPause();
     void edmStop();
 };
