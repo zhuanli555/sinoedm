@@ -123,6 +123,16 @@ bool EDM::GetEdmComm()
 	return dwStatus==1;
 }
 
+bool EDM::GetEdmInterfaceIn()
+{
+    short dwStatus;
+#ifdef EDM_DEBUG
+    return true;
+#endif
+    dwStatus = ioctl(fd,IOC_INTERFACE_IN,&m_stEdmInterfaceIn);
+    return dwStatus==1;
+}
+
 bool EDM::GetEdmMacPassPara(MAC_PASS_PARA* pPass)
 {
 	short dwStatus;
@@ -146,7 +156,6 @@ int EDM::GetEdmAxisWorkPos(int iLabel)
 //获取端口数据
 bool EDM::GetEdmStatusData()
 {
-	short dwStatus;
 	int iLabel=0;
     GetEdmComm();
 	memcpy(&m_stEdmShowData.stComm,&m_stEdmComm,sizeof(MAC_COMMON));
@@ -155,8 +164,7 @@ bool EDM::GetEdmStatusData()
 	m_stEdmShowData.enCoorType = (EDM_COOR_TYPE)m_iWorkIndex;
 	memcpy(&m_stEdmShowData.stEdmInterfaceOut,&m_stEdmInterfaceOut,sizeof(MAC_INTERFACE_OUT));
 
-    dwStatus = ioctl(fd,IOC_INTERFACE_IN,&m_stEdmInterfaceIn);
-	if (dwStatus==1)
+    if (GetEdmInterfaceIn())
 	{
 		m_bMachFault = FALSE;
 		memcpy(&m_stEdmShowData.stEdmInterfaceIn,&m_stEdmInterfaceIn,sizeof(MAC_INTERFACE_IN));

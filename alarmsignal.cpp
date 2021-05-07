@@ -64,7 +64,6 @@ void AlarmSignal::reSort()
 void AlarmSignal::EdmStatusSignChange()
 {
     static Mac_Status status;
-    memset(&status,0,sizeof(Mac_Status));
     if (edm->m_stEdmShowData.stStatus.bStop || m_stEntileStatus.bStop)
     {
         if (++m_stEntileStatus.iStopCnt >= 10)

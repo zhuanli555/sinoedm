@@ -142,6 +142,7 @@ public:
 	unsigned long EdmClose();
 	void GetMacPara(MAC_SYSTEM_SET* pSysSet);
 	bool GetEdmComm();
+    bool GetEdmInterfaceIn();
 	bool GetEdmMacPassPara(MAC_PASS_PARA* pPass);
 	int  GetEdmAxisWorkPos(int iLabel);
 	bool GetEdmStatusData();
