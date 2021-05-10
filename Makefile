@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CONCURRENT_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CONCURRENT_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I../qt5/5.12.1/gcc_64/include -I../qt5/5.12.1/gcc_64/include/QtWidgets -I../qt5/5.12.1/gcc_64/include/QtGui -I../qt5/5.12.1/gcc_64/include/QtSql -I../qt5/5.12.1/gcc_64/include/QtConcurrent -I../qt5/5.12.1/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I. -I../qt5/5.12.1/gcc_64/mkspecs/linux-g++
+INCPATH       = -I. -I../qt5/5.12.1/gcc_64/include -I../qt5/5.12.1/gcc_64/include/QtCharts -I../qt5/5.12.1/gcc_64/include/QtWidgets -I../qt5/5.12.1/gcc_64/include/QtGui -I../qt5/5.12.1/gcc_64/include/QtSql -I../qt5/5.12.1/gcc_64/include/QtConcurrent -I../qt5/5.12.1/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I. -I../qt5/5.12.1/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/zhuanli/qt5/5.12.1/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = sinoedm1.0.0
 DISTDIR = /home/zhuanli/sinoedm/.tmp/sinoedm1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/zhuanli/qt5/5.12.1/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/home/zhuanli/qt5/5.12.1/gcc_64/lib -lQt5Widgets -lQt5Gui -lQt5Sql -lQt5Concurrent -lQt5Core -lGL -lpthread   
+LIBS          = $(SUBLIBS) -L/home/zhuanli/qt5/5.12.1/gcc_64/lib -lQt5Charts -lQt5Widgets -lQt5Gui -lQt5Sql -lQt5Concurrent -lQt5Core -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -532,6 +532,7 @@ Makefile: sinoedm.pro ../qt5/5.12.1/gcc_64/mkspecs/linux-g++/qmake.conf ../qt5/5
 		../qt5/5.12.1/gcc_64/mkspecs/features/yacc.prf \
 		../qt5/5.12.1/gcc_64/mkspecs/features/lex.prf \
 		sinoedm.pro \
+		../qt5/5.12.1/gcc_64/lib/libQt5Charts.prl \
 		../qt5/5.12.1/gcc_64/lib/libQt5Widgets.prl \
 		../qt5/5.12.1/gcc_64/lib/libQt5Gui.prl \
 		../qt5/5.12.1/gcc_64/lib/libQt5Sql.prl \
@@ -731,6 +732,7 @@ Makefile: sinoedm.pro ../qt5/5.12.1/gcc_64/mkspecs/linux-g++/qmake.conf ../qt5/5
 ../qt5/5.12.1/gcc_64/mkspecs/features/yacc.prf:
 ../qt5/5.12.1/gcc_64/mkspecs/features/lex.prf:
 sinoedm.pro:
+../qt5/5.12.1/gcc_64/lib/libQt5Charts.prl:
 ../qt5/5.12.1/gcc_64/lib/libQt5Widgets.prl:
 ../qt5/5.12.1/gcc_64/lib/libQt5Gui.prl:
 ../qt5/5.12.1/gcc_64/lib/libQt5Sql.prl:
@@ -934,13 +936,48 @@ moc_mainwindow.cpp: mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractitemview.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChartView \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchartview.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QAbstractAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qabstractaxis.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChartGlobal \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchartglobal.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QtGlobal \
+		../qt5/5.12.1/gcc_64/include/QtGui/QPen \
+		../qt5/5.12.1/gcc_64/include/QtGui/qpen.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QFont \
+		../qt5/5.12.1/gcc_64/include/QtCore/QVariant \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QAbstractSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qabstractseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChart \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchart.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QLegend \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qlegend.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QGraphicsWidget \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicswidget.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicslayoutitem.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsitem.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QBrush \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMargins \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QGraphicsView \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsview.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qpainter.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qtextoption.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qscrollarea.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsscene.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QSplineSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qsplineseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qlineseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QXYSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qxyseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QList \
+		../qt5/5.12.1/gcc_64/include/QtCore/QPointF \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTabWidget \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLineEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlineedit.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextcursor.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextformat.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpen.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtextoption.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTextEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qtextedit.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextdocument.h \
@@ -952,7 +989,6 @@ moc_mainwindow.cpp: mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlayoutitem.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qboxlayout.h \
 		EDM/EDM.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
 		EDM/common.h \
 		EDM/EDM_Db.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QString \
@@ -1127,7 +1163,7 @@ moc_mainwindow.cpp: mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qbuttongroup.h \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
 
 moc_program.cpp: program.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QMainWindow \
@@ -1266,7 +1302,7 @@ moc_program.cpp: program.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include program.h -o moc_program.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include program.h -o moc_program.cpp
 
 moc_EDM.cpp: EDM/EDM.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
@@ -1537,9 +1573,10 @@ moc_EDM.cpp: EDM/EDM.h \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
 		EDM/EDM.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include EDM/EDM.h -o moc_EDM.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include EDM/EDM.h -o moc_EDM.cpp
 
 moc_coordwidget.cpp: coordwidget.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QWidget \
@@ -1819,9 +1856,10 @@ moc_coordwidget.cpp: coordwidget.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include coordwidget.h -o moc_coordwidget.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include coordwidget.h -o moc_coordwidget.cpp
 
 moc_unionzero.cpp: unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLabel \
@@ -2111,9 +2149,10 @@ moc_unionzero.cpp: unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include unionzero.h -o moc_unionzero.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include unionzero.h -o moc_unionzero.cpp
 
 moc_codeeditor.cpp: codeeditor.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QPlainTextEdit \
@@ -2236,7 +2275,7 @@ moc_codeeditor.cpp: codeeditor.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include codeeditor.h -o moc_codeeditor.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include codeeditor.h -o moc_codeeditor.cpp
 
 moc_alarmsignal.cpp: alarmsignal.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QWidget \
@@ -2508,6 +2547,7 @@ moc_alarmsignal.cpp: alarmsignal.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		EDM/EDM_OP_List.h \
 		EDM/EDM_OP_HOLE.h \
 		EDM/EDM_OP.h \
@@ -2522,7 +2562,7 @@ moc_alarmsignal.cpp: alarmsignal.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/QList \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include alarmsignal.h -o moc_alarmsignal.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include alarmsignal.h -o moc_alarmsignal.cpp
 
 moc_EDM_OP_List.cpp: EDM/EDM_OP_List.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
@@ -2795,10 +2835,11 @@ moc_EDM_OP_List.cpp: EDM/EDM_OP_List.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		EDM/EDM_OP_File.h \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include EDM/EDM_OP_List.h -o moc_EDM_OP_List.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include EDM/EDM_OP_List.h -o moc_EDM_OP_List.cpp
 
 moc_settingdialog.cpp: settingdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QDialog \
@@ -2909,7 +2950,7 @@ moc_settingdialog.cpp: settingdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/qsettings.h \
 		moc_predefs.h \
 		../qt5/5.12.1/gcc_64/bin/moc
-	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include settingdialog.h -o moc_settingdialog.cpp
+	/home/zhuanli/qt5/5.12.1/gcc_64/bin/moc $(DEFINES) --include /home/zhuanli/sinoedm/moc_predefs.h -I/home/zhuanli/qt5/5.12.1/gcc_64/mkspecs/linux-g++ -I/home/zhuanli/sinoedm -I/home/zhuanli/qt5/5.12.1/gcc_64/include -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCharts -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtWidgets -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtGui -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtSql -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtConcurrent -I/home/zhuanli/qt5/5.12.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include settingdialog.h -o moc_settingdialog.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -3073,13 +3114,48 @@ main.o: main.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractitemview.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChartView \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchartview.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QAbstractAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qabstractaxis.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChartGlobal \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchartglobal.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QtGlobal \
+		../qt5/5.12.1/gcc_64/include/QtGui/QPen \
+		../qt5/5.12.1/gcc_64/include/QtGui/qpen.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QFont \
+		../qt5/5.12.1/gcc_64/include/QtCore/QVariant \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QAbstractSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qabstractseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChart \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchart.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QLegend \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qlegend.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QGraphicsWidget \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicswidget.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicslayoutitem.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsitem.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QBrush \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMargins \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QGraphicsView \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsview.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qpainter.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qtextoption.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qscrollarea.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsscene.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QSplineSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qsplineseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qlineseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QXYSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qxyseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QList \
+		../qt5/5.12.1/gcc_64/include/QtCore/QPointF \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTabWidget \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLineEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlineedit.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextcursor.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextformat.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpen.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtextoption.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTextEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qtextedit.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextdocument.h \
@@ -3091,7 +3167,6 @@ main.o: main.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlayoutitem.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qboxlayout.h \
 		EDM/EDM.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
 		EDM/common.h \
 		EDM/EDM_Db.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QString \
@@ -3412,13 +3487,48 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractitemview.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChartView \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchartview.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QAbstractAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qabstractaxis.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChartGlobal \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchartglobal.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QtGlobal \
+		../qt5/5.12.1/gcc_64/include/QtGui/QPen \
+		../qt5/5.12.1/gcc_64/include/QtGui/qpen.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QFont \
+		../qt5/5.12.1/gcc_64/include/QtCore/QVariant \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QAbstractSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qabstractseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QChart \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qchart.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QLegend \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qlegend.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QGraphicsWidget \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicswidget.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicslayoutitem.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsitem.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/QBrush \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMargins \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/QGraphicsView \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsview.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qpainter.h \
+		../qt5/5.12.1/gcc_64/include/QtGui/qtextoption.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qscrollarea.h \
+		../qt5/5.12.1/gcc_64/include/QtWidgets/qgraphicsscene.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QSplineSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qsplineseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qlineseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QXYSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qxyseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QList \
+		../qt5/5.12.1/gcc_64/include/QtCore/QPointF \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTabWidget \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLineEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlineedit.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextcursor.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextformat.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qpen.h \
-		../qt5/5.12.1/gcc_64/include/QtGui/qtextoption.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTextEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qtextedit.h \
 		../qt5/5.12.1/gcc_64/include/QtGui/qtextdocument.h \
@@ -3430,7 +3540,6 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlayoutitem.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qboxlayout.h \
 		EDM/EDM.h \
-		../qt5/5.12.1/gcc_64/include/QtCore/QObject \
 		EDM/common.h \
 		EDM/EDM_Db.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QString \
@@ -4067,6 +4176,7 @@ EDM.o: EDM/EDM.cpp EDM/EDM.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		../qt5/5.12.1/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EDM.o EDM/EDM.cpp
 
@@ -4337,7 +4447,8 @@ EDM_Db.o: EDM/EDM_Db.cpp EDM/EDM_Db.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/cmdhandle.h \
 		EDM/EDM.h \
-		EDM/electool.h
+		EDM/electool.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EDM_Db.o EDM/EDM_Db.cpp
 
 coordwidget.o: coordwidget.cpp coordwidget.h \
@@ -4618,6 +4729,7 @@ coordwidget.o: coordwidget.cpp coordwidget.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		../qt5/5.12.1/gcc_64/include/QtCore/QDebug \
 		../qt5/5.12.1/gcc_64/include/QtGui/QPixmap \
 		../qt5/5.12.1/gcc_64/include/QtCore/QSettings
@@ -4911,6 +5023,7 @@ unionzero.o: unionzero.cpp unionzero.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		../qt5/5.12.1/gcc_64/include/QtGui/QKeyEvent \
 		../qt5/5.12.1/gcc_64/include/QtCore/QTextCodec \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QDialogButtonBox \
@@ -5647,7 +5760,8 @@ cmdhandle.o: EDM/cmdhandle.cpp EDM/cmdhandle.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qmessagebox.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
-		EDM/electool.h
+		EDM/electool.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cmdhandle.o EDM/cmdhandle.cpp
 
 alarmsignal.o: alarmsignal.cpp alarmsignal.h \
@@ -5920,6 +6034,7 @@ alarmsignal.o: alarmsignal.cpp alarmsignal.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		EDM/EDM_OP_List.h \
 		EDM/EDM_OP_HOLE.h \
 		EDM/EDM_OP.h \
@@ -6204,6 +6319,7 @@ EDM_OP.o: EDM/EDM_OP.cpp EDM/EDM_OP.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		EDM/EDM_OP_File.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EDM_OP.o EDM/EDM_OP.cpp
 
@@ -6475,7 +6591,8 @@ EDM_OP_File.o: EDM/EDM_OP_File.cpp EDM/EDM_OP_File.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qdialog.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
-		EDM/cmdhandle.h
+		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EDM_OP_File.o EDM/EDM_OP_File.cpp
 
 EDM_OP_HOLE.o: EDM/EDM_OP_HOLE.cpp EDM/EDM_OP_HOLE.h \
@@ -6748,6 +6865,7 @@ EDM_OP_HOLE.o: EDM/EDM_OP_HOLE.cpp EDM/EDM_OP_HOLE.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		EDM/EDM_OP_File.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EDM_OP_HOLE.o EDM/EDM_OP_HOLE.cpp
 
@@ -7022,6 +7140,7 @@ EDM_OP_List.o: EDM/EDM_OP_List.cpp EDM/EDM_OP_List.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QMap \
 		EDM/electool.h \
 		EDM/cmdhandle.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QMutex \
 		EDM/EDM_OP_File.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EDM_OP_List.o EDM/EDM_OP_List.cpp
 

@@ -10,6 +10,11 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QtCharts/QChartView>
+#include <QtCharts/QSplineSeries>
+#include <QtCharts/QScatterSeries>
+#include <QDateTimeAxis>
+#include <QValueAxis>
 #include <QTabWidget>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -23,6 +28,8 @@
 #include "program.h"
 #include "settingdialog.h"
 #include "unionzero.h"
+
+QT_CHARTS_USE_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
@@ -44,6 +51,11 @@ private:
     void createActions();
     QWidget* createCommandTab();
     QWidget* createProcessTab();
+    void createChartMove();
+    void createChartPass();
+    void createChartHole();
+    void DrawPassLine();
+    QWidget* createSplineTab();
     void Char2QStringInBinary(unsigned char btVal,QString &str);
     void systemSetChangeForCoord();
 
@@ -108,6 +120,12 @@ private:
     QComboBox* speedValue;
     QTableWidget* elecPageTable;
     QTableWidget* elecOralTable;
+    QChart* chartMove;
+    QSplineSeries* seriesMove;
+    QChart* chartPass;
+    QSplineSeries* seriesPass;
+    QChart* chartHole;
+    QScatterSeries* seriesHole;
     QLabel *holeRise;
     QLabel *holeLoc;
     QLabel *holeZero;

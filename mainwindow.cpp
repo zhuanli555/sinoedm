@@ -14,6 +14,7 @@
 #include "EDM/initdb.h"
 
 extern QString path;
+
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 {
     //showFullScreen();
@@ -45,6 +46,7 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
     tab = new QTabWidget;
     tab->addTab(createCommandTab(),QString::fromLocal8Bit("发送命令"));
     tab->addTab(createProcessTab(),QString::fromLocal8Bit("加工页面"));
+    tab->addTab(createSplineTab(),QString::fromLocal8Bit("曲线显示"));
     //main
     QGridLayout *mainLayout =new QGridLayout;
     mainLayout->setSpacing(10);
@@ -167,7 +169,7 @@ unsigned char MainWindow::EDMMacInit()
 
 void MainWindow::timeUpdate()
 {
-
+    DrawPassLine();
 }
 
 void MainWindow::createActions()
@@ -322,6 +324,125 @@ QWidget* MainWindow::createProcessTab()
     mainLayout->setStretchFactor(elecOralTable,1);
     widget->setLayout(mainLayout);
     connect(elecPageTable,&QTableWidget::itemChanged,this,&MainWindow::elecTableChanged);
+    return widget;
+}
+
+void MainWindow::createChartMove()
+{
+    QPen penY(Qt::darkBlue,3,Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin);
+    chartMove = new QChart;
+    seriesMove = new QSplineSeries;
+    QValueAxis* axisX = new QValueAxis();
+    QValueAxis* axisY = new QValueAxis();
+    chartMove->legend()->hide();                             //隐藏图例
+    chartMove->addSeries(seriesMove);                      //把线添加到chart
+    chartMove->setTitle("axis move trail");
+    axisX->setMin(-200.0);
+    axisX->setMax(400.0);
+    axisY->setMin(-200.0);
+    axisY->setMax(400.0);
+    axisX->setTitleText("X");
+    axisY->setTitleText("Y");
+    axisY->setLinePen(penY);
+    axisX->setLinePen(penY);
+    chartMove->addAxis(axisX,Qt::AlignBottom);               //设置坐标轴位于chart中的位置
+    chartMove->addAxis(axisY,Qt::AlignLeft);
+    seriesMove->attachAxis(axisX);                           //把数据添加到坐标轴上
+    seriesMove->attachAxis(axisY);
+}
+
+void MainWindow::createChartPass()
+{
+    QPen penY(Qt::darkBlue,3,Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin);
+    chartPass = new QChart;
+    seriesPass = new QSplineSeries;
+    QDateTimeAxis* axisX = new QDateTimeAxis();
+    QValueAxis* axisY = new QValueAxis();
+    chartPass->legend()->hide();                             //隐藏图例
+    chartPass->addSeries(seriesPass);                      //把线添加到chart
+    chartPass->setTitle("pass spline");
+    axisX->setTickCount(10);                             //设置坐标轴格数
+    axisY->setTickCount(5);
+    axisX->setFormat("mm:ss");                        //设置时间显示格式
+    axisY->setMin(-200.0);                                    //设置Y轴范围
+    axisY->setMax(400.0);
+    axisX->setTitleText("T");
+    axisY->setTitleText("Z");
+    axisY->setLinePenColor(QColor(Qt::darkBlue));        //设置坐标轴颜色样式
+    axisY->setGridLineColor(QColor(Qt::darkBlue));
+    axisY->setGridLineVisible(false);                    //设置Y轴网格不显示
+    axisY->setLinePen(penY);
+    axisX->setLinePen(penY);
+    chartPass->addAxis(axisX,Qt::AlignBottom);               //设置坐标轴位于chart中的位置
+    chartPass->addAxis(axisY,Qt::AlignLeft);
+    seriesPass->attachAxis(axisX);                           //把数据添加到坐标轴上
+    seriesPass->attachAxis(axisY);
+}
+
+//画数据、动态更新数据
+void MainWindow::DrawPassLine()
+{
+    int number;
+    QDateTime currentTime = QDateTime::currentDateTime();
+    //设置坐标轴显示范围
+    chartPass->axisX()->setMin(QDateTime::currentDateTime().addSecs(-60 * 1));
+    chartPass->axisX()->setMax(QDateTime::currentDateTime().addSecs(0));
+
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));                          //这里生成随机数做测试
+    number = qrand() % 9;
+    //增加新的点到曲线末端
+    seriesPass->append(currentTime.toMSecsSinceEpoch(), number);
+    seriesMove->append(edm->m_stEdmShowData.iWorkPos[0]/1000, edm->m_stEdmShowData.iWorkPos[1]/1000);
+    seriesHole->append(qrand()%200, qrand()%100);
+    seriesHole->setUseOpenGL(true);//点多了会卡顿，防止卡顿
+}
+
+void MainWindow::createChartHole()
+{
+    chartHole = new QChart;
+    seriesHole = new QScatterSeries;
+    QValueAxis* axisX = new QValueAxis();
+    QValueAxis* axisY = new QValueAxis();
+    chartHole->legend()->hide();                             //隐藏图例
+    chartHole->addSeries(seriesHole);                      //把线添加到chart
+    chartHole->setTitle("hole location");
+    axisX->setMin(-200.0);
+    axisX->setMax(400.0);
+    axisY->setMin(-200.0);
+    axisY->setMax(400.0);
+    axisX->setTitleText("X");
+    axisY->setTitleText("Y");
+    seriesHole->setMarkerShape(QScatterSeries::MarkerShapeCircle);//设置散点样式
+    seriesHole->setMarkerSize(15);
+    chartHole->addAxis(axisX,Qt::AlignBottom);               //设置坐标轴位于chart中的位置
+    chartHole->addAxis(axisY,Qt::AlignLeft);
+    seriesHole->attachAxis(axisX);                           //把数据添加到坐标轴上
+    seriesHole->attachAxis(axisY);
+}
+
+QWidget* MainWindow::createSplineTab()
+{
+    QWidget* widget = new QWidget();
+    //运动(xy/t)
+    createChartMove();
+    //穿透(z/t)
+    createChartPass();
+    //散点(x/y)
+    createChartHole();
+    QHBoxLayout* mainLayout = new QHBoxLayout;
+    QChartView* chartView1 = new QChartView(chartMove);
+    chartView1->setRenderHint(QPainter::Antialiasing);
+    chartView1->chart()->setTheme(QChart::ChartThemeBrownSand);
+    QChartView* chartView2 = new QChartView(chartPass);
+    chartView2->setRenderHint(QPainter::Antialiasing);
+    chartView2->chart()->setTheme(QChart::ChartThemeBrownSand);
+    QChartView* chartView3 = new QChartView(chartHole);
+    chartView3->setRenderHint(QPainter::Antialiasing);
+    chartView3->chart()->setTheme(QChart::ChartThemeBrownSand);
+    mainLayout->addWidget(chartView1);
+    mainLayout->addWidget(chartView2);
+    mainLayout->addWidget(chartView3);
+    widget->setLayout(mainLayout);
     return widget;
 }
 
@@ -728,7 +849,6 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     case Qt::Key_Escape:
         edmStop();break;
     case Qt::Key_F4:
-        INFO_PRINT();
         edm->EdmLowPump(!edm->m_stEdmShowData.stStatus.bPumpLow);break;//低压 冲液
     case Qt::Key_F5:
         edm->EdmPower(!edm->m_stEdmShowData.stStatus.bPower);break;
