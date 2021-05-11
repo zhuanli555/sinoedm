@@ -42,7 +42,7 @@ SOURCES += \
     EDM/EDM_OP_HOLE.cpp \
     EDM/EDM_OP_List.cpp \
     EDM/electool.cpp \
-    settingdialog.cpp
+    settingdialog.cpp \
 
 HEADERS += \
         mainwindow.h \
@@ -61,14 +61,27 @@ HEADERS += \
     EDM/EDM_OP_List.h \
     EDM/electool.h \
     settingdialog.h \
-    EDM/initdb.h
+    EDM/initdb.h \
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES +=
+DISTFILES += \
+    db/sino.db \
+    icon/bj.png \
+    icon/fx.png \
+    icon/fxbj.png \
+    icon/jg.png \
+    icon/zx.png \
+    icon/zxbj.png \
+    db/edmsystem.ini \
+    processFile/312 \
+    processFile/DEFAULT \
+    uiStyles/dark.qss \
+    uiStyles/default.qss \
+    uiStyles/mystery.qss
 
 FORMS += \
     settingdialog.ui

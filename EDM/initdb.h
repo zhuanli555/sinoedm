@@ -6,7 +6,7 @@
 QSqlError initDb()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("sino.db");
+    db.setDatabaseName("db/sino.db");
     QSqlQuery q;
     if (!db.open()) {
         QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),

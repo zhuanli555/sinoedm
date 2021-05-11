@@ -38,8 +38,7 @@ public:
     void GetMacSystemPara(MAC_KPINT* pInt,MAC_SYSTEM_SET* pSet);
 
     void GetPrunePara(MAC_OTHER* pPrune);
-private:	
-    QSqlError initDb();
+private:
     QSqlDatabase db;
     QSqlQuery q;
     QString GetElecPagePara2QString(Elec_Page* pElecPage);

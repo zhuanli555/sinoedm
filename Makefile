@@ -103,7 +103,20 @@ OBJECTS       = main.o \
 		moc_alarmsignal.o \
 		moc_EDM_OP_List.o \
 		moc_settingdialog.o
-DIST          = ../qt5/5.12.1/gcc_64/mkspecs/features/spec_pre.prf \
+DIST          = db/sino.db \
+		icon/bj.png \
+		icon/fx.png \
+		icon/fxbj.png \
+		icon/jg.png \
+		icon/zx.png \
+		icon/zxbj.png \
+		db/edmsystem.ini \
+		processFile/312 \
+		processFile/DEFAULT \
+		uiStyles/dark.qss \
+		uiStyles/default.qss \
+		uiStyles/mystery.qss \
+		../qt5/5.12.1/gcc_64/mkspecs/features/spec_pre.prf \
 		../qt5/5.12.1/gcc_64/mkspecs/common/unix.conf \
 		../qt5/5.12.1/gcc_64/mkspecs/common/linux.conf \
 		../qt5/5.12.1/gcc_64/mkspecs/common/sanitize.conf \
@@ -973,6 +986,12 @@ moc_mainwindow.cpp: mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtCharts/qxyseries.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QList \
 		../qt5/5.12.1/gcc_64/include/QtCore/QPointF \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QScatterSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qscatterseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QDateTimeAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qdatetimeaxis.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QValueAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qvalueaxis.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTabWidget \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLineEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlineedit.h \
@@ -3151,6 +3170,12 @@ main.o: main.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtCharts/qxyseries.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QList \
 		../qt5/5.12.1/gcc_64/include/QtCore/QPointF \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QScatterSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qscatterseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QDateTimeAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qdatetimeaxis.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QValueAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qvalueaxis.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTabWidget \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLineEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlineedit.h \
@@ -3339,6 +3364,7 @@ main.o: main.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qcheckbox.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QButtonGroup \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qbuttongroup.h \
+		../qt5/5.12.1/gcc_64/include/QtCore/QFile \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QApplication \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qapplication.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qdesktopwidget.h \
@@ -3524,6 +3550,12 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../qt5/5.12.1/gcc_64/include/QtCharts/qxyseries.h \
 		../qt5/5.12.1/gcc_64/include/QtCore/QList \
 		../qt5/5.12.1/gcc_64/include/QtCore/QPointF \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QScatterSeries \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qscatterseries.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QDateTimeAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qdatetimeaxis.h \
+		../qt5/5.12.1/gcc_64/include/QtCharts/QValueAxis \
+		../qt5/5.12.1/gcc_64/include/QtCharts/qvalueaxis.h \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QTabWidget \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/QLineEdit \
 		../qt5/5.12.1/gcc_64/include/QtWidgets/qlineedit.h \

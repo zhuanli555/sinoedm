@@ -326,7 +326,9 @@ QWidget* MainWindow::createProcessTab()
     connect(elecPageTable,&QTableWidget::itemChanged,this,&MainWindow::elecTableChanged);
     return widget;
 }
-
+/**
+ * 生成机床运动监测曲线
+ */
 void MainWindow::createChartMove()
 {
     QPen penY(Qt::darkBlue,3,Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin);
@@ -350,7 +352,9 @@ void MainWindow::createChartMove()
     seriesMove->attachAxis(axisX);                           //把数据添加到坐标轴上
     seriesMove->attachAxis(axisY);
 }
-
+/**
+ * 生成机床Z轴穿透曲线
+ */
 void MainWindow::createChartPass()
 {
     QPen penY(Qt::darkBlue,3,Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin);
@@ -397,6 +401,9 @@ void MainWindow::DrawPassLine()
     seriesHole->setUseOpenGL(true);//点多了会卡顿，防止卡顿
 }
 
+/**
+ * 生成需要加工的孔位位置散点
+ */
 void MainWindow::createChartHole()
 {
     chartHole = new QChart;
@@ -445,7 +452,10 @@ QWidget* MainWindow::createSplineTab()
     widget->setLayout(mainLayout);
     return widget;
 }
-
+/**
+ * 改变加工状态
+ * @param status 加工状态
+ */
 void MainWindow::setOpStatus(int status)
 {
     static int statusPre = -1;
@@ -479,7 +489,9 @@ void MainWindow::setOpStatus(int status)
         break;
     }
 }
-
+/**
+ * 电加工参数表变化时调用的槽函数
+ */
 void MainWindow::elecTableChanged()
 {
     elecOralTable->blockSignals(true);
