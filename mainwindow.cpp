@@ -18,6 +18,8 @@ extern QString path;
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 {
     //showFullScreen();
+    welcome = new Welcome;
+    welcome->show();
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
     QWidget* widget = new QWidget();
     this->setCentralWidget(widget);

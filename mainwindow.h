@@ -28,6 +28,7 @@
 #include "program.h"
 #include "settingdialog.h"
 #include "unionzero.h"
+#include "welcome.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -96,6 +97,7 @@ private:
     QAction* settingAction;
     QAction* workZeroAction;
     QAction* exitAction;
+    Welcome* welcome;
     //left
     CoordWidget* coordWidget;
     //right

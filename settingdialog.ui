@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>机械设置</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -145,21 +145,8 @@
     </item>
    </layout>
   </widget>
-  <zorder>yLabelFlag</zorder>
+  <zorder>layoutWidget</zorder>
   <zorder>buttonBox</zorder>
-  <zorder>label</zorder>
-  <zorder>label_2</zorder>
-  <zorder>label_3</zorder>
-  <zorder>label_4</zorder>
-  <zorder>label_5</zorder>
-  <zorder>label_6</zorder>
-  <zorder>xLabelFlag</zorder>
-  <zorder>label_7</zorder>
-  <zorder>bLabelFlag</zorder>
-  <zorder>aLabelFlag</zorder>
-  <zorder>xMValueLimit</zorder>
-  <zorder>yMValueLimit</zorder>
-  <zorder>wMValueLimit</zorder>
  </widget>
  <resources/>
  <connections>

@@ -4,3 +4,4 @@ moc_*.h
 moc_*.hpp
 sinoedm
 sinoedm.pro.user
+ui_*

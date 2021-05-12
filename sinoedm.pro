@@ -43,6 +43,8 @@ SOURCES += \
     EDM/EDM_OP_List.cpp \
     EDM/electool.cpp \
     settingdialog.cpp \
+    glwidget.cpp \
+    welcome.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -62,6 +64,8 @@ HEADERS += \
     EDM/electool.h \
     settingdialog.h \
     EDM/initdb.h \
+    glwidget.h \
+    welcome.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
