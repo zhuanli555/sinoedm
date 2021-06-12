@@ -1,3 +1,4 @@
+//
 #include "alarmsignal.h"
 #include <QTextCodec>
 
@@ -61,6 +62,7 @@ void AlarmSignal::reSort()
     }
 }
 
+//¼à²âÐÅºÅ×´Ì¬
 void AlarmSignal::EdmStatusSignChange()
 {
     static Mac_Status status;
@@ -141,6 +143,7 @@ void AlarmSignal::EdmStatusSignChange()
     }
 }
 
+//ÊÖºÐ¿ØÖÆ
 void AlarmSignal::edmHandProcess()
 {
     if (!m_stEntileStatus.bOpIn && !m_stEntileStatus.bRTzero)

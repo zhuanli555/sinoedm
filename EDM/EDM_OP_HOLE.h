@@ -71,9 +71,7 @@ protected:
 	void EdmHoleMvCmdProcess();
 private:
 	void SetAllErr();
-	unsigned char EdmHoleRise();
-	unsigned char EdmHoleUp2Safe();
-	unsigned char EdmHoleDownFromSafe();
+    unsigned char EdmHoleRise();
 	unsigned char EdmHoleLocation();
 	unsigned char EdmHoleZeroAdjust();
 	unsigned char EdmHoleZeroAdjust_Sing();

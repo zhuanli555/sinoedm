@@ -103,6 +103,7 @@ MainWindow::~MainWindow()
     macProcessHandle.waitForFinished();
 }
 
+//用户线程
 void MainWindow::MacUserOperate()
 {
     while(!m_quit)

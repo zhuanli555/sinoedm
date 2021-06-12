@@ -134,6 +134,7 @@ QString CoordWidget::float2QString(float value)
     return str;
 }
 
+//显示轴的位置
 void CoordWidget::ShowAxisData()
 {
     static int iMachPos[MAC_LABEL_COUNT] = {0};
@@ -157,6 +158,7 @@ void CoordWidget::ShowAxisData()
     }
 }
 
+//显示告警状态
 void CoordWidget::ShowMacUserStatus()
 {
     static unsigned long bPosLimit[MAC_LABEL_COUNT] = {0};

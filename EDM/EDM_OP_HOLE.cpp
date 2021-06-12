@@ -1,4 +1,4 @@
-//edm_op_grind.cpp edm_op_grind实现文件
+//edm_op_hole.cpp 加工实现文件
 #include "EDM_OP_HOLE.h"
 #include <math.h>
 
@@ -26,6 +26,7 @@ EDM_OP_HOLE::~EDM_OP_HOLE()
 	m_pEdm = NULL;
 }
 
+//根据加工类型决定加工步骤
 void EDM_OP_HOLE::EdmHoleOpTypeInit()
 {
 	if (!m_ListStage.empty())
@@ -42,11 +43,9 @@ void EDM_OP_HOLE::EdmHoleOpTypeInit()
 	} 
 	else if (m_stOpStatus.enOpType==OP_HOLE_PROGRAME)
 	{
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
-        //m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleUp2Safe);
+        m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleSynchro);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleLocation);
-        //m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleDownFromSafe);
+        m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleLocation);
         m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleZeroAdjust);//电极对零
         m_ListStage.push_back(&EDM_OP_HOLE::EdmHolePrune);//电极修整
         m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleOpPage);//加工
@@ -63,11 +62,9 @@ void EDM_OP_HOLE::EdmHoleOpTypeInit()
 	} 
 	else if (m_stOpStatus.enOpType==OP_HOLE_SIMULATE)
 	{
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
-        //m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleUp2Safe);
+        m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleSynchro);
-		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleLocation);
-        //m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleDownFromSafe);
+        m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleLocation);
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRootSleep);		
 		m_ListStage.push_back(&EDM_OP_HOLE::EdmHoleRise);
 	}
@@ -83,6 +80,7 @@ void EDM_OP_HOLE::EdmHoleOpTypeInit()
 	m_it = m_ListStage.begin();		
 }
 
+//机床暂停/开始
 void EDM_OP_HOLE::EdmOpSetStart(unsigned char bStart)
 {
 	MAC_OPERATE_TYPE enOpType;
@@ -142,7 +140,7 @@ void EDM_OP_HOLE::EdmOpSetStart(unsigned char bStart)
 	}
 }
 
-
+//加工入口
 void EDM_OP_HOLE::EdmOpCarry()
 {
 	if (m_stOpStatus.bStart && !m_stOpStatus.bOpOver)
@@ -196,7 +194,7 @@ void EDM_OP_HOLE::SetAllErr()
 	}
 }
 
-
+//加工结束
 void EDM_OP_HOLE::EdmOpOver()
 {
 	EdmHoleRecover();
@@ -257,7 +255,7 @@ void EDM_OP_HOLE::EdmHoleCarry()
 	m_stOpStatus.stCycle.bCycleStart = m_stOpCtrl.stZeroCtrl.bCycleStart;
 }
 
-
+//运动命令处理
 void EDM_OP_HOLE::EdmHoleCmdProcess()
 {
 	if (m_stOpStatus.iCmdIndex>=m_pOpFile->m_iCmdNum || m_stOpStatus.iCmdIndex<0)
@@ -276,7 +274,7 @@ void EDM_OP_HOLE::EdmHoleCmdProcess()
 		EdmHoleMvCmdProcess();	
 }
 
-
+//暂停命令处理
 void EDM_OP_HOLE::EdmHolePauseProcess()
 {
 	m_stOpStatus.bStart = FALSE;
@@ -285,7 +283,7 @@ void EDM_OP_HOLE::EdmHolePauseProcess()
 	SetEdmHolePower(FALSE,FALSE,FALSE);
 }
 
-
+//结束处理
 void EDM_OP_HOLE::EdmHoleOverProcess()
 {
 	if (m_stOpStatus.enOpType==OP_HOLE_CHECK_C)
@@ -370,100 +368,7 @@ unsigned char EDM_OP_HOLE::EdmHoleRise()
 	return FALSE;
 }
 
-unsigned char EDM_OP_HOLE::EdmHoleUp2Safe()
-{
-    DIGIT_CMD cmd;
-    INFO_PRINT();
-
-	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
-		return FALSE;
-
-	if (m_pEdm->m_stSysSet.iAxistLabel<0 || m_pEdm->m_stSysSet.iAxistLabel>=MAC_LABEL_COUNT)
-	{
-		return TRUE;
-	}
-
-	if (m_stOpCtrl.stZeroCtrl.bStageLast)
-	{
-		m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
-
-		return TRUE;
-	}
-
-    if (!m_stOpCtrl.stZeroCtrl.bStageLast && m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel==6)
-	{	
-        memset(&cmd,0,sizeof(DIGIT_CMD));
-        cmd.enAim = AIM_G90;
-        cmd.enCoor = m_pOpFile->m_enCoor;
-        cmd.enOrbit = ORBIT_G01;
-        cmd.iFreq = MAC_INT_FREQ;
-        cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.iAxistLabel;
-        cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_pEdm->mp_ElecMan[m_pOpFile->m_sFile].stElecOral.iSafePos;
-        cmd.iAxisCnt++;
-        if (m_pEdm->EdmSendMovePara(&cmd))
-        {
-            m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-        }
-	}
-	else
-	{
-        m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-	}
-	return FALSE;
-}
-
-
-unsigned char EDM_OP_HOLE::EdmHoleDownFromSafe()
-{
-	DIGIT_CMD cmd;
-    INFO_PRINT();
-
-	if (m_pEdm->m_stEdmComm.enMvStatus != RULE_MOVE_OVER)
-		return FALSE;
-
-	if (m_pEdm->m_stSysSet.iAxistLabel<0 || m_pEdm->m_stSysSet.iAxistLabel>=MAC_LABEL_COUNT)
-	{
-		if (m_stOpCtrl.stZeroCtrl.bEmptyMove)
-        {
-			CycleOver();
-		}
-		return TRUE;
-	}
-
-	if (m_stOpCtrl.stZeroCtrl.bStageLast)
-	{
-        m_stOpCtrl.stZeroCtrl.bStageLast = FALSE;
-		if (m_stOpCtrl.stZeroCtrl.bEmptyMove)
-		{
-            INFO_PRINT();
-			CycleOver();
-		}		
-		return TRUE;
-	}
-
-    if (!m_stOpCtrl.stZeroCtrl.bStageLast && m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel==6)
-    {
-
-        memset(&cmd,0,sizeof(DIGIT_CMD));
-        cmd.enAim = AIM_G90;
-        cmd.enCoor = m_pOpFile->m_enCoor;
-        cmd.enOrbit = ORBIT_G01;
-        cmd.iFreq = m_iWholeFreq;
-        cmd.stAxisDigit[cmd.iAxisCnt].iLabel = m_pEdm->m_stSysSet.iAxistLabel;
-        cmd.stAxisDigit[cmd.iAxisCnt].iDistance = m_iSafeLabelMacPos - m_pEdm->m_stEdmComm.stMoveCtrlComm[ m_pEdm->m_stSysSet.iAxistLabel].iWorkPosSet;
-        cmd.iAxisCnt++;
-        if (m_pEdm->EdmSendMovePara(&cmd))
-        {
-            m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-        }
-    }
-	else
-	{
-        m_stOpCtrl.stZeroCtrl.bStageLast = TRUE;
-	}
-	return FALSE;
-}
-
+//确认孔位
 unsigned char EDM_OP_HOLE::EdmHoleLocation()
 {
     DIGIT_CMD cmd2Send;
@@ -660,6 +565,7 @@ unsigned char EDM_OP_HOLE::EdmHoleZeroAdjust()
 			stElec.iServo = 75;
             stElec.iShake = 300;
             stElec.iShakeSense = 50;
+            //TODO
 			m_pEdm->WriteElecPara(&stElec,"EdmHoleZeroAdjust");
 
             m_stOpCtrl.iWaitCnt = EDM_OP_WAIT_COUNT;
@@ -853,7 +759,7 @@ unsigned char EDM_OP_HOLE::EdmHoleOpPage()
 	return FALSE;
 }
 
-
+//铣削加工
 unsigned char EDM_OP_HOLE::EdmHoleMillPage()
 {
 	int iSum =0;
@@ -1313,7 +1219,7 @@ void EDM_OP_HOLE::EdmHoleRecover()
     m_pEdm->EdmSetProtect(TRUE);
 }
 
-
+//设置高频和反修
 void EDM_OP_HOLE::SetEdmHolePower(unsigned char bPower,unsigned char bPrune,unsigned char bOtherClose)
 {
 	unsigned char bLowPump = FALSE;
@@ -1369,6 +1275,7 @@ unsigned char EDM_OP_HOLE::ExteedTimeAlarm()
 	return FALSE;
 }
 
+//电极余长
 unsigned char EDM_OP_HOLE::PoleLenAlarm()
 {
 	int iLabel = m_pEdm->m_stSysSet.stSetNoneLabel.iOpLabel;

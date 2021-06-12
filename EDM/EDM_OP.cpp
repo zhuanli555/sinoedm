@@ -1,4 +1,4 @@
-//edm_op.cpp edm_op实现文件
+//edm_op.cpp 加工实现基类文件
 #include "EDM_OP.h"
 #include <math.h>
 

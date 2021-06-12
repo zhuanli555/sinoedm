@@ -1,4 +1,4 @@
-//EDM_Db.cpp EDM_Db实现文件
+//EDM_Db.cpp 数据库实现文件
 
 #include "EDM_Db.h"
 #include "cmdhandle.h"
@@ -6,7 +6,7 @@
 EDM_Db::EDM_Db()
 {
 }
-
+//从数据库获取螺补数据
 void EDM_Db::GetAxisLuoBuData(char cSymbol, int iVal[], int nCount)
 {
 #ifdef SQL	
@@ -44,6 +44,7 @@ void EDM_Db::GetAxisLuoBuData(char cSymbol, int iVal[], int nCount)
 #endif
 }
 
+//获取轴的参数（机械位置和方向）
 void EDM_Db::GetEdmCommPara(MAC_COMMON *pComm, int iWorkIndex)
 {
     int i = 0;
@@ -84,6 +85,7 @@ void EDM_Db::SaveEdmWorkSet(int iWorkIndex, int a[][6])
     }
 }
 
+//获取机床参数
 void EDM_Db::GetEdmKpIntPara(MAC_KPINT *pInt, MAC_SYSTEM_SET *pSet)
 {
 	int i = 0;
@@ -164,6 +166,7 @@ void EDM_Db::SaveWorkPosSetIndex(int iIndex)
     q.exec(str);
 }
 
+//获取坐标系
 void EDM_Db::GetAllCoor(int a[][6])
 {
 	int i = 0;
@@ -203,6 +206,7 @@ void EDM_Db::SaveOpName(QString strName)
     q.exec(str);
 }
 
+//获取电参数
 void EDM_Db::GetElecMan(MAP_ELEC_MAN* pElecMan)
 {
     QString strTmp,sql;

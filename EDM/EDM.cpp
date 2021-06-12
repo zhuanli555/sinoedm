@@ -9,7 +9,7 @@
 
 #define INTERFACE_HANDWHEEL_IN_FIRST 0x1D0    //手轮所在接口，轴及速率,0x310
 #define INTERFACE_HANDWHEEL_IN_SECOND 0x1D2   //手轮所在接口，脉冲,0x312
-//#define EDM_DEBUG
+#define EDM_DEBUG
 EDM* EDM::m_pEdm = NULL;
 QString EDM::m_strElecDefault="DEFAULT";
 QMutex EDM::mutex;
